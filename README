@@ -1,0 +1,24 @@
+COMMON
+~~~~~~
+
+libdlna aims at being the reference open-source implementation
+of DLNA (Digital Living Network Alliance) standards.
+Its primary goal is to provide DLNA support to uShare, an embedded UPnP A/V
+Media Server, but will be used to build both DLNA servers and players.
+
+libdlna relies on FFMPEG librairies (libavformat and libavcodec)
+to handle and demux A/V streams.
+
+DEVELOPERS
+~~~~~~~~~~
+
+Build using traditional ./configure && make commands.
+Try ./configure --help for list of available build options.
+
+libplayer uses GNU Coding Standards as default indentation and code style.
+Please always conform to this standard before applying your changes.
+
+AUTHORS
+~~~~~~~
+
+Benjamin Zores <ben@geexbox.org>
