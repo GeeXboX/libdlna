@@ -15,7 +15,7 @@ DEVELOPERS
 Build using traditional ./configure && make commands.
 Try ./configure --help for list of available build options.
 
-libplayer uses GNU Coding Standards as default indentation and code style.
+libdlna uses GNU Coding Standards as default indentation and code style.
 Please always conform to this standard before applying your changes.
 
 AUTHORS

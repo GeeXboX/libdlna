@@ -265,10 +265,10 @@ else
     TMPDIR1="/tmp"
 fi
 
-TMPC="${TMPDIR1}/libplayer-${RANDOM}-$$-${RANDOM}.c"
-TMPO="${TMPDIR1}/libplayer-${RANDOM}-$$-${RANDOM}.o"
-TMPE="${TMPDIR1}/libplayer-${RANDOM}-$$-${RANDOM}"
-TMPS="${TMPDIR1}/libplayer-${RANDOM}-$$-${RANDOM}.S"
+TMPC="${TMPDIR1}/libdlna-${RANDOM}-$$-${RANDOM}.c"
+TMPO="${TMPDIR1}/libdlna-${RANDOM}-$$-${RANDOM}.o"
+TMPE="${TMPDIR1}/libdlna-${RANDOM}-$$-${RANDOM}"
+TMPS="${TMPDIR1}/libdlna-${RANDOM}-$$-${RANDOM}.S"
 
 CONFIGFILE="config.mak"
 
@@ -571,7 +571,7 @@ check_lib ffmpeg/avcodec.h avcodec_register_all -lavcodec || die "Error, can't f
 #   logging result
 #################################################
 echolog ""
-echolog "libplayer: configure is OK"
+echolog "libdlna: configure is OK"
 echolog "configuration:"
 echolog "  install prefix     $PREFIX"
 echolog "  C compiler         $cc"
