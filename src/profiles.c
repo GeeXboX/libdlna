@@ -30,6 +30,7 @@ static dlna_registered_profile_t *first_profile = NULL;
 extern dlna_registered_profile_t dlna_profile_image_jpeg;
 extern dlna_registered_profile_t dlna_profile_image_png;
 extern dlna_registered_profile_t dlna_profile_audio_ac3;
+extern dlna_registered_profile_t dlna_profile_audio_amr;
 extern dlna_registered_profile_t dlna_profile_audio_mp3;
 
 static void
@@ -54,6 +55,7 @@ dlna_register_all_media_profiles (void)
   dlna_register_profile (&dlna_profile_image_jpeg);
   dlna_register_profile (&dlna_profile_image_png);
   dlna_register_profile (&dlna_profile_audio_ac3);
+  dlna_register_profile (&dlna_profile_audio_amr);
   dlna_register_profile (&dlna_profile_audio_mp3);
 }
 
@@ -70,6 +72,9 @@ dlna_register_media_profile (dlna_media_profile_t profile)
     break;
   case DLNA_PROFILE_AUDIO_AC3:
     dlna_register_profile (&dlna_profile_audio_ac3);
+    break;
+  case DLNA_PROFILE_AUDIO_AMR:
+    dlna_register_profile (&dlna_profile_audio_amr);
     break;
   case DLNA_PROFILE_AUDIO_MP3:
     dlna_register_profile (&dlna_profile_audio_mp3);

@@ -6,6 +6,7 @@ SRCS =  profiles.c \
 	image_jpeg.c \
 	image_png.c \
 	audio_ac3.c \
+	audio_amr.c \
 	audio_mp3.c \
 
 CFLAGS += -fPIC
