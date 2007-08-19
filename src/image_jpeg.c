@@ -26,6 +26,7 @@
 #include "profiles.h"
 #include "image.h"
 
+#define JPEG_KNOWN_EXTENSIONS "jpg,jpe,jpeg"
 #define JPEG_MIME_TYPE "image/jpeg"
 
 /* Profile for image media class content of small resolution */
@@ -75,12 +76,9 @@ probe_jpeg (AVFormatContext *ctx)
 {
   AVStream *stream;
   AVCodecContext *codec;
-  char *ext;
-  
-  ext = get_file_extension (ctx->filename);
-  if (strcasecmp (ext, "jpg")
-      && strcasecmp (ext, "jpe")
-      && strcasecmp (ext, "jpeg"))
+
+  /* check for valid file extension */
+  if (!match_file_extension (ctx->filename, JPEG_KNOWN_EXTENSIONS))
     return NULL;
 
   /* should only have 1 stream */

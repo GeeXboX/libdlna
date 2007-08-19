@@ -26,6 +26,7 @@
 #include "profiles.h"
 #include "image.h"
 
+#define PNG_KNOWN_EXTENSIONS "png"
 #define PNG_MIME_TYPE "image/png"
 
 /* Profile for image thumbnails */
@@ -61,10 +62,9 @@ probe_png (AVFormatContext *ctx)
 {
   AVStream *stream;
   AVCodecContext *codec;
-  char *ext;
-  
-  ext = get_file_extension (ctx->filename);
-  if (strcasecmp (ext, "png"))
+
+  /* check for valid file extension */
+  if (!match_file_extension (ctx->filename, PNG_KNOWN_EXTENSIONS))
     return NULL;
 
   /* should only have 1 stream */

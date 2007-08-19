@@ -25,6 +25,7 @@
 #include "dlna.h"
 #include "profiles.h"
 
+#define MP3_KNOWN_EXTENSIONS "mp3"
 #define MP3_MIME_TYPE "audio/mpeg"
 #define MP3_LABEL "2-ch"
 
@@ -49,11 +50,9 @@ probe_mp3 (AVFormatContext *ctx)
 {
   AVStream *stream;
   AVCodecContext *codec;
-  char *ext;
   
   /* check for valid file extension */
-  ext = get_file_extension (ctx->filename);
-  if (strcasecmp (ext, "mp3"))
+  if (!match_file_extension (ctx->filename, MP3_KNOWN_EXTENSIONS))
     return NULL;
 
   /* should only have 1 stream */

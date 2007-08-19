@@ -25,6 +25,7 @@
 #include "dlna.h"
 #include "profiles.h"
 
+#define AC3_KNOWN_EXTENSIONS "ac3"
 #define AC3_MIME_TYPE "audio/vnd.dolby.dd-raw"
 #define AC3_LABEL "2-ch multi"
 
@@ -40,11 +41,9 @@ probe_ac3 (AVFormatContext *ctx)
 {
   AVStream *stream;
   AVCodecContext *codec;
-  char *ext;
   
   /* check for valid file extension */
-  ext = get_file_extension (ctx->filename);
-  if (strcasecmp (ext, "ac3"))
+  if (!match_file_extension (ctx->filename, AC3_KNOWN_EXTENSIONS))
     return NULL;
 
   /* should only have 1 stream */

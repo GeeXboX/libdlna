@@ -25,6 +25,7 @@
 #include "dlna.h"
 #include "profiles.h"
 
+#define AMR_KNOWN_EXTENSIONS "amr,3gp,mp4"
 #define AMR_MIME_TYPE "audio/mp4"
 #define THREE_GPP_MIME_TYPE "audio/3gpp"
 #define MONO_LABEL "mono"
@@ -56,13 +57,9 @@ probe_amr (AVFormatContext *ctx)
 {
   AVStream *stream;
   AVCodecContext *codec;
-  char *ext;
   
   /* check for valid file extension */
-  ext = get_file_extension (ctx->filename);
-  if (strcasecmp (ext, "amr")
-      && strcasecmp (ext, "3gp")
-      && strcasecmp (ext, "mp4"))
+  if (!match_file_extension (ctx->filename, AMR_KNOWN_EXTENSIONS))
     return NULL;
 
   /* should only have 1 stream */
@@ -98,7 +95,7 @@ probe_amr (AVFormatContext *ctx)
     case 7950:
     case 10200:
     case 12200:
-      if (!strcasecmp (ext, "3gp"))
+      if (!strcasecmp (get_file_extension (ctx->filename), "3gp"))
         return set_profile (&three_gpp);
       else
         return set_profile (&amr);
