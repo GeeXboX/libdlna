@@ -75,11 +75,6 @@ probe_mp3 (AVFormatContext *ctx)
   if (codec->channels > 2)
     return NULL;
 
-  if (codec->sample_rate != 32000 &&
-      codec->sample_rate != 44100 &&
-      codec->sample_rate != 48000)
-    return NULL;
-
   switch (codec->sample_rate)
   {
   case 16000:
