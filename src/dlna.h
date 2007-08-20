@@ -129,5 +129,11 @@ void dlna_register_all_media_profiles (void);
 void dlna_register_media_profile (dlna_media_profile_t profile);
 
 dlna_profile_t *dlna_guess_media_profile (const char *filename);
+char * dlna_write_protocol_info (dlna_protocol_info_type_t type,
+                                 dlna_org_play_speed_t speed,
+                                 dlna_org_conversion_t ci,
+                                 dlna_org_operation_t op,
+                                 dlna_org_flags_t flags,
+                                 dlna_profile_t *p);
 
 #endif /* _DLNA_H_ */
