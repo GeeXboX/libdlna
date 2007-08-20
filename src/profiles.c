@@ -192,3 +192,44 @@ set_profile (dlna_profile_t *profile)
   memcpy (p, profile, sizeof (*profile));
   return p;
 }
+
+AVCodecContext *
+audio_profile_get_codec (AVFormatContext *ctx)
+{
+  AVStream *stream = NULL;
+  AVCodecContext *codec = NULL;
+  int i;
+  
+  /* check there is no video stream in container
+   (otherwise it would be part of AV profile) */
+  for (i = 0; i < ctx->nb_streams; i++)
+  {
+    stream = ctx->streams[i];
+    if (!stream)
+      return NULL;
+    
+    codec = stream->codec;
+    if (!codec)
+      return NULL;
+
+    if (codec->codec_type == CODEC_TYPE_VIDEO)
+      return NULL;
+  }
+
+  /* find first audio stream */
+  for (i = 0; i < ctx->nb_streams; i++)
+  {
+    stream = ctx->streams[i];
+    if (!stream)
+      return NULL;
+    
+    codec = stream->codec;
+    if (!codec)
+      return NULL;
+
+    if (codec->codec_type == CODEC_TYPE_AUDIO)
+      break;
+  }
+
+  return codec;
+}

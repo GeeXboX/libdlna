@@ -172,10 +172,8 @@ static dlna_profile_t bsac_mult5_iso __attribute__ ((unused)) = {
 static dlna_profile_t *
 probe_mpeg4 (AVFormatContext *ctx)
 {
-  AVStream *stream = NULL;
   AVCodecContext *codec = NULL;
   int adts = 0;
-  int i;
   
   /* check for valid file extension */
   if (!match_file_extension (ctx->filename, MPEG4_KNOWN_EXTENSIONS))
@@ -184,30 +182,7 @@ probe_mpeg4 (AVFormatContext *ctx)
   if (!strcasecmp (get_file_extension (ctx->filename), "aac"))
     adts = 1;
 
-  /* check there is no video stream in container */
-  for (i = 0; i < ctx->nb_streams; i++)
-  {
-    AVStream *s;
-    AVCodecContext *c;
-
-    s = ctx->streams[i];
-    c = s->codec;
-
-    if (c->codec_type == CODEC_TYPE_VIDEO)
-      return NULL;
-  }
-
-  /* find first audio stream */
-  for (i = 0; i < ctx->nb_streams; i++)
-  {
-    stream = ctx->streams[i];
-    if (stream)
-      codec = stream->codec;
-
-    if (codec && codec->codec_type == CODEC_TYPE_AUDIO)
-      break;
-  }
-
+  codec = audio_profile_get_codec (ctx);
   if (!codec)
     return NULL;
   
