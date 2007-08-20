@@ -25,7 +25,7 @@
 #include "dlna.h"
 #include "profiles.h"
 
-#define ATRAC3_KNOWN_EXTENSIONS "acm,wav"
+#define ATRAC3_KNOWN_EXTENSIONS "at3p,acm,wav"
 #define ATRAC3_MIME_TYPE "audio/x-sony-oma"
 #define ATRAC3_LABEL "2-ch multi"
 
