@@ -34,6 +34,7 @@ extern dlna_registered_profile_t dlna_profile_audio_amr;
 extern dlna_registered_profile_t dlna_profile_audio_atrac3;
 extern dlna_registered_profile_t dlna_profile_audio_lpcm;
 extern dlna_registered_profile_t dlna_profile_audio_mp3;
+extern dlna_registered_profile_t dlna_profile_audio_mpeg4;
 
 static void
 dlna_register_profile (dlna_registered_profile_t *profile)
@@ -61,6 +62,7 @@ dlna_register_all_media_profiles (void)
   dlna_register_profile (&dlna_profile_audio_atrac3);
   dlna_register_profile (&dlna_profile_audio_lpcm);
   dlna_register_profile (&dlna_profile_audio_mp3);
+  dlna_register_profile (&dlna_profile_audio_mpeg4);
 }
 
 void
@@ -88,6 +90,9 @@ dlna_register_media_profile (dlna_media_profile_t profile)
     break;
   case DLNA_PROFILE_AUDIO_MP3:
     dlna_register_profile (&dlna_profile_audio_mp3);
+    break;
+  case DLNA_PROFILE_AUDIO_MPEG4:
+    dlna_register_profile (&dlna_profile_audio_mpeg4);
     break;
   default:
     break;
