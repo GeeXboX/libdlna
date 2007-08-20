@@ -39,22 +39,14 @@ static dlna_profile_t atrac3 = {
 static dlna_profile_t *
 probe_atrac3 (AVFormatContext *ctx)
 {
-  AVStream *stream;
   AVCodecContext *codec;
   
   /* check for valid file extension */
   if (!match_file_extension (ctx->filename, ATRAC3_KNOWN_EXTENSIONS))
     return NULL;
 
-  /* should only have 1 stream */
-  if (ctx->nb_streams > 1)
-    return NULL;
-
-  stream = ctx->streams[0];
-  codec = stream->codec;
-  
-  /* which obviously should be an audio one */
-  if (codec->codec_type != CODEC_TYPE_AUDIO)
+  codec = audio_profile_get_codec (ctx);
+  if (!codec)
     return NULL;
 
   /* check for ATRAC3 codec */

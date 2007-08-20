@@ -39,7 +39,6 @@ static dlna_profile_t lpcm = {
 static dlna_profile_t *
 probe_lpcm (AVFormatContext *ctx)
 {
-  AVStream *stream;
   AVCodecContext *codec;
   dlna_profile_t *p;
   char mime[128];
@@ -48,15 +47,8 @@ probe_lpcm (AVFormatContext *ctx)
   if (!match_file_extension (ctx->filename, LPCM_KNOWN_EXTENSIONS))
     return NULL;
 
-  /* should only have 1 stream */
-  if (ctx->nb_streams > 1)
-    return NULL;
-
-  stream = ctx->streams[0];
-  codec = stream->codec;
-  
-  /* which obviously should be an audio one */
-  if (codec->codec_type != CODEC_TYPE_AUDIO)
+  codec = audio_profile_get_codec (ctx);
+  if (!codec)
     return NULL;
 
   /* check for 16-bit signed network-endian PCM codec  */
