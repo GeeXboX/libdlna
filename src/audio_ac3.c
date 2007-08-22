@@ -49,10 +49,6 @@ probe_ac3 (AVFormatContext *ctx)
   if (!codec)
     return NULL;
   
-  /* which obviously should be an audio one */
-  if (codec->codec_type != CODEC_TYPE_AUDIO)
-    return NULL;
-
   /* check for AC3 codec */
   if (codec->codec_id != CODEC_ID_AC3)
     return NULL;
