@@ -31,9 +31,17 @@ typedef struct dlna_registered_profile_s {
   struct dlna_registered_profile_s *next;
 } dlna_registered_profile_t;
 
+typedef struct av_codecs_s {
+  AVStream *as;
+  AVCodecContext *ac;
+  AVStream *vs;
+  AVCodecContext *vc;
+} av_codecs_t;
+
 char * get_file_extension (const char *filename);
 int match_file_extension (const char *filename, const char *extensions);
 dlna_profile_t *set_profile (dlna_profile_t *profile);
 AVCodecContext * audio_profile_get_codec (AVFormatContext *ctx);
+av_codecs_t *av_profile_get_codecs (AVFormatContext *ctx);
 
 #endif /* _PROFILES_H_ */

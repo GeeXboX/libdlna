@@ -36,6 +36,7 @@ extern dlna_registered_profile_t dlna_profile_audio_lpcm;
 extern dlna_registered_profile_t dlna_profile_audio_mp3;
 extern dlna_registered_profile_t dlna_profile_audio_mpeg4;
 extern dlna_registered_profile_t dlna_profile_audio_wma;
+extern dlna_registered_profile_t dlna_profile_av_mpeg1;
 
 static void
 dlna_register_profile (dlna_registered_profile_t *profile)
@@ -65,6 +66,7 @@ dlna_register_all_media_profiles (void)
   dlna_register_profile (&dlna_profile_audio_mp3);
   dlna_register_profile (&dlna_profile_audio_mpeg4);
   dlna_register_profile (&dlna_profile_audio_wma);
+  dlna_register_profile (&dlna_profile_av_mpeg1);
 }
 
 void
@@ -98,6 +100,9 @@ dlna_register_media_profile (dlna_media_profile_t profile)
     break;
   case DLNA_PROFILE_AUDIO_WMA:
     dlna_register_profile (&dlna_profile_audio_wma);
+    break;
+  case DLNA_PROFILE_AV_MPEG1:
+    dlna_register_profile (&dlna_profile_av_mpeg1);
     break;
   default:
     break;
@@ -237,6 +242,66 @@ audio_profile_get_codec (AVFormatContext *ctx)
   }
 
   return codec;
+}
+
+av_codecs_t *
+av_profile_get_codecs (AVFormatContext *ctx)
+{
+  AVStream *stream = NULL;
+  AVCodecContext *codec = NULL;
+  av_codecs_t *codecs = NULL;
+  int i;
+ 
+  codecs = malloc (sizeof (av_codecs_t));
+  
+  /* find first audio stream */
+  for (i = 0; i < ctx->nb_streams; i++)
+  {
+    stream = ctx->streams[i];
+    if (!stream)
+      goto av_profile_get_codecs_end;
+    
+    codec = stream->codec;
+    if (!codec)
+      goto av_profile_get_codecs_end;
+
+    if (codec->codec_type == CODEC_TYPE_AUDIO)
+    {
+      codecs->as = stream;
+      codecs->ac = codec;
+      break;
+    }
+  }
+
+  /* find first video stream */
+  for (i = 0; i < ctx->nb_streams; i++)
+  {
+    stream = ctx->streams[i];
+    if (!stream)
+      goto av_profile_get_codecs_end;
+    
+    codec = stream->codec;
+    if (!codec)
+      goto av_profile_get_codecs_end;
+
+    if (codec->codec_type == CODEC_TYPE_VIDEO)
+    {
+      codecs->vs = stream;
+      codecs->vc = codec;
+      break;
+    }
+  }
+
+  /* check for at least one video stream and one audio stream in container */
+  if (!codecs->ac || !codecs->vc)
+    goto av_profile_get_codecs_end;
+  
+  return codecs;
+
+ av_profile_get_codecs_end:
+  if (codecs)
+    free (codecs);
+  return NULL;
 }
 
 char *

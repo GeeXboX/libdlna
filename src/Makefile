@@ -12,6 +12,7 @@ SRCS =  profiles.c \
 	audio_mp3.c \
 	audio_mpeg4.c \
 	audio_wma.c \
+	av_mpeg1.c \
 
 CFLAGS += -fPIC
 
