@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+  <!--
+      This web site is (c) 2007 Zores Benjamin
+      HomePage for the libdlna: reference open source DLNA standards implementation (http://libdlna.geexbox.org/)
+      Feel free to get inspiration from this site, as long as you leave this comment here.
+    -->
+  <head>
+    <title>GeeXboX libdlna HomePage</title>
+    <meta http-equiv="Content-language" content="en"/>
+    <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=ISO-8859-1"/>
+    <meta name="description" content="GeeXboX libdlna Homepage : reference open source DLNA standards implementation"/>
+
+    <meta name="dc.description" content="GeeXboX libdlna Homepage : reference open source DLNA standards implementation"/>
+    <meta name="dc.subject" content="GeeXboX libdlna Homepage : reference open source DLNA standards implementation"/>
+    <meta name="dc.title" content="GeeXboX libdlna Homepage"/>
+    <meta name="author" content="Benjamin Zores"/>
+    <meta name="robots" content="index, follow"/>
+    <meta name="keywords" content="computer, OS, Linux, UPnP, MediaServer, A/V, DLNA, embedded, multimedia, HTPC, home, theater, movie, audio, video, media, standalone, free, software, open, source, h264, avc, mpeg, mp3, atrac, lpcm, ac3, PC, libdlna, geexbox, geexbox.org"/>
+    <style type="text/css">
+      body { margin: 10px; padding: 0; font : 0.8em Verdana,Arial,Helvetica,sans-serif; }
+      pre { font-size : 1.1em; background-color: rgb(220, 220, 220); padding: 2ex 6ex; border: 1px solid #ccc;}
+      h1 { text-align: center; margin-bottom: 2em; }
+      h2 { margin-top: 1em; border-bottom: 2px solid #ccc; }
+      h3 { }
+      dl.list { margin-left: 2em; }
+      dt { font-weight: bold; }
+      dd { margin-bottom: 1ex; }
+      li { list-style-type: square; }
+    </style>
+  </head>
+  <body>
+    <h1>
+      <tt>GeeXboX libdlna</tt><br/>
+      Reference DLNA open-source implementation for Linux
+    </h1>
+
+    <h2>Introduction</h2>
+    <p>
+      libdlna aims at being the reference open-source implementation
+of DLNA (Digital Living Network Alliance) standards. Its primary goal is to provide DLNA support to <a href="http://ushare.geexbox.org/">uShare</a>, an embedded DLNA &amp; UPnP A/V Media Server, but it will be used to build both DLNA servers and players in the long term.<br/>
+      <br/>
+      libdlna is written in C and relies on FFMPEG librairies (libavformat and libavcodec) to handle and demux A/V streams. You still need <a href="http://pupnp.sourceforge.net/">libupnp</a> to provide basic UPnP support to your project.<br/>
+      <br/>
+      libdlna is based on official DLNA specifications and aims at a providing a complete respect of the defined standards. Right now, libdlna can be used to build compliant DLNA Media Servers.<br/>
+      <br/>
+      libdlna is free software - it is licensed under the terms of the <a href="http://www.gnu.org/copyleft/lgpl.html">GNU Lesser General Public License</a> (LGPL).
+    </p>
+
+    <h2>Latest News</h2>
+    <div>
+      libdlna is work in progress right now. If you're interested in its development, you're highly welcomed to join in.<br/>
+      libdlna has been tested successfully with Sony PlayStation 3.<br/>
+      <br />
+      Currently supported DLNA profiles:
+      <ul>
+	<li>Image: JPEG, PNG</li>
+	<li>Audio: AC3, AMR, ATRAC3, LPCM, MP3, MPEG-4, WMA</li>
+	<li>AV: MPEG-1, MPEG-2</li>
+      </ul>
+    </div>
+
+    <h2>Copyright and License</h2>
+    <div>
+      libdlna is copyright (C) 2007 Benjamin Zores.<br/>
+      <br/>
+      This program is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.<br/>
+      <br/>
+      This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.<br/>
+      <br/>
+      You should have received a copy of the GNU Lesser General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+    </div>
+
+    <h2>Download</h2>
+    <p>
+      There's no official public release right now.<br/>
+    </p>
+    <dl>
+      <dt>Development Tree</dt>
+      <dd>
+      The latest libdlna development tree can be grabbed using <a href="http://www.selenic.com/mercurial/">Mercurial</a>, a revision control system, similar in purpose to tools such as CVS, SCCS, and Subversion. It is used to keep track of the changes made to a source tree and to help programmers combine and otherwise manipulate changes made by multiple people or at different times.<br/>
+      <br/>
+      There are currently 2 ways of accessing the Mercurial tree: via command-line or web interface (to just have a look to some changes on a specific file, for example). You can directly access to the web interface with your browser from:<br/>
+      <br/>
+      <a href="http://hg.geexbox.org/libdlna/">libdlna Mercurial</a><br/>
+      <br/>
+      In order to access to Mercurial via command line, create and enter a new directory and do the following (be sure that you have installed the mercurial package).<br/>
+      <ul>
+        <li>To get a local copy of the libdlna Mercurial repository :
+          <pre class="code">hg clone http://hg.geexbox.org/libdlna</pre>
+        </li>
+        <li>To update your local copy of the Mercurial, synchronizing with our server :
+          <pre class="code">hg pull -u</pre>
+        </li>
+      </ul>
+      </dd>
+    </dl>
+
+    <h2>Feedback</h2>
+    <p>
+      The author of libdlna and this document, <i>Benjamin Zores</i>, can be contacted by <a href="mailto:ben@geexbox.org">e-mail</a>.
+    </p>
+    <p>
+      Please send bug reports, suggestions, ideas, comments or patches to : <a href="mailto:ben@geexbox.org">ben@geexbox.org</a>.
+    </p>
+  </body>
+</html>
