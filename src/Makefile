@@ -3,6 +3,7 @@ include ../config.mak
 LIBNAME = libdlna.so
 
 SRCS =  profiles.c \
+	containers.c \
 	image_jpeg.c \
 	image_png.c \
 	audio_ac3.c \

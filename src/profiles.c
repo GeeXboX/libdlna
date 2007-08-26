@@ -24,6 +24,7 @@
 
 #include "dlna.h"
 #include "profiles.h"
+#include "containers.h"
 
 static dlna_registered_profile_t *first_profile = NULL;
 
@@ -140,6 +141,8 @@ dlna_guess_media_profile (const char *filename)
     return NULL;
   }
 
+  stream_get_container (pFormatCtx);
+  
   p = first_profile;
   while (p)
   {
