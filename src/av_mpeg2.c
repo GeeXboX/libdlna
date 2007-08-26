@@ -28,6 +28,7 @@
 
 #include "dlna.h"
 #include "profiles.h"
+#include "containers.h"
 
 #define MPEG2_KNOWN_EXTENSIONS "mpg,mpeg,mpe,m2v,mp2p,mp2t,ts,ps,pes"
 #define MPEG2_MIME_TYPE "video/mpeg"
@@ -35,20 +36,6 @@
 #define MPEG2_LABEL_CIF30 "CIF30"
 #define MPEG2_LABEL_SD "SD"
 #define MPEG2_LABEL_HD "HD"
-
-#define MPEG_PACK_HEADER 0xba
-#define MPEG_TS_SYNC_CODE 0x47
-#define MPEG_TS_PACKET_LENGTH 188
-#define MPEG_TS_PACKET_LENGTH_DLNA 192 /* prepends 4 bytes to TS packet */
-
-typedef enum {
-  MPEG_UNKNOWN_STREAM,
-  MPEG_ELEMENTARY_STREAM,
-  MPEG_PROGRAM_STREAM,
-  MPEG_TRANSPORT_STREAM,
-  MPEG_TRANSPORT_STREAM_DLNA,
-  MPEG_TRANSPORT_STREAM_DLNA_NO_TS,
-} mpeg_stream_type_t;
 
 typedef struct mpeg_ps_es_stream_s {
   int width;
@@ -324,51 +311,6 @@ static dlna_profile_t mpeg_es_ntsc_xac3 = {
   .label = MPEG2_LABEL_SD
 };
 
-static mpeg_stream_type_t
-mpeg_find_container_type (const char *filename)
-{
-  unsigned char buffer[2*MPEG_TS_PACKET_LENGTH_DLNA+1];
-  int fd, i;
-
-  /* read file header */
-  fd = open (filename, O_RDONLY);
-  read (fd, buffer, 2 * MPEG_TS_PACKET_LENGTH_DLNA); 
-  close (fd);
-
-  /* check for MPEG-TS container */
-  for (i = 0; i < MPEG_TS_PACKET_LENGTH; i++)
-  {
-    if (buffer[i] == MPEG_TS_SYNC_CODE)
-    {
-      if (buffer[i + MPEG_TS_PACKET_LENGTH] == MPEG_TS_SYNC_CODE)
-        return MPEG_TRANSPORT_STREAM;
-    }
-  }
-
-  /* check for DLNA specific MPEG-TS container */
-  for (i = 0; i < MPEG_TS_PACKET_LENGTH_DLNA; i++)
-  {
-    if (buffer[i] == MPEG_TS_SYNC_CODE)
-    {
-      if (buffer[i + MPEG_TS_PACKET_LENGTH_DLNA] == MPEG_TS_SYNC_CODE)
-      {
-        if (buffer[i] == 0x00 && buffer [i+1] == 0x00 &&
-            buffer [i+2] == 0x00 && buffer [i+3] == 0x00)
-          return MPEG_TRANSPORT_STREAM_DLNA_NO_TS; /* empty timestamp */
-        else
-          return MPEG_TRANSPORT_STREAM_DLNA; /* valid timestamp */
-      }
-    }
-  }
-
-  /* check for MPEG-PS and MPEG-(P)ES container */
-  if (buffer[0] == 0x00 && buffer[1] == 0x00 && buffer[2] == 0x01)
-    return (buffer[3] == MPEG_PACK_HEADER) ?
-      MPEG_PROGRAM_STREAM : MPEG_ELEMENTARY_STREAM;
-
-  return MPEG_UNKNOWN_STREAM;
-}
-
 static int
 is_mpeg_ps_es_audio_stream_lpcm (AVFormatContext *ctx, av_codecs_t *codecs)
 {
@@ -596,7 +538,7 @@ probe_mpeg_es (AVFormatContext *ctx, av_codecs_t *codecs)
 
 static dlna_profile_t *
 probe_mpeg_ts (AVFormatContext *ctx,
-               av_codecs_t *codecs, mpeg_stream_type_t st)
+               av_codecs_t *codecs, dlna_container_type_t st)
 {
   int xac3 = 0; /* extended AC3 audio */
   int i;
@@ -623,11 +565,11 @@ probe_mpeg_ts (AVFormatContext *ctx,
 
     switch (st)
     {
-    case MPEG_TRANSPORT_STREAM:
+    case CT_MPEG_TRANSPORT_STREAM:
       return set_profile (&mpeg_ts_mp_ll_aac_iso);
-    case MPEG_TRANSPORT_STREAM_DLNA:
+    case CT_MPEG_TRANSPORT_STREAM_DLNA:
       return set_profile (&mpeg_ts_mp_ll_aac_t);
-    case MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
+    case CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
       return set_profile (&mpeg_ts_mp_ll_aac);
     default:
       return NULL;
@@ -651,11 +593,11 @@ probe_mpeg_ts (AVFormatContext *ctx,
         {
           switch (st)
           {
-          case MPEG_TRANSPORT_STREAM:
+          case CT_MPEG_TRANSPORT_STREAM:
             return set_profile (&mpeg_ts_sd_eu_iso);
-          case MPEG_TRANSPORT_STREAM_DLNA:
+          case CT_MPEG_TRANSPORT_STREAM_DLNA:
             return set_profile (&mpeg_ts_sd_eu_t);
-          case MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
+          case CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
             return set_profile (&mpeg_ts_sd_eu);
           default:
             return NULL;
@@ -714,13 +656,13 @@ probe_mpeg_ts (AVFormatContext *ctx,
     {
       switch (st)
       {
-      case MPEG_TRANSPORT_STREAM:
+      case CT_MPEG_TRANSPORT_STREAM:
         return xac3 ? set_profile (&mpeg_ts_sd_na_xac3_iso)
           : set_profile (&mpeg_ts_sd_na_iso);
-      case MPEG_TRANSPORT_STREAM_DLNA:
+      case CT_MPEG_TRANSPORT_STREAM_DLNA:
         return xac3 ? set_profile (&mpeg_ts_sd_na_xac3_t)
           : set_profile (&mpeg_ts_sd_na_t);
-      case MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
+      case CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
         return xac3 ? set_profile (&mpeg_ts_sd_na_xac3)
           : set_profile (&mpeg_ts_sd_na);
       default:
@@ -742,13 +684,13 @@ probe_mpeg_ts (AVFormatContext *ctx,
     {
       switch (st)
       {
-      case MPEG_TRANSPORT_STREAM:
+      case CT_MPEG_TRANSPORT_STREAM:
         return xac3 ? set_profile (&mpeg_ts_hd_na_xac3_iso)
           : set_profile (&mpeg_ts_hd_na_iso);
-      case MPEG_TRANSPORT_STREAM_DLNA:
+      case CT_MPEG_TRANSPORT_STREAM_DLNA:
         return xac3 ? set_profile (&mpeg_ts_hd_na_xac3_t)
           : set_profile (&mpeg_ts_hd_na_t);
-      case MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
+      case CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
         return xac3 ? set_profile (&mpeg_ts_hd_na_xac3)
           : set_profile (&mpeg_ts_hd_na);
       default:
@@ -766,7 +708,7 @@ probe_mpeg2 (AVFormatContext *ctx)
 {
   av_codecs_t *codecs;
   dlna_profile_t *profile = NULL;
-  mpeg_stream_type_t st;
+  dlna_container_type_t st;
   
   /* check for valid file extension */
   if (!match_file_extension (ctx->filename, MPEG2_KNOWN_EXTENSIONS))
@@ -780,21 +722,21 @@ probe_mpeg2 (AVFormatContext *ctx)
   if (codecs->vc->codec_id != CODEC_ID_MPEG2VIDEO)
     goto probe_mpeg2_end;
 
-  st = mpeg_find_container_type (ctx->filename);
+  st = stream_get_container (ctx);
   switch (st)
   {
-  case MPEG_UNKNOWN_STREAM:
-    break;
-  case MPEG_ELEMENTARY_STREAM:
+  case CT_MPEG_ELEMENTARY_STREAM:
     profile = probe_mpeg_es (ctx, codecs);
     break;
-  case MPEG_PROGRAM_STREAM:
+  case CT_MPEG_PROGRAM_STREAM:
     profile = probe_mpeg_ps (ctx, codecs);
     break;
-  case MPEG_TRANSPORT_STREAM:
-  case MPEG_TRANSPORT_STREAM_DLNA:
-  case MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
+  case CT_MPEG_TRANSPORT_STREAM:
+  case CT_MPEG_TRANSPORT_STREAM_DLNA:
+  case CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
     profile = probe_mpeg_ts (ctx, codecs, st);
+    break;
+  default:
     break;
   }
 
