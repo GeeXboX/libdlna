@@ -81,16 +81,19 @@ static wmv9_profile_t wmv9_profile_simple_low[] = {
 
 static wmv9_profile_t wmv9_profile_simple_medium[] = {
   { 240, 176, 30, 1, 384000},
+  { 240, 176, 30000, 1001, 384000},
   { 352, 288, 15, 1, 384000}
 };
 
 static wmv9_profile_t wmv9_profile_main_medium[] = {
   { 720, 480, 30, 1, 10000000},
+  { 720, 480, 30000, 1001, 10000000},
   { 720, 576, 25, 1, 10000000}
 };
 
 static wmv9_profile_t wmv9_profile_main_high[] = {
-  { 1920, 1080, 30, 1, 20000000}
+  { 1920, 1080, 30, 1, 20000000},
+  { 1920, 1080, 30000, 1001, 20000000}
 };
 
 /* Medium resolution video (Main profile at Medium Level)
