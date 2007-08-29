@@ -68,8 +68,8 @@ typedef enum {
 } wmv9_profile_audio_t;
 
 typedef struct wmv9_profile_s {
-  int width;
-  int height;
+  int max_width;
+  int max_height;
   int fps_num;
   int fps_den;
   int max_bitrate;
@@ -173,8 +173,8 @@ is_valid_wmv9_video_profile (wmv9_profile_t profile[], int size,
   int i;
 
   for (i = 0; i < size / sizeof (wmv9_profile_t); i++)
-    if (vc->width == profile[i].width &&
-        vc->height == profile[i].height &&
+    if (vc->width <= profile[i].max_width &&
+        vc->height <= profile[i].max_height &&
         vs->r_frame_rate.num == profile[i].fps_num &&
         vs->r_frame_rate.num == profile[i].fps_den &&
         vc->bit_rate <= profile[i].max_bitrate)
