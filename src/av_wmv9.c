@@ -176,7 +176,7 @@ is_valid_wmv9_video_profile (wmv9_profile_t profile[], int size,
     if (vc->width <= profile[i].max_width &&
         vc->height <= profile[i].max_height &&
         vs->r_frame_rate.num == profile[i].fps_num &&
-        vs->r_frame_rate.num == profile[i].fps_den &&
+        vs->r_frame_rate.den == profile[i].fps_den &&
         vc->bit_rate <= profile[i].max_bitrate)
       return 1;
 
