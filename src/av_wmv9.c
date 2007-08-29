@@ -51,6 +51,7 @@
 
 #include "dlna.h"
 #include "profiles.h"
+#include "containers.h"
 
 #define WMV9_KNOWN_EXTENSIONS "asf,avi,wmv"
 #define WMV9_MIME_TYPE "video/x-ms-wmv"
@@ -255,6 +256,10 @@ probe_wmv9 (AVFormatContext *ctx)
   
   /* check for valid file extension */
   if (!match_file_extension (ctx->filename, WMV9_KNOWN_EXTENSIONS))
+    return NULL;
+
+  /* need to be in ASF container only */
+  if (stream_get_container (ctx) != CT_ASF)
     return NULL;
 
   codecs = av_profile_get_codecs (ctx);
