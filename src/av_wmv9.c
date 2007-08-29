@@ -53,7 +53,7 @@
 #include "profiles.h"
 #include "containers.h"
 
-#define WMV9_KNOWN_EXTENSIONS "asf,avi,wmv"
+#define WMV9_KNOWN_EXTENSIONS "asf,wmv"
 #define WMV9_MIME_TYPE "video/x-ms-wmv"
 #define WMV9_LABEL_SD "SD"
 #define WMV9_LABEL_HD "HD"
