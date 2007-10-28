@@ -1012,29 +1012,6 @@ audio_is_valid_mp3 (AVCodecContext *ac)
 }
 
 static int
-audio_is_valid_ac3 (AVCodecContext *ac)
-{
-  if (!ac)
-    return 0;
-  
-  /* supported channels: 1/0, 2/0, 3/0, 2/1, 3/1, 2/2, 3/2 */
-  if (ac->channels > 5)
-    return 0;
-
-  /* supported sampling rate: 32, 44.1 and 48 kHz */
-  if (ac->sample_rate != 32000 &&
-      ac->sample_rate != 44100 &&
-      ac->sample_rate != 48000)
-    return 0;
-
-  /* supported bitrate: 32 Kbps - 640 Kbps */
-  if (ac->bit_rate < 32000 || ac->bit_rate > 640000)
-    return 0;
-
-  return 1;
-}
-
-static int
 audio_is_valid_g726 (AVCodecContext *ac)
 {
   if (!ac)
