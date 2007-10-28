@@ -973,45 +973,6 @@ audio_is_valid_mp2 (AVCodecContext *ac)
 }
 
 static int
-audio_is_valid_mp3 (AVCodecContext *ac)
-{
-  if (!ac)
-    return 0;
-  
-  /* only mono and stereo are supported */
-  if (ac->channels > 2)
-    return 0;
-
-  if (ac->sample_rate != 32000 &&
-      ac->sample_rate != 44100 &&
-      ac->sample_rate != 48000)
-    return 0;
-  
-  switch (ac->bit_rate)
-  {
-  case 32000:
-  case 40000:
-  case 48000:
-  case 56000:
-  case 64000:
-  case 80000:
-  case 96000:
-  case 112000:
-  case 128000:
-  case 160000:
-  case 192000:
-  case 224000:
-  case 256000:
-  case 320000:
-    return 1;
-  default:
-      return 0;
-  }
-  
-  return 0;
-}
-
-static int
 audio_is_valid_g726 (AVCodecContext *ac)
 {
   if (!ac)

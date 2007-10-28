@@ -44,35 +44,77 @@ static dlna_profile_t mp3x = {
   .label = MP3_LABEL
 };
 
-/* Audio encoding must be MPEG-1 Layer 3 */
-static dlna_profile_t *
-probe_mp3 (AVFormatContext *ctx)
+static int
+audio_is_valid_mp3_common (AVCodecContext *ac)
 {
-  AVCodecContext *codec;
-  
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, MP3_KNOWN_EXTENSIONS))
-    return NULL;
-
-  codec = audio_profile_get_codec (ctx);
-  if (!codec)
-    return NULL;
+  if (!ac)
+    return 0;
 
   /* check for MP3 codec */
-  if (codec->codec_id != CODEC_ID_MP3)
-    return NULL;
+  if (ac->codec_id != CODEC_ID_MP3)
+    return 0;
   
   /* only mono and stereo are supported */
-  if (codec->channels > 2)
-    return NULL;
+  if (ac->channels > 2)
+    return 0;
 
-  switch (codec->sample_rate)
+  return 1;
+}
+
+int
+audio_is_valid_mp3 (AVCodecContext *ac)
+{
+  if (!ac)
+    return 0;
+
+  if (!audio_is_valid_mp3_common (ac))
+    return 0;
+
+  if (ac->sample_rate != 32000 &&
+      ac->sample_rate != 44100 &&
+      ac->sample_rate != 48000)
+    return 0;
+  
+  switch (ac->bit_rate)
   {
-  case 16000:
-  case 22050:
-  case 24000:
-    switch (codec->bit_rate)
-    {
+  case 32000:
+  case 40000:
+  case 48000:
+  case 56000:
+  case 64000:
+  case 80000:
+  case 96000:
+  case 112000:
+  case 128000:
+  case 160000:
+  case 192000:
+  case 224000:
+  case 256000:
+  case 320000:
+    return 1;
+  default:
+      break;
+  }
+  
+  return 0;
+}
+
+int
+audio_is_valid_mp3x (AVCodecContext *ac)
+{
+  if (!ac)
+    return 0;
+
+  if (!audio_is_valid_mp3_common (ac))
+    return 0;
+
+  if (ac->sample_rate != 16000 &&
+      ac->sample_rate != 22050 &&
+      ac->sample_rate != 24000)
+    return 0;
+  
+  switch (ac->bit_rate)
+  {
     case 8000:
     case 16000:
     case 24000:
@@ -90,38 +132,33 @@ probe_mp3 (AVFormatContext *ctx)
     case 224000:
     case 256000:
     case 320000:
-      return set_profile (&mp3x);
-    default:
-      return NULL;
-    }
-    break;
-  case 32000:
-  case 44100:
-  case 48000:
-    switch (codec->bit_rate)
-    {
-    case 32000:
-    case 40000:
-    case 48000:
-    case 56000:
-    case 64000:
-    case 80000:
-    case 96000:
-    case 112000:
-    case 128000:
-    case 160000:
-    case 192000:
-    case 224000:
-    case 256000:
-    case 320000:
-      return set_profile (&mp3);
-    default:
-      return NULL;
-    }
-    break;
+    return 1;
   default:
-    return NULL;
+      break;
   }
+  
+  return 0;
+}
+
+/* Audio encoding must be MPEG-1 Layer 3 */
+static dlna_profile_t *
+probe_mp3 (AVFormatContext *ctx)
+{
+  AVCodecContext *codec;
+  
+  /* check for valid file extension */
+  if (!match_file_extension (ctx->filename, MP3_KNOWN_EXTENSIONS))
+    return NULL;
+
+  codec = audio_profile_get_codec (ctx);
+  if (!codec)
+    return NULL;
+
+  if (audio_is_valid_mp3x (codec))
+    return set_profile (&mp3x);
+
+  if (audio_is_valid_mp3 (codec))
+    return set_profile (&mp3);
   
   return NULL;
 }

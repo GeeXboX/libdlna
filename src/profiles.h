@@ -48,5 +48,7 @@ av_codecs_t *av_profile_get_codecs (AVFormatContext *ctx);
 int audio_is_valid_amr (AVCodecContext *ac);
 int audio_is_valid_amr_wb (AVCodecContext *ac);
 int audio_is_valid_ac3 (AVCodecContext *ac);
+int audio_is_valid_mp3 (AVCodecContext *ac);
+int audio_is_valid_mp3x (AVCodecContext *ac);
 
 #endif /* _PROFILES_H_ */
