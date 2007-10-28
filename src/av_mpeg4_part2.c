@@ -893,29 +893,6 @@ mpeg4_video_get_profile (mpeg4_vcodec_type_t vctype,
 }
 
 static int
-audio_is_valid_mp2 (AVCodecContext *ac)
-{
-  if (!ac)
-    return 0;
-
-  if (ac->codec_id != CODEC_ID_MP2)
-    return 0;
-  
-  if (ac->channels > 5)
-    return 0;
-
-  if (ac->sample_rate != 32000 &&
-      ac->sample_rate != 44100 &&
-      ac->sample_rate != 48000)
-    return 0;
-  
-  if (ac->bit_rate < 32000 || ac->bit_rate > 448000)
-    return 0;
-  
-  return 1;
-}
-
-static int
 audio_is_valid_g726 (AVCodecContext *ac)
 {
   if (!ac)
