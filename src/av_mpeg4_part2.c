@@ -954,32 +954,32 @@ mpeg4_audio_get_profile (AVStream *as, AVCodecContext *ac)
   if (!as || !ac)
     return MPEG4_AUDIO_PROFILE_INVALID;
 
-    if (audio_is_valid_aac_mult5 (ac))
-      return MPEG4_AUDIO_PROFILE_AAC_MULT5;
-    if (audio_is_valid_aac_stereo (ac))
-      return MPEG4_AUDIO_PROFILE_AAC;
+  if (audio_is_valid_aac_mult5 (ac))
+    return MPEG4_AUDIO_PROFILE_AAC_MULT5;
+  if (audio_is_valid_aac_stereo (ac))
+    return MPEG4_AUDIO_PROFILE_AAC;
 
-    if (audio_is_valid_atrac (ac))
-      return MPEG4_AUDIO_PROFILE_ATRAC;
-
-    if (audio_is_valid_amr (ac))
-      return MPEG4_AUDIO_PROFILE_AMR;
-
-    if (audio_is_valid_amr_wb (ac))
-      return MPEG4_AUDIO_PROFILE_AMR_WB;
-
-    if (audio_is_valid_mp2 (ac))
-      return MPEG4_AUDIO_PROFILE_MP2;
-
-    if (audio_is_valid_mp3 (ac))
-      return MPEG4_AUDIO_PROFILE_MP3;
-
-    if (audio_is_valid_ac3 (ac))
-      return MPEG4_AUDIO_PROFILE_AC3;
-
-    if (audio_is_valid_g726 (ac))
-      return MPEG4_AUDIO_PROFILE_G726;
-
+  if (audio_is_valid_atrac (ac))
+    return MPEG4_AUDIO_PROFILE_ATRAC;
+  
+  if (audio_is_valid_amr (ac))
+    return MPEG4_AUDIO_PROFILE_AMR;
+  
+  if (audio_is_valid_amr_wb (ac))
+    return MPEG4_AUDIO_PROFILE_AMR_WB;
+  
+  if (audio_is_valid_mp2 (ac))
+    return MPEG4_AUDIO_PROFILE_MP2;
+  
+  if (audio_is_valid_mp3 (ac))
+    return MPEG4_AUDIO_PROFILE_MP3;
+  
+  if (audio_is_valid_ac3 (ac))
+    return MPEG4_AUDIO_PROFILE_AC3;
+  
+  if (audio_is_valid_g726 (ac))
+    return MPEG4_AUDIO_PROFILE_G726;
+  
   return MPEG4_AUDIO_PROFILE_INVALID;
 }
 
