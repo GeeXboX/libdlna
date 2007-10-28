@@ -892,27 +892,6 @@ mpeg4_video_get_profile (mpeg4_vcodec_type_t vctype,
   return MPEG4_VIDEO_PROFILE_INVALID;
 }
 
-static int
-audio_is_valid_g726 (AVCodecContext *ac)
-{
-  if (!ac)
-    return 0;
-
-  if (ac->codec_id != CODEC_ID_ADPCM_G726)
-    return 0;
-  
-  if (ac->channels != 1)
-    return 0;
-
-  if (ac->sample_rate != 8000)
-    return 0;
-
-  if (ac->bit_rate != 32000)
-    return 0;
-
-  return 1;
-}
-
 static mpeg4_audio_profile_t
 mpeg4_audio_get_profile (AVStream *as, AVCodecContext *ac)
 {

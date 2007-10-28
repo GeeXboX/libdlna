@@ -9,6 +9,7 @@ SRCS =  profiles.c \
 	audio_ac3.c \
 	audio_amr.c \
 	audio_atrac3.c \
+	audio_g726.c \
 	audio_lpcm.c \
 	audio_mp2.c \
 	audio_mp3.c \
