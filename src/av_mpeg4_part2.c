@@ -893,6 +893,18 @@ mpeg4_video_get_profile (mpeg4_vcodec_type_t vctype,
 }
 
 static int
+audio_is_valid_atrac (AVCodecContext *ac)
+{
+  if (!ac)
+    return 0;
+
+  if (ac->codec_id != CODEC_ID_ATRAC3)
+    return 0;
+
+  return 1;
+}
+
+static int
 audio_is_valid_mp2 (AVCodecContext *ac)
 {
   if (!ac)
@@ -953,7 +965,9 @@ mpeg4_audio_get_profile (AVStream *as, AVCodecContext *ac)
     break;
   }
   case CODEC_ID_ATRAC3:
-    return MPEG4_AUDIO_PROFILE_ATRAC;
+    if (audio_is_valid_atrac (ac))
+      return MPEG4_AUDIO_PROFILE_ATRAC;
+    break;
   case CODEC_ID_AMR_NB:
   {
     if (audio_is_valid_amr (ac))
