@@ -897,6 +897,9 @@ audio_is_valid_mp2 (AVCodecContext *ac)
 {
   if (!ac)
     return 0;
+
+  if (ac->codec_id != CODEC_ID_MP2)
+    return 0;
   
   if (ac->channels > 5)
     return 0;
@@ -916,6 +919,9 @@ static int
 audio_is_valid_g726 (AVCodecContext *ac)
 {
   if (!ac)
+    return 0;
+
+  if (ac->codec_id != CODEC_ID_ADPCM_G726)
     return 0;
   
   if (ac->channels != 1)
