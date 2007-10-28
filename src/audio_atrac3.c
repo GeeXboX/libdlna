@@ -36,6 +36,18 @@ static dlna_profile_t atrac3 = {
   .label = ATRAC3_LABEL
 };
 
+int
+audio_is_valid_atrac (AVCodecContext *ac)
+{
+  if (!ac)
+    return 0;
+
+  if (ac->codec_id != CODEC_ID_ATRAC3)
+    return 0;
+
+  return 1;
+}
+
 static dlna_profile_t *
 probe_atrac3 (AVFormatContext *ctx)
 {
@@ -49,11 +61,10 @@ probe_atrac3 (AVFormatContext *ctx)
   if (!codec)
     return NULL;
 
-  /* check for ATRAC3 codec */
-  if (codec->codec_id != CODEC_ID_ATRAC3)
-    return NULL;
+  if (audio_is_valid_atrac (codec))
+    return set_profile (&atrac3);
 
-  return set_profile (&atrac3);
+  return NULL;
 }
 
 dlna_registered_profile_t dlna_profile_audio_atrac3 = {

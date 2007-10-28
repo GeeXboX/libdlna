@@ -893,18 +893,6 @@ mpeg4_video_get_profile (mpeg4_vcodec_type_t vctype,
 }
 
 static int
-audio_is_valid_atrac (AVCodecContext *ac)
-{
-  if (!ac)
-    return 0;
-
-  if (ac->codec_id != CODEC_ID_ATRAC3)
-    return 0;
-
-  return 1;
-}
-
-static int
 audio_is_valid_mp2 (AVCodecContext *ac)
 {
   if (!ac)

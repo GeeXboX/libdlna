@@ -52,5 +52,6 @@ int audio_is_valid_mp3 (AVCodecContext *ac);
 int audio_is_valid_mp3x (AVCodecContext *ac);
 int audio_is_valid_aac_stereo (AVCodecContext *ac);
 int audio_is_valid_aac_mult5 (AVCodecContext *ac);
+int audio_is_valid_atrac (AVCodecContext *ac);
 
 #endif /* _PROFILES_H_ */
