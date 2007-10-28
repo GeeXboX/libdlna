@@ -893,66 +893,6 @@ mpeg4_video_get_profile (mpeg4_vcodec_type_t vctype,
 }
 
 static int
-audio_is_valid_aac (AVCodecContext *ac)
-{
-  if (!ac)
-    return 0;
-  
-  /* TODO: need to check for HE-AAC, LTP and BSAC */
-
-  /* supported sampling rate:
-     8, 11.025, 12, 16, 22.05, 24, 32, 44.1 and 48 kHz */
-  if (ac->sample_rate != 8000 &&
-      ac->sample_rate != 11025 &&
-      ac->sample_rate != 12000 &&
-      ac->sample_rate != 16000 &&
-      ac->sample_rate != 22050 &&
-      ac->sample_rate != 24000 &&
-      ac->sample_rate != 32000 &&
-      ac->sample_rate != 44100 &&
-      ac->sample_rate != 48000)
-    return 0;
-
-  return 1;
-}
-
-static int
-audio_is_valid_aac_stereo (AVCodecContext *ac)
-{
-  if (!ac)
-    return 0;
-
-  if (!audio_is_valid_aac (ac))
-    return 0;
-  
-  if (ac->channels > 2)
-    return 0;
-  
-  if (ac->bit_rate > 576000)
-    return 0;
-    
-  return 1;
-}
-
-static int
-audio_is_valid_aac_mult5 (AVCodecContext *ac)
-{
-  if (!ac)
-    return 0;
-
-  if (!audio_is_valid_aac (ac))
-    return 0;
-  
-  if (ac->channels != 5)
-    return 0;
-  
-  if (ac->bit_rate > 1444000)
-    return 0;
-    
-  return 1;
-}
-
-static int
 audio_is_valid_mp2 (AVCodecContext *ac)
 {
   if (!ac)

@@ -169,6 +169,68 @@ static dlna_profile_t bsac_mult5_iso __attribute__ ((unused)) = {
   .label = MPEG4_MULTI_CH_LABEL
 };
 
+static int
+audio_is_valid_aac (AVCodecContext *ac)
+{
+  if (!ac)
+    return 0;
+  
+  /* TODO: need to check for HE-AAC, LTP and BSAC */
+  if (ac->codec_id != CODEC_ID_AAC)
+    return 0;
+  
+  /* supported sampling rate:
+     8, 11.025, 12, 16, 22.05, 24, 32, 44.1 and 48 kHz */
+  if (ac->sample_rate != 8000 &&
+      ac->sample_rate != 11025 &&
+      ac->sample_rate != 12000 &&
+      ac->sample_rate != 16000 &&
+      ac->sample_rate != 22050 &&
+      ac->sample_rate != 24000 &&
+      ac->sample_rate != 32000 &&
+      ac->sample_rate != 44100 &&
+      ac->sample_rate != 48000)
+    return 0;
+
+  return 1;
+}
+
+int
+audio_is_valid_aac_stereo (AVCodecContext *ac)
+{
+  if (!ac)
+    return 0;
+
+  if (!audio_is_valid_aac (ac))
+    return 0;
+  
+  if (ac->channels > 2)
+    return 0;
+  
+  if (ac->bit_rate > 576000)
+    return 0;
+    
+  return 1;
+}
+
+int
+audio_is_valid_aac_mult5 (AVCodecContext *ac)
+{
+  if (!ac)
+    return 0;
+
+  if (!audio_is_valid_aac (ac))
+    return 0;
+  
+  if (ac->channels != 5)
+    return 0;
+  
+  if (ac->bit_rate > 1444000)
+    return 0;
+    
+  return 1;
+}
+
 static dlna_profile_t *
 probe_mpeg4 (AVFormatContext *ctx)
 {
@@ -190,38 +252,12 @@ probe_mpeg4 (AVFormatContext *ctx)
   /* TODO: need to check for HE-AAC, LTP and BSAC */
   if (codec->codec_id == CODEC_ID_AAC)
   {
-    /* supported sampling rate:
-       8, 11.025, 12, 16, 22.05, 24, 32, 44.1 and 48 kHz */
-    if (codec->sample_rate != 8000 &&
-        codec->sample_rate != 11025 &&
-        codec->sample_rate != 12000 &&
-        codec->sample_rate != 16000 &&
-        codec->sample_rate != 22050 &&
-        codec->sample_rate != 24000 &&
-        codec->sample_rate != 32000 &&
-        codec->sample_rate != 44100 &&
-        codec->sample_rate != 48000)
-    return NULL;
-
-    if (codec->channels == 5)
-    {
-      /* maximum bitrate: 1440 Kbps */
-      if (codec->bit_rate > 1440000)
-        return NULL;
-      
+    if (audio_is_valid_aac_mult5 (codec))
       return adts ?
         set_profile (&aac_mult5_adts): set_profile (&aac_mult5_iso);
-    }
-    else if (codec->channels <= 2)
-    {
-      /* maximum bitrate: 576 Kbps */
-      if (codec->bit_rate > 576000)
-        return NULL;
-      
-      if (codec->bit_rate <= 320000)
-        return adts ?
-          set_profile (&aac_adts_320) : set_profile (&aac_iso_320);
-    }
+    else if (audio_is_valid_aac_stereo (codec))
+      return adts ?
+        set_profile (&aac_adts_320) : set_profile (&aac_iso_320);
     else
       return adts ?
         set_profile (&aac_adts) : set_profile (&aac_iso);
