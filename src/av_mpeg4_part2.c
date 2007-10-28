@@ -1052,64 +1052,6 @@ audio_is_valid_g726 (AVCodecContext *ac)
   return 1;
 }
 
-static int
-audio_is_valid_amr (AVCodecContext *ac)
-{
-  if (!ac)
-    return 0;
-
-  /* only mono is supported */
-  if (ac->channels != 1)
-    return 0;
-
-  /* only supports 8 kHz sampling rate */
-  if (ac->sample_rate != 8000)
-    return 0;
-
-  /* valid CBR bitrates: 4.75, 5.15, 5.9, 6.7, 7.4, 7.95, 10.2, 12.2 Kbps */
-  switch (ac->bit_rate)
-  {
-  case 4750:
-  case 5150:
-  case 5900:
-  case 6700:
-  case 7400:
-  case 7950:
-  case 10200:
-  case 12200:
-    return 1;
-  default:
-    break;
-  }
-
-  return 0;
-}
-
-static int
-audio_is_valid_amr_wb (AVCodecContext *ac)
-{
-  if (!ac)
-    return 0;
-
-  /* valid sampling rates: 8, 16, 24, 32 and 48 kHz */
-  if (ac->sample_rate != 8000 &&
-      ac->sample_rate != 16000 &&
-      ac->sample_rate != 24000 &&
-      ac->sample_rate != 32000 &&
-      ac->sample_rate != 48000)
-    return 0;
-
-  /* supported bit rates: 5.2 Kbps - 48 Kbps */
-  if (ac->bit_rate < 5200 || ac->bit_rate > 48000)
-    return 0;
-
-  /* only mono and stereo are supported */
-  if (ac->channels > 2)
-    return 0;
-
-  return 1;
-}
-
 static mpeg4_audio_profile_t
 mpeg4_audio_get_profile (AVStream *as, AVCodecContext *ac)
 {

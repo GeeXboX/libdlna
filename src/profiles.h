@@ -44,4 +44,8 @@ dlna_profile_t *set_profile (dlna_profile_t *profile);
 AVCodecContext * audio_profile_get_codec (AVFormatContext *ctx);
 av_codecs_t *av_profile_get_codecs (AVFormatContext *ctx);
 
+/* audio profile checks */
+int audio_is_valid_amr (AVCodecContext *ac);
+int audio_is_valid_amr_wb (AVCodecContext *ac);
+
 #endif /* _PROFILES_H_ */
