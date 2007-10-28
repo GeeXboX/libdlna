@@ -15,6 +15,7 @@ SRCS =  profiles.c \
 	audio_wma.c \
 	av_mpeg1.c \
 	av_mpeg2.c \
+	av_mpeg4_part2.c \
 	av_wmv9.c \
 
 CFLAGS += -fPIC
