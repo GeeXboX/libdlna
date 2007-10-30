@@ -32,8 +32,6 @@
 #include "profiles.h"
 #include "containers.h"
 
-#define MPEG4_KNOWN_EXTENSIONS "mp4,3gp,3gpp,asf,mpg,mpeg,mpe,mp2t,ts"
-
 typedef enum {
   MPEG4_VCODEC_INVALID,
   MPEG4_VCODEC_H263,
@@ -926,10 +924,6 @@ probe_mpeg4_part2 (AVFormatContext *ctx)
   mpeg4_audio_profile_t ap;
   int i;
   
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, MPEG4_KNOWN_EXTENSIONS))
-    return NULL;
-
   /* grab codecs info */
   codecs = av_profile_get_codecs (ctx);
   if (!codecs)
@@ -981,6 +975,7 @@ probe_mpeg4_part2 (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_av_mpeg4_part2 = {
   .id = DLNA_PROFILE_AV_MPEG4_PART2,
+  .extensions = "mp4,3gp,3gpp,asf,mpg,mpeg,mpe,mp2t,ts",
   .probe = probe_mpeg4_part2,
   .next = NULL
 };

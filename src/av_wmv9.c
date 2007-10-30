@@ -53,8 +53,6 @@
 #include "profiles.h"
 #include "containers.h"
 
-#define WMV9_KNOWN_EXTENSIONS "asf,wmv"
-
 typedef enum {
   WMV9_AUDIO_UNKNOWN,
   WMV9_AUDIO_WMA_BASELINE,
@@ -249,10 +247,6 @@ probe_wmv9 (AVFormatContext *ctx)
   av_codecs_t *codecs;
   wmv9_profile_audio_t ap;
   
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, WMV9_KNOWN_EXTENSIONS))
-    return NULL;
-
   /* need to be in ASF container only */
   if (stream_get_container (ctx) != CT_ASF)
     return NULL;
@@ -322,6 +316,7 @@ probe_wmv9 (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_av_wmv9 = {
   .id = DLNA_PROFILE_AV_WMV9,
+  .extensions = "asf,wmv",
   .probe = probe_wmv9,
   .next = NULL
 };

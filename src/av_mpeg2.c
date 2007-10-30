@@ -30,8 +30,6 @@
 #include "profiles.h"
 #include "containers.h"
 
-#define MPEG2_KNOWN_EXTENSIONS "mpg,mpeg,mpe,m2v,mp2p,mp2t,ts,ps,pes"
-
 typedef struct mpeg_ps_es_stream_s {
   int width;
   int height;
@@ -705,10 +703,6 @@ probe_mpeg2 (AVFormatContext *ctx)
   dlna_profile_t *profile = NULL;
   dlna_container_type_t st;
   
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, MPEG2_KNOWN_EXTENSIONS))
-    return NULL;
-
   codecs = av_profile_get_codecs (ctx);
   if (!codecs)
     goto probe_mpeg2_end;
@@ -744,6 +738,7 @@ probe_mpeg2 (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_av_mpeg2 = {
   .id = DLNA_PROFILE_AV_MPEG2,
+  .extensions = "mpg,mpeg,mpe,m2v,mp2p,mp2t,ts,ps,pes",
   .probe = probe_mpeg2,
   .next = NULL
 };

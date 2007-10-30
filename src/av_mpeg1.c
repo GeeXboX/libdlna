@@ -25,8 +25,6 @@
 #include "dlna.h"
 #include "profiles.h"
 
-#define MPEG1_KNOWN_EXTENSIONS "mpg,mpeg,mpe,m1v"
-
 /* MPEG-1 video with 2 channel MPEG-1 Layer2 audio
    encapsulated in MPEG-1 system */
 static dlna_profile_t mpeg1 = {
@@ -40,10 +38,6 @@ probe_mpeg1 (AVFormatContext *ctx)
 {
   av_codecs_t *codecs;
   
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, MPEG1_KNOWN_EXTENSIONS))
-    return NULL;
-
   codecs = av_profile_get_codecs (ctx);
   if (!codecs)
     goto probe_mpeg1_end;
@@ -104,6 +98,7 @@ probe_mpeg1 (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_av_mpeg1 = {
   .id = DLNA_PROFILE_AV_MPEG1,
+  .extensions = "mpg,mpeg,mpe,m1v",
   .probe = probe_mpeg1,
   .next = NULL
 };

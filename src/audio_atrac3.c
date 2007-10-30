@@ -25,8 +25,6 @@
 #include "dlna.h"
 #include "profiles.h"
 
-#define ATRAC3_KNOWN_EXTENSIONS "at3p,acm,wav"
-
 /* Profile for audio media class content */
 static dlna_profile_t atrac3 = {
   .id = "ATRAC3plus",
@@ -51,10 +49,6 @@ probe_atrac3 (AVFormatContext *ctx)
 {
   AVCodecContext *codec;
   
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, ATRAC3_KNOWN_EXTENSIONS))
-    return NULL;
-
   codec = audio_profile_get_codec (ctx);
   if (!codec)
     return NULL;
@@ -67,6 +61,7 @@ probe_atrac3 (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_audio_atrac3 = {
   .id = DLNA_PROFILE_AUDIO_ATRAC3,
+  .extensions = "at3p,acm,wav",
   .probe = probe_atrac3,
   .next = NULL
 };

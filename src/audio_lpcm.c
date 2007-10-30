@@ -25,8 +25,6 @@
 #include "dlna.h"
 #include "profiles.h"
 
-#define LPCM_KNOWN_EXTENSIONS "pcm,lpcm,wav,aiff"
-
 /* Profile for audio media class content */
 static dlna_profile_t lpcm = {
   .id = "LPCM",
@@ -41,10 +39,6 @@ probe_lpcm (AVFormatContext *ctx)
   dlna_profile_t *p;
   char mime[128];
   
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, LPCM_KNOWN_EXTENSIONS))
-    return NULL;
-
   codec = audio_profile_get_codec (ctx);
   if (!codec)
     return NULL;
@@ -72,6 +66,7 @@ probe_lpcm (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_audio_lpcm = {
   .id = DLNA_PROFILE_AUDIO_LPCM,
+  .extensions = "pcm,lpcm,wav,aiff",
   .probe = probe_lpcm,
   .next = NULL
 };

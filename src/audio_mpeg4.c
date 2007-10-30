@@ -25,8 +25,6 @@
 #include "dlna.h"
 #include "profiles.h"
 
-#define MPEG4_KNOWN_EXTENSIONS "aac,3gp,mp4,mov,qt,m4a"
-
 /* Profile for audio media class content */
 static dlna_profile_t aac_adts = {
   .id = "AAC_ADTS",
@@ -230,10 +228,6 @@ probe_mpeg4 (AVFormatContext *ctx)
   AVCodecContext *codec = NULL;
   int adts = 0;
   
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, MPEG4_KNOWN_EXTENSIONS))
-    return NULL;
-
   if (!strcasecmp (get_file_extension (ctx->filename), "aac"))
     adts = 1;
 
@@ -261,6 +255,7 @@ probe_mpeg4 (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_audio_mpeg4 = {
   .id = DLNA_PROFILE_AUDIO_MPEG4,
+  .extensions = "aac,3gp,mp4,mov,qt,m4a",
   .probe = probe_mpeg4,
   .next = NULL
 };

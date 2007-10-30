@@ -25,8 +25,6 @@
 #include "dlna.h"
 #include "profiles.h"
 
-#define WMA_KNOWN_EXTENSIONS "wma,asf"
-
 /* WMA content (bit rate less than 193 kbps) */
 static dlna_profile_t wmabase = {
   .id = "WMABASE",
@@ -53,10 +51,6 @@ probe_wma (AVFormatContext *ctx)
 {
   AVCodecContext *codec;
   
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, WMA_KNOWN_EXTENSIONS))
-    return NULL;
-
   codec = audio_profile_get_codec (ctx);
   if (!codec)
     return NULL;
@@ -105,6 +99,7 @@ probe_wma (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_audio_wma = {
   .id = DLNA_PROFILE_AUDIO_WMA,
+  .extensions = "wma,asf",
   .probe = probe_wma,
   .next = NULL
 };

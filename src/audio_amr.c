@@ -25,8 +25,6 @@
 #include "dlna.h"
 #include "profiles.h"
 
-#define AMR_KNOWN_EXTENSIONS "amr,3gp,mp4"
-
 /* Profile for audio media class content */
 static dlna_profile_t amr = {
   .id = "AMR_3GPP",
@@ -117,10 +115,6 @@ probe_amr (AVFormatContext *ctx)
 {
   AVCodecContext *codec;
   
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, AMR_KNOWN_EXTENSIONS))
-    return NULL;
-
   codec = audio_profile_get_codec (ctx);
   if (!codec)
     return NULL;
@@ -141,6 +135,7 @@ probe_amr (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_audio_amr = {
   .id = DLNA_PROFILE_AUDIO_AMR,
+  .extensions = "amr,3gp,mp4",
   .probe = probe_amr,
   .next = NULL
 };

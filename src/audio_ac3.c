@@ -25,8 +25,6 @@
 #include "dlna.h"
 #include "profiles.h"
 
-#define AC3_KNOWN_EXTENSIONS "ac3"
-
 /* Profile for audio media class content */
 static dlna_profile_t ac3 = {
   .id = "AC3",
@@ -66,10 +64,6 @@ probe_ac3 (AVFormatContext *ctx)
 {
   AVCodecContext *codec;
   
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, AC3_KNOWN_EXTENSIONS))
-    return NULL;
-
   codec = audio_profile_get_codec (ctx);
   if (!codec)
     return NULL;
@@ -81,6 +75,7 @@ probe_ac3 (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_audio_ac3 = {
   .id = DLNA_PROFILE_AUDIO_AC3,
+  .extensions = "ac3",
   .probe = probe_ac3,
   .next = NULL
 };

@@ -156,7 +156,19 @@ dlna_guess_media_profile (const char *filename)
   p = first_profile;
   while (p)
   {
-    dlna_profile_t *prof = p->probe (pFormatCtx);
+    dlna_profile_t *prof;
+    
+    if (p->extensions)
+    {
+      /* check for valid file extension */
+      if (!match_file_extension (filename, p->extensions))
+      {
+        p = p->next;
+        continue;
+      }
+    }
+    
+    prof = p->probe (pFormatCtx);
     if (prof)
     {
       profile = prof;
