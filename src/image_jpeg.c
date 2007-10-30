@@ -27,47 +27,46 @@
 #include "image.h"
 
 #define JPEG_KNOWN_EXTENSIONS "jpg,jpe,jpeg"
-#define JPEG_MIME_TYPE "image/jpeg"
 
 /* Profile for image media class content of small resolution */
 static dlna_profile_t jpeg_sm = {
   .id = "JPEG_SM",
-  .mime = JPEG_MIME_TYPE,
+  .mime = MIME_IMAGE_JPEG,
   .label = IMAGE_TYPE_PICTURE
 };
 
 /* Profile for image media class content of medium resolution */
 static dlna_profile_t jpeg_med = {
   .id = "JPEG_MED",
-  .mime = JPEG_MIME_TYPE,
+  .mime = MIME_IMAGE_JPEG,
   .label = IMAGE_TYPE_PICTURE
 };
 
 /* Profile for image media class content of high resolution */
 static dlna_profile_t jpeg_lrg = {
   .id = "JPEG_LRG",
-  .mime = JPEG_MIME_TYPE,
+  .mime = MIME_IMAGE_JPEG,
   .label = IMAGE_TYPE_PICTURE
 };
 
 /* Profile for image thumbnails */
 static dlna_profile_t jpeg_tn = {
   .id = "JPEG_TN",
-  .mime = JPEG_MIME_TYPE,
+  .mime = MIME_IMAGE_JPEG,
   .label = IMAGE_TYPE_ICON
 };
 
 /* Profile for small icons */
 static dlna_profile_t jpeg_sm_ico = {
   .id = "JPEG_SM_ICO",
-  .mime = JPEG_MIME_TYPE,
+  .mime = MIME_IMAGE_JPEG,
   .label = IMAGE_TYPE_ICON
 };
 
 /* Profile for large icons */
 static dlna_profile_t jpeg_lrg_ico = {
   .id = "JPEG_LRG_ICO",
-  .mime = JPEG_MIME_TYPE,
+  .mime = MIME_IMAGE_JPEG,
   .label = IMAGE_TYPE_ICON
 };
 

@@ -26,14 +26,12 @@
 #include "profiles.h"
 
 #define LPCM_KNOWN_EXTENSIONS "pcm,lpcm,wav,aiff"
-#define LPCM_MIME_TYPE "audio/L16"
-#define LPCM_LABEL "2-ch"
 
 /* Profile for audio media class content */
 static dlna_profile_t lpcm = {
   .id = "LPCM",
   .mime = NULL,
-  .label = LPCM_LABEL
+  .label = LABEL_AUDIO_2CH
 };
 
 static dlna_profile_t *
@@ -66,7 +64,7 @@ probe_lpcm (AVFormatContext *ctx)
 
   p = set_profile (&lpcm);
   sprintf (mime, "%s;rate=%d;channels=%d",
-           LPCM_MIME_TYPE, codec->sample_rate, codec->channels);
+           MIME_AUDIO_LPCM, codec->sample_rate, codec->channels);
   p->mime = strdup (mime);
   
   return p;

@@ -26,30 +26,26 @@
 #include "profiles.h"
 
 #define AMR_KNOWN_EXTENSIONS "amr,3gp,mp4"
-#define AMR_MIME_TYPE "audio/mp4"
-#define THREE_GPP_MIME_TYPE "audio/3gpp"
-#define MONO_LABEL "mono"
-#define TWO_CH_LABEL "2-ch"
 
 /* Profile for audio media class content */
 static dlna_profile_t amr = {
   .id = "AMR_3GPP",
-  .mime = AMR_MIME_TYPE,
-  .label = MONO_LABEL
+  .mime = MIME_AUDIO_MPEG_4,
+  .label = LABEL_AUDIO_MONO
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t three_gpp = {
   .id = "AMR_3GPP",
-  .mime = THREE_GPP_MIME_TYPE,
-  .label = MONO_LABEL
+  .mime = MIME_AUDIO_3GP,
+  .label = LABEL_AUDIO_MONO
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t amr_wbplus = {
   .id = "AMR_WBplus",
-  .mime = THREE_GPP_MIME_TYPE,
-  .label = TWO_CH_LABEL
+  .mime = MIME_AUDIO_3GP,
+  .label = LABEL_AUDIO_2CH
 };
 
 int

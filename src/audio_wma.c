@@ -26,29 +26,26 @@
 #include "profiles.h"
 
 #define WMA_KNOWN_EXTENSIONS "wma,asf"
-#define WMA_MIME_TYPE "audio/x-ms-wma"
-#define WMA_2CH_LABEL "2-ch"
-#define WMA_MULTI_CH_LABEL "2-ch multi"
 
 /* WMA content (bit rate less than 193 kbps) */
 static dlna_profile_t wmabase = {
   .id = "WMABASE",
-  .mime = WMA_MIME_TYPE,
-  .label = WMA_2CH_LABEL
+  .mime = MIME_AUDIO_WMA,
+  .label = LABEL_AUDIO_2CH
 };
 
 /* WMA content */
 static dlna_profile_t wmafull = {
   .id = "WMAFULL",
-  .mime = WMA_MIME_TYPE,
-  .label = WMA_2CH_LABEL
+  .mime = MIME_AUDIO_WMA,
+  .label = LABEL_AUDIO_2CH
 };
 
 /* WMA professional version */
 static dlna_profile_t wmapro = {
   .id = "WMAPRO",
-  .mime = WMA_MIME_TYPE,
-  .label = WMA_MULTI_CH_LABEL
+  .mime = MIME_AUDIO_WMA,
+  .label = LABEL_AUDIO_2CH_MULTI
 };
 
 static dlna_profile_t *

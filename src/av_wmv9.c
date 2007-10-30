@@ -54,11 +54,6 @@
 #include "containers.h"
 
 #define WMV9_KNOWN_EXTENSIONS "asf,wmv"
-#define WMV9_MIME_TYPE "video/x-ms-wmv"
-#define WMV9_LABEL_SD "SD"
-#define WMV9_LABEL_HD "HD"
-#define WMV9_LABEL_QCIF15 "QCIF15"
-#define WMV9_LABEL_CIF15 "CIF15"
 
 typedef enum {
   WMV9_AUDIO_UNKNOWN,
@@ -101,70 +96,70 @@ static wmv9_profile_t wmv9_profile_main_high[] = {
    with baseline WMA audio */
 static dlna_profile_t wmvmed_base = {
   .id = "WMVMED_BASE",
-  .mime = WMV9_MIME_TYPE,
-  .label = WMV9_LABEL_SD
+  .mime = MIME_VIDEO_WMV,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Medium resolution video (Main profile at Medium Level)
    with full WMA audio */
 static dlna_profile_t wmvmed_full = {
   .id = "WMVMED_FULL",
-  .mime = WMV9_MIME_TYPE,
-  .label = WMV9_LABEL_SD
+  .mime = MIME_VIDEO_WMV,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Medium resolution video (Main profile at Medium Level)
    with WMA professional audio */
 static dlna_profile_t wmvmed_pro = {
   .id = "WMVMED_PRO",
-  .mime = WMV9_MIME_TYPE,
-  .label = WMV9_LABEL_HD
+  .mime = MIME_VIDEO_WMV,
+  .label = LABEL_VIDEO_HD
 };
 
 /* High resolution video (Main profile at High Level)
    with full WMA audio */
 static dlna_profile_t wmvhigh_full = {
   .id = "WMVHIGH_FULL",
-  .mime = WMV9_MIME_TYPE,
-  .label = WMV9_LABEL_HD
+  .mime = MIME_VIDEO_WMV,
+  .label = LABEL_VIDEO_HD
 };
 
 /* High resolution video (Main profile at High Level)
    with WMA professional audio */
 static dlna_profile_t wmvhigh_pro = {
   .id = "WMVHIGH_PRO",
-  .mime = WMV9_MIME_TYPE,
-  .label = WMV9_LABEL_HD
+  .mime = MIME_VIDEO_WMV,
+  .label = LABEL_VIDEO_HD
 };
 
 /* HighMAT profile */
 static dlna_profile_t wmvhm_base __attribute__ ((unused)) = {
   .id = "WMVHM_BASE",
-  .mime = WMV9_MIME_TYPE,
-  .label = WMV9_LABEL_SD
+  .mime = MIME_VIDEO_WMV,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Low resolution video (Simple Profile at Low Level)
    with baseline WMA audio */
 static dlna_profile_t wmvspll_base = {
   .id = "WMVSPLL_BASE",
-  .mime = WMV9_MIME_TYPE,
-  .label = WMV9_LABEL_QCIF15
+  .mime = MIME_VIDEO_WMV,
+  .label = LABEL_VIDEO_QCIF15
 };
 
 /* Low resolution video (Simple Profile at Medium Level)
    with baseline WMA audio */
 static dlna_profile_t wmvspml_base = {
   .id = "WMVSPML_BASE",
-  .mime = WMV9_MIME_TYPE,
-  .label = WMV9_LABEL_CIF15
+  .mime = MIME_VIDEO_WMV,
+  .label = LABEL_VIDEO_CIF15
 };
 
 /* Low resolution video (Simple Profile at Medium Level) with MP3 audio */
 static dlna_profile_t wmvspml_mp3 = {
   .id = "WMVSPML_MP3",
-  .mime = WMV9_MIME_TYPE,
-  .label = WMV9_LABEL_CIF15
+  .mime = MIME_VIDEO_WMV,
+  .label = LABEL_VIDEO_CIF15
 };
 
 static int

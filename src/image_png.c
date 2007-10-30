@@ -27,33 +27,32 @@
 #include "image.h"
 
 #define PNG_KNOWN_EXTENSIONS "png"
-#define PNG_MIME_TYPE "image/png"
 
 /* Profile for image thumbnails */
 static dlna_profile_t png_tn = {
   .id = "PNG_TN",
-  .mime = PNG_MIME_TYPE,
+  .mime = MIME_IMAGE_PNG,
   .label = IMAGE_TYPE_ICON
 };
 
 /* Profile for small icons */
 static dlna_profile_t png_sm_ico = {
   .id = "PNG_SM_ICO",
-  .mime = PNG_MIME_TYPE,
+  .mime = MIME_IMAGE_PNG,
   .label = IMAGE_TYPE_ICON
 };
 
 /* Profile for large icons */
 static dlna_profile_t png_lrg_ico = {
   .id = "PNG_LRG_ICO",
-  .mime = PNG_MIME_TYPE,
+  .mime = MIME_IMAGE_PNG,
   .label = IMAGE_TYPE_ICON
 };
 
 /* Profile for image class content of high resolution */
 static dlna_profile_t png_lrg = {
   .id = "PNG_LRG",
-  .mime = PNG_MIME_TYPE,
+  .mime = MIME_IMAGE_PNG,
   .label = IMAGE_TYPE_PICTURE
 };
 

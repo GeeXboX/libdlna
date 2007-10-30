@@ -26,15 +26,13 @@
 #include "profiles.h"
 
 #define MPEG1_KNOWN_EXTENSIONS "mpg,mpeg,mpe,m1v"
-#define MPEG1_MIME_TYPE "video/mpeg"
-#define MPEG1_LABEL "CIF30"
 
 /* MPEG-1 video with 2 channel MPEG-1 Layer2 audio
    encapsulated in MPEG-1 system */
 static dlna_profile_t mpeg1 = {
   .id = "MPEG1",
-  .mime = MPEG1_MIME_TYPE,
-  .label = MPEG1_LABEL
+  .mime = MIME_VIDEO_MPEG,
+  .label = LABEL_VIDEO_CIF30
 };
 
 static dlna_profile_t *

@@ -26,14 +26,12 @@
 #include "profiles.h"
 
 #define AC3_KNOWN_EXTENSIONS "ac3"
-#define AC3_MIME_TYPE "audio/vnd.dolby.dd-raw"
-#define AC3_LABEL "2-ch multi"
 
 /* Profile for audio media class content */
 static dlna_profile_t ac3 = {
   .id = "AC3",
-  .mime = AC3_MIME_TYPE,
-  .label = AC3_LABEL
+  .mime = MIME_AUDIO_DOLBY_DIGITAL,
+  .label = LABEL_AUDIO_2CH_MULTI
 };
 
 int

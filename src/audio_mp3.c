@@ -26,22 +26,20 @@
 #include "profiles.h"
 
 #define MP3_KNOWN_EXTENSIONS "mp3"
-#define MP3_MIME_TYPE "audio/mpeg"
-#define MP3_LABEL "2-ch"
 
 /* Profile for audio media class content */
 static dlna_profile_t mp3 = {
   .id = "MP3",
-  .mime = MP3_MIME_TYPE,
-  .label = MP3_LABEL
+  .mime = MIME_AUDIO_MPEG,
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content with extensions
    for lower sampling rates and bitrates */
 static dlna_profile_t mp3x = {
   .id = "MP3X",
-  .mime = MP3_MIME_TYPE,
-  .label = MP3_LABEL
+  .mime = MIME_AUDIO_MPEG,
+  .label = LABEL_AUDIO_2CH
 };
 
 static int

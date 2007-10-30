@@ -34,17 +34,6 @@
 
 #define MPEG4_KNOWN_EXTENSIONS "mp4,3gp,3gpp,asf,mpg,mpeg,mpe,mp2t,ts"
 
-#define MPEG_MIME_TYPE "video/mpeg"
-#define MPEG4_MIME_TYPE "video/mp4"
-#define MPEG4_TS_DLNA_MIME_TYPE "video/vnd.dlna.mpeg-tts"
-#define ASF_MIME_TYPE "video/x-ms-asf"
-#define THREE_GPP_MIME_TYPE "video/3gpp"
-
-#define MPEG4_LABEL_QCIF15 "QCIF15"
-#define MPEG4_LABEL_CIF15 "CIF15"
-#define MPEG4_LABEL_CIF30 "CIF30"
-#define MPEG4_LABEL_SD "SD"
-
 typedef enum {
   MPEG4_VCODEC_INVALID,
   MPEG4_VCODEC_H263,
@@ -198,112 +187,112 @@ static video_properties_t profile_p2_asp_l5_res[] = {
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_sp_aac = {
   .id = "MPEG4_P2_MP4_SP_AAC",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with HE AAC audio,
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_sp_heaac = {
   .id = "MPEG4_P2_MP4_SP_HEAAC",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with ATRAC3plus audio,
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_sp_atrac3plus = {
   .id = "MPEG4_P2_MP4_SP_ATRAC3plus",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with AAC LTP audio,
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_sp_aac_ltp = {
   .id = "MPEG4_P2_MP4_SP_AAC_LTP",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile Level 2 with AAC audio,
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_sp_l2_aac = {
   .id = "MPEG4_P2_MP4_SP_L2_AAC",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF15
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_CIF15
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile Level 2 with AMR audio,
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_sp_l2_amr = {
   .id = "MPEG4_P2_MP4_SP_L2_AMR",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF15
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_CIF15
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile Level 3+ with AAC audio,
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_sp_vga_aac = {
   .id = "MPEG4_P2_MP4_SP_VGA_AAC",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile Level 3+ with HEAAC audio,
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_sp_vga_heaac = {
   .id = "MPEG4_P2_MP4_SP_VGA_HEAAC",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with AAC LC audio,
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_asp_aac = {
   .id = "MPEG4_P2_MP4_ASP_AAC",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with HEAAC audio,
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_asp_heaac = {
   .id = "MPEG4_P2_MP4_ASP_HEAAC",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with HEAAC
    multi-channel audio, encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_asp_heaac_mult5 = {
   .id = "MPEG4_P2_MP4_ASP_HEAAC_MULT5",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with ATRAC3plus audio,
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_asp_actrac3plus = {
   .id = "MPEG4_P2_MP4_ASP_ATRAC3plus",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile up to Level 5
    with only Simple Object with AAC LC audio, encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_asp_l5_so_aac = {
   .id = "MPEG4_P2_MP4_ASP_L5_SO_AAC",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile up to Level 5
    with only Simple Object with HEAAC audio, encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_asp_l5_so_heaac = {
   .id = "MPEG4_P2_MP4_ASP_L5_SO_HEAAC",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile up to Level 5
@@ -311,24 +300,24 @@ static dlna_profile_t mpeg4_p2_mp4_asp_l5_so_heaac = {
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_asp_l5_so_heaac_mult5 = {
   .id = "MPEG4_P2_MP4_ASP_L5_SO_HEAAC_MULT5",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile up to Level 4
    with only Simple Object with AAC LC audio, encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_asp_l4_so_aac = {
   .id = "MPEG4_P2_MP4_ASP_L4_SO_AAC",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile up to Level 4
    with only Simple Object with HEAAC audio, encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_asp_l4_so_heaac = {
   .id = "MPEG4_P2_MP4_ASP_L4_SO_HEAAC",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile up to Level 4
@@ -336,24 +325,24 @@ static dlna_profile_t mpeg4_p2_mp4_asp_l4_so_heaac = {
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_p2_mp4_asp_l4_so_heaac_mult5 = {
   .id = "MPEG4_P2_MP4_ASP_L4_SO_HEAAC_MULT5",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_4,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for H263 Profile 0 Level 10 with AAC LC audio,
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_h263_mp4_p0_l10_aac = {
   .id = "MPEG4_H263_MP4_P0_L10_AAC",
-  .mime = THREE_GPP_MIME_TYPE,
-  .label = MPEG4_LABEL_QCIF15
+  .mime = MIME_VIDEO_3GP,
+  .label = LABEL_VIDEO_QCIF15
 };
 
 /* Profile for H263 Profile 0 Level 10 with AAC LTP audio,
    encapsulated in MP4 */
 static dlna_profile_t mpeg4_h263_mp4_p0_l10_aac_ltp = {
   .id = "MPEG4_H263_MP4_P0_L10_AAC_LTP",
-  .mime = THREE_GPP_MIME_TYPE,
-  .label = MPEG4_LABEL_QCIF15
+  .mime = MIME_VIDEO_3GP,
+  .label = LABEL_VIDEO_QCIF15
 };
 
 /*********************/
@@ -364,80 +353,80 @@ static dlna_profile_t mpeg4_h263_mp4_p0_l10_aac_ltp = {
    encapsulated in MPEG2-TS with a zero timestamp field */
 static dlna_profile_t mpeg4_p2_ts_sp_aac = {
   .id = "MPEG4_P2_TS_SP_AAC",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with AAC LC audio,
    encapsulated in MPEG2-TS with a valid timestamp field */
 static dlna_profile_t mpeg4_p2_ts_sp_aac_t = {
   .id = "MPEG4_P2_TS_SP_AAC_T",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with AAC LC audio,
    encapsulated in MPEG2-TS without a timestamp field */
 static dlna_profile_t mpeg4_p2_ts_sp_aac_iso = {
   .id = "MPEG4_P2_TS_SP_AAC_ISO",
-  .mime = MPEG_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with MPEG-1 Layer3 audio,
    encapsulated in MPEG2-TS with a zero timestamp field */
 static dlna_profile_t mpeg4_p2_ts_sp_mpeg1_l3 = {
   .id = "MPEG4_P2_TS_SP_MPEG1_L3",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with MPEG-1 Layer3 audio,
    encapsulated in MPEG2-TS with a valid timestamp field */
 static dlna_profile_t mpeg4_p2_ts_sp_mpeg1_l3_t = {
   .id = "MPEG4_P2_TS_SP_MPEG1_L3_T",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with MPEG-1 Layer3 audio,
    encapsulated in MPEG2-TS without a timestamp field */
 static dlna_profile_t mpeg4_p2_ts_sp_mpeg1_l3_iso = {
   .id = "MPEG4_P2_TS_SP_MPEG1_L3_ISO",
-  .mime = MPEG_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with AC3 multichannel audio,
    encapsulated in MPEG2-TS with a zero timestamp field */
 static dlna_profile_t mpeg4_p2_ts_sp_ac3 = {
   .id = "MPEG4_P2_TS_SP_AC3_L3",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with AC3 multichannel audio,
    encapsulated in MPEG2-TS with a valid timestamp field */
 static dlna_profile_t mpeg4_p2_ts_sp_ac3_t = {
   .id = "MPEG4_P2_TS_SP_AC3_T",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with AC3 multichannel audio,
    encapsulated in MPEG2-TS without a timestamp field */
 static dlna_profile_t mpeg4_p2_ts_sp_ac3_iso = {
   .id = "MPEG4_P2_TS_SP_AC3_ISO",
-  .mime = MPEG_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with MPEG-1/2 Layer 1/2
    multichannel audio, encapsulated in MPEG2-TS with a zero timestamp field */
 static dlna_profile_t mpeg4_p2_ts_sp_mpeg2_l2 = {
   .id = "MPEG4_P2_TS_SP_MPEG2_L2",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with MPEG-1/2 Layer1/2
@@ -445,8 +434,8 @@ static dlna_profile_t mpeg4_p2_ts_sp_mpeg2_l2 = {
    encapsulated in MPEG2-TS with a valid timestamp field */
 static dlna_profile_t mpeg4_p2_ts_sp_mpeg2_l2_t = {
   .id = "MPEG4_P2_TS_SP_MPEG2_L2_T",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile with MPEG-1/2 Layer1/2
@@ -454,56 +443,56 @@ static dlna_profile_t mpeg4_p2_ts_sp_mpeg2_l2_t = {
    encapsulated in MPEG2-TS without a timestamp field */
 static dlna_profile_t mpeg4_p2_ts_sp_mpeg2_l2_iso = {
   .id = "MPEG4_P2_TS_SP_MPEG2_L2_ISO",
-  .mime = MPEG_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with AAC LC audio,
    encapsulated in MPEG2-TS with a zero timestamp field */
 static dlna_profile_t mpeg4_p2_ts_asp_aac = {
   .id = "MPEG4_P2_TS_ASP_AAC",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with AAC LC audio,
    encapsulated in MPEG2-TS with a valid timestamp field */
 static dlna_profile_t mpeg4_p2_ts_asp_aac_t = {
   .id = "MPEG4_P2_TS_ASP_AAC_T",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with AAC LC audio,
    encapsulated in MPEG2-TS without a timestamp field */
 static dlna_profile_t mpeg4_p2_ts_asp_aac_iso = {
   .id = "MPEG4_P2_TS_ASP_AAC_ISO",
-  .mime = MPEG_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with MPEG-1 Layer3 audio,
    encapsulated in MPEG2-TS with a zero timestamp field */
 static dlna_profile_t mpeg4_p2_ts_asp_mpeg1_l3 = {
   .id = "MPEG4_P2_TS_ASP_MPEG1_L3",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with MPEG-1 Layer3 audio,
    encapsulated in MPEG2-TS with a valid timestamp field */
 static dlna_profile_t mpeg4_p2_ts_asp_mpeg1_l3_t = {
   .id = "MPEG4_P2_TS_ASP_MPEG1_L3_T",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with MPEG-1 Layer3 audio,
    encapsulated in MPEG2-TS without a timestamp field */
 static dlna_profile_t mpeg4_p2_ts_asp_mpeg1_l3_iso = {
   .id = "MPEG4_P2_TS_ASP_MPEG1_L3_ISO",
-  .mime = MPEG_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with AC3
@@ -511,8 +500,8 @@ static dlna_profile_t mpeg4_p2_ts_asp_mpeg1_l3_iso = {
    encapsulated in MPEG2-TS with a zero timestamp field */
 static dlna_profile_t mpeg4_p2_ts_asp_ac3 = {
   .id = "MPEG4_P2_TS_ASP_AC3_L3",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with AC3
@@ -520,8 +509,8 @@ static dlna_profile_t mpeg4_p2_ts_asp_ac3 = {
    encapsulated in MPEG2-TS with a valid timestamp field */
 static dlna_profile_t mpeg4_p2_ts_asp_ac3_t = {
   .id = "MPEG4_P2_TS_ASP_AC3_T",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile with AC3
@@ -529,56 +518,56 @@ static dlna_profile_t mpeg4_p2_ts_asp_ac3_t = {
    encapsulated in MPEG2-TS without a timestamp field */
 static dlna_profile_t mpeg4_p2_ts_asp_ac3_iso = {
   .id = "MPEG4_P2_TS_ASP_AC3_ISO",
-  .mime = MPEG_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_MPEG,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Core Profile with AC3 multichannel audio,
    encapsulated in MPEG2-TS with a zero timestamp field */
 static dlna_profile_t mpeg4_p2_ts_co_ac3 = {
   .id = "MPEG4_P2_TS_CO_AC3",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Core Profile with AC3 multichannel audio,
    encapsulated in MPEG2-TS with a valid timestamp field */
 static dlna_profile_t mpeg4_p2_ts_co_ac3_t = {
   .id = "MPEG4_P2_TS_CO_AC3_T",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Core Profile with AC3 multichannel audio,
    encapsulated in MPEG2-TS without a timestamp field */
 static dlna_profile_t mpeg4_p2_ts_co_ac3_iso = {
   .id = "MPEG4_P2_TS_CO_AC3_ISO",
-  .mime = MPEG_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Core Profile with MPEG-1/2 Layer1/2 audio,
    encapsulated in MPEG2-TS with a zero timestamp field */
 static dlna_profile_t mpeg4_p2_ts_co_mpeg2_l2 = {
   .id = "MPEG4_P2_TS_CO_MPEG2_L2",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Core Profile with MPEG-1/2 Layer1/2 audio,
    encapsulated in MPEG2-TS with a valid timestamp field */
 static dlna_profile_t mpeg4_p2_ts_co_mpeg2_l2_t = {
   .id = "MPEG4_P2_TS_CO_MPEG2_L2_T",
-  .mime = MPEG4_TS_DLNA_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG_TS,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Core Profile with MPEG-1/2 Layer1/2 audio,
    encapsulated in MPEG2-TS without a timestamp field */
 static dlna_profile_t mpeg4_p2_ts_co_mpeg2_l2_iso = {
   .id = "MPEG4_P2_TS_CO_MPEG2_L2_ISO",
-  .mime = MPEG_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_MPEG,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /*****************/
@@ -589,24 +578,24 @@ static dlna_profile_t mpeg4_p2_ts_co_mpeg2_l2_iso = {
    encapsulated in ASF */
 static dlna_profile_t mpeg4_p2_asf_sp_g726 = {
   .id = "MPEG4_P2_ASF_SP_G726",
-  .mime = ASF_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_ASF,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile up to Level 5
    with only Simple Object with G.726 audio, encapsulated in ASF */
 static dlna_profile_t mpeg4_p2_asf_asp_l5_so_g726 = {
   .id = "MPEG4_P2_ASF_ASP_L5_SO_G726",
-  .mime = ASF_MIME_TYPE,
-  .label = MPEG4_LABEL_SD
+  .mime = MIME_VIDEO_ASF,
+  .label = LABEL_VIDEO_SD
 };
 
 /* Profile for MPEG-4 Part 2 Advanced Simple Profile up to Level 4
    with only Simple Object with G.726 audio, encapsulated in ASF */
 static dlna_profile_t mpeg4_p2_asf_asp_l4_so_g726 = {
   .id = "MPEG4_P2_ASF_ASP_L4_SO_G726",
-  .mime = ASF_MIME_TYPE,
-  .label = MPEG4_LABEL_CIF30
+  .mime = MIME_VIDEO_ASF,
+  .label = LABEL_VIDEO_CIF30
 };
 
 /******************/
@@ -617,32 +606,32 @@ static dlna_profile_t mpeg4_p2_asf_asp_l4_so_g726 = {
    encapsulated in 3GPP */
 static dlna_profile_t mpeg4_h263_3gpp_p0_l10_amr_wbplus = {
   .id = "MPEG4_H263_3GPP_P0_L10_AMR_WBplus",
-  .mime = THREE_GPP_MIME_TYPE,
-  .label = MPEG4_LABEL_QCIF15
+  .mime = MIME_VIDEO_3GP,
+  .label = LABEL_VIDEO_QCIF15
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile Level 0b with AAC audio,
    encapsulated in 3GPP */
 static dlna_profile_t mpeg4_p2_3gpp_sp_l0b_aac = {
   .id = "MPEG4_P2_3GPP_SP_L0B_AAC",
-  .mime = THREE_GPP_MIME_TYPE,
-  .label = MPEG4_LABEL_QCIF15
+  .mime = MIME_VIDEO_3GP,
+  .label = LABEL_VIDEO_QCIF15
 };
 
 /* Profile for MPEG-4 Part 2 Simple Profile Level 0b with AMR audio,
    encapsulated in 3GPP */
 static dlna_profile_t mpeg4_p2_3gpp_sp_l0b_amr = {
   .id = "MPEG4_P2_3GPP_SP_L0B_AMR",
-  .mime = THREE_GPP_MIME_TYPE,
-  .label = MPEG4_LABEL_QCIF15
+  .mime = MIME_VIDEO_3GP,
+  .label = LABEL_VIDEO_QCIF15
 };
 
 /* Profile for MPEG-4 H.263 Profile 3 Level 10 with AMR audio,
    encapsulated in 3GPP */
 static dlna_profile_t mpeg4_h263_3gpp_p3_l10_amr = {
   .id = "MPEG4_H263_3GPP_P3_L10_AMR",
-  .mime = THREE_GPP_MIME_TYPE,
-  .label = MPEG4_LABEL_QCIF15
+  .mime = MIME_VIDEO_3GP,
+  .label = LABEL_VIDEO_QCIF15
 };
 
 static const struct {

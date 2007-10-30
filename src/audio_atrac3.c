@@ -26,14 +26,12 @@
 #include "profiles.h"
 
 #define ATRAC3_KNOWN_EXTENSIONS "at3p,acm,wav"
-#define ATRAC3_MIME_TYPE "audio/x-sony-oma"
-#define ATRAC3_LABEL "2-ch multi"
 
 /* Profile for audio media class content */
 static dlna_profile_t atrac3 = {
   .id = "ATRAC3plus",
-  .mime = ATRAC3_MIME_TYPE,
-  .label = ATRAC3_LABEL
+  .mime = MIME_AUDIO_ATRAC,
+  .label = LABEL_AUDIO_2CH_MULTI
 };
 
 int

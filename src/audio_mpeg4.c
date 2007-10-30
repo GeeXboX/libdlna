@@ -27,39 +27,32 @@
 
 #define MPEG4_KNOWN_EXTENSIONS "aac,3gp,mp4,mov,qt,m4a"
 
-#define MPEG4_MIME_TYPE "audio/mp4"
-#define ADTS_MIME_TYPE "audio/vnd.dlna.adts"
-#define THREE_GPP_MIME_TYPE "audio/3gpp"
-
-#define MPEG4_2CH_LABEL "2-ch"
-#define MPEG4_MULTI_CH_LABEL "multi"
-
 /* Profile for audio media class content */
 static dlna_profile_t aac_adts = {
   .id = "AAC_ADTS",
-  .mime = ADTS_MIME_TYPE,
-  .label = MPEG4_2CH_LABEL
+  .mime = MIME_AUDIO_ADTS,
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t aac_adts_320 = {
   .id = "AAC_ADTS_320",
-  .mime = ADTS_MIME_TYPE,
-  .label = MPEG4_2CH_LABEL
+  .mime = MIME_AUDIO_ADTS,
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t aac_iso = {
   .id = "AAC_ISO",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_2CH_LABEL
+  .mime = MIME_AUDIO_MPEG_4,
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t aac_iso_320 = {
   .id = "AAC_ISO_320",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_2CH_LABEL
+  .mime = MIME_AUDIO_MPEG_4,
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content. In the case of AAC LTP profiles,
@@ -68,105 +61,105 @@ static dlna_profile_t aac_iso_320 = {
 static dlna_profile_t aac_ltp_iso __attribute__ ((unused)) = {
   .id = "AAC_LTP_ISO",
   .mime = NULL,
-  .label = MPEG4_2CH_LABEL
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content with up to 5.1 channels */
 static dlna_profile_t aac_ltp_mult5_iso __attribute__ ((unused)) = {
   .id = "AAC_LTP_MULT5_ISO",
   .mime = NULL,
-  .label = MPEG4_MULTI_CH_LABEL
+  .label = LABEL_AUDIO_MULTI
 };
 
 /* Profile for audio media class content with up to 7.1 channels */
 static dlna_profile_t aac_ltp_mult7_iso __attribute__ ((unused)) = {
   .id = "AAC_LTP_MULT7_ISO",
   .mime = NULL,
-  .label = MPEG4_MULTI_CH_LABEL
+  .label = LABEL_AUDIO_MULTI
 };
 
 /* Profile for audio media class content with up to 5.1 channels */
 static dlna_profile_t aac_mult5_adts = {
   .id = "AAC_MULT5_ADTS",
-  .mime = ADTS_MIME_TYPE,
-  .label = MPEG4_MULTI_CH_LABEL
+  .mime = MIME_AUDIO_ADTS,
+  .label = LABEL_AUDIO_MULTI
 };
 
 /* Profile for audio media class content with up to 5.1 channels */
 static dlna_profile_t aac_mult5_iso = {
   .id = "AAC_MULT5_ISO",
-  .mime = MPEG4_MIME_TYPE,
-  .label = MPEG4_MULTI_CH_LABEL
+  .mime = MIME_AUDIO_MPEG_4,
+  .label = LABEL_AUDIO_MULTI
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t heaac_l2_adts __attribute__ ((unused)) = {
   .id = "HEAAC_L2_ADTS",
-  .mime = ADTS_MIME_TYPE,
-  .label = MPEG4_2CH_LABEL
+  .mime = MIME_AUDIO_ADTS,
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t heaac_l2_iso __attribute__ ((unused)) = {
   .id = "HEAAC_L2_ISO",
   .mime = NULL,
-  .label = MPEG4_2CH_LABEL
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t heaac_l3_adts __attribute__ ((unused)) = {
   .id = "HEAAC_L3_ADTS",
-  .mime = ADTS_MIME_TYPE,
-  .label = MPEG4_2CH_LABEL
+  .mime = MIME_AUDIO_ADTS,
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t heaac_l3_iso __attribute__ ((unused)) = {
   .id = "HEAAC_L3_ISO",
   .mime = NULL,
-  .label = MPEG4_2CH_LABEL
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content with up to 5.1 channels */
 static dlna_profile_t heaac_mult5_adts __attribute__ ((unused)) = {
   .id = "HEAAC_MULT5_ADTS",
-  .mime = ADTS_MIME_TYPE,
-  .label = MPEG4_MULTI_CH_LABEL
+  .mime = MIME_AUDIO_ADTS,
+  .label = LABEL_AUDIO_MULTI
 };
 
 /* Profile for audio media class content with up to 5.1 channels */
 static dlna_profile_t heaac_mult5_iso __attribute__ ((unused)) = {
   .id = "HEAAC_MULT5_ISO",
   .mime = NULL,
-  .label = MPEG4_MULTI_CH_LABEL
+  .label = LABEL_AUDIO_MULTI
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t heaac_l2_adts_320 __attribute__ ((unused)) = {
   .id = "HEAAC_L2_ADTS_320",
-  .mime = ADTS_MIME_TYPE,
-  .label = MPEG4_2CH_LABEL
+  .mime = MIME_AUDIO_ADTS,
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t heaac_l2_iso_320 __attribute__ ((unused)) = {
   .id = "HEAAC_L2_ISO_320",
   .mime = NULL,
-  .label = MPEG4_2CH_LABEL
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t bsac_iso __attribute__ ((unused)) = {
   .id = "BSAC_ISO",
   .mime = NULL,
-  .label = MPEG4_2CH_LABEL
+  .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content with up to 5.1 channels */
 static dlna_profile_t bsac_mult5_iso __attribute__ ((unused)) = {
   .id = "BSAC_MULT5_ISO",
   .mime = NULL,
-  .label = MPEG4_MULTI_CH_LABEL
+  .label = LABEL_AUDIO_MULTI
 };
 
 static int
