@@ -76,7 +76,7 @@ probe_ac3 (AVFormatContext *ctx)
   
   if (audio_is_valid_ac3 (codec))
     return set_profile (&ac3);
-  return 0;
+  return NULL;
 }
 
 dlna_registered_profile_t dlna_profile_audio_ac3 = {
