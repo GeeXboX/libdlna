@@ -36,6 +36,7 @@ static dlna_profile_t *
 probe_avc (AVFormatContext *ctx)
 {
   av_codecs_t *codecs;
+  dlna_container_type_t st;
 
   /* grab codecs info */
   codecs = av_profile_get_codecs (ctx);
@@ -46,6 +47,14 @@ probe_avc (AVFormatContext *ctx)
   if (codecs->vc->codec_id != CODEC_ID_H264)
     goto probe_avc_end;
 
+  /* check for a supported container */
+  st = stream_get_container (ctx);
+  if (st != CT_MOV && /* MP4 or 3GPP */
+      st != CT_MPEG_TRANSPORT_STREAM &&
+      st != CT_MPEG_TRANSPORT_STREAM_DLNA &&
+      st != CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS)
+    goto probe_avc_end;
+  
  probe_avc_end:
   if (codecs)
     free (codecs);
