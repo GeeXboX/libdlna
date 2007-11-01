@@ -83,6 +83,7 @@ mov_find_container_type (const char *filename)
     return CT_UNKNOWN;
 
   if (!strcasecmp (get_file_extension (filename), "3gp") ||
+      !strcasecmp (get_file_extension (filename), "3gpp") ||
       !strcasecmp (get_file_extension (filename), "3g2"))
     return CT_3GP;
 
