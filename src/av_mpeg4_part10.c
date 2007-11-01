@@ -860,6 +860,24 @@ static const struct {
   { &avc_mp4_bl_l1b_qcif15_heaac, CT_MOV,
     AVC_VIDEO_PROFILE_BL_L1B_QCIF, AVC_AUDIO_PROFILE_HEAAC },
 
+  /* 3GPP Container */
+  { &avc_3gpp_bl_cif30_amr_wbplus, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF30, AVC_AUDIO_PROFILE_AMR_WB },
+
+  { &avc_3gpp_bl_cif15_amr_wbplus, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF15, AVC_AUDIO_PROFILE_AMR_WB },
+
+  { &avc_3gpp_bl_qcif15_aac, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_QCIF15, AVC_AUDIO_PROFILE_AAC },
+  { &avc_3gpp_bl_qcif15_aac_ltp, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_QCIF15, AVC_AUDIO_PROFILE_AAC_LTP },
+  { &avc_3gpp_bl_qcif15_heaac, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_QCIF15, AVC_AUDIO_PROFILE_HEAAC },
+  { &avc_3gpp_bl_qcif15_amr_wbplus, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_QCIF15, AVC_AUDIO_PROFILE_AMR_WB },
+  { &avc_3gpp_bl_qcif15_amr, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_QCIF15, AVC_AUDIO_PROFILE_AMR },
+  
   { NULL }
 };
   
