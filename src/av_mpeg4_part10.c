@@ -55,11 +55,13 @@ typedef enum {
   AVC_AUDIO_PROFILE_BSAC,
   AVC_AUDIO_PROFILE_AAC_LTP_MULT7,
   AVC_AUDIO_PROFILE_AAC_LTP_MULT5,
+  AVC_AUDIO_PROFILE_AAC_LTP_520,
   AVC_AUDIO_PROFILE_AAC_LTP,
   AVC_AUDIO_PROFILE_AC3,
   AVC_AUDIO_PROFILE_MP3,
   AVC_AUDIO_PROFILE_HEAAC,  
   AVC_AUDIO_PROFILE_AAC_MULT5,
+  AVC_AUDIO_PROFILE_AAC_520,
   AVC_AUDIO_PROFILE_AAC
 } avc_audio_profile_t;
 
@@ -783,6 +785,84 @@ static dlna_profile_t avc_3gpp_bl_qcif15_amr = {
   .label = LABEL_VIDEO_QCIF15
 };
 
+static const struct {
+  dlna_profile_t *profile;
+  dlna_container_type_t st;
+  avc_video_profile_t vp;
+  avc_audio_profile_t ap;
+} avc_profiles_mapping[] = {
+  /* MPEG-4 Container */
+  { &avc_mp4_mp_sd_aac_mult5, CT_MOV,
+    AVC_VIDEO_PROFILE_MP_SD, AVC_AUDIO_PROFILE_AAC_MULT5 },
+  { &avc_mp4_mp_sd_heaac_l2, CT_MOV,
+    AVC_VIDEO_PROFILE_MP_SD, AVC_AUDIO_PROFILE_HEAAC },
+  { &avc_mp4_mp_sd_mpeg1_l3, CT_MOV,
+    AVC_VIDEO_PROFILE_MP_SD, AVC_AUDIO_PROFILE_MP3 },
+  { &avc_mp4_mp_sd_ac3, CT_MOV,
+    AVC_VIDEO_PROFILE_MP_SD, AVC_AUDIO_PROFILE_AC3 },
+  { &avc_mp4_mp_sd_aac_ltp, CT_MOV,
+    AVC_VIDEO_PROFILE_MP_SD, AVC_AUDIO_PROFILE_AAC_LTP },
+  { &avc_mp4_mp_sd_aac_ltp_mult5, CT_MOV,
+    AVC_VIDEO_PROFILE_MP_SD, AVC_AUDIO_PROFILE_AAC_LTP_MULT5 },
+  { &avc_mp4_mp_sd_aac_ltp_mult7, CT_MOV,
+    AVC_VIDEO_PROFILE_MP_SD, AVC_AUDIO_PROFILE_AAC_LTP_MULT7 },
+  { &avc_mp4_mp_sd_atrac3plus, CT_MOV,
+    AVC_VIDEO_PROFILE_MP_SD, AVC_AUDIO_PROFILE_ATRAC },
+  { &avc_mp4_mp_sd_bsac, CT_MOV,
+    AVC_VIDEO_PROFILE_MP_SD, AVC_AUDIO_PROFILE_BSAC },
+  
+  { &avc_mp4_bl_l3l_sd_aac, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_L3L_SD, AVC_AUDIO_PROFILE_AAC },
+  { &avc_mp4_bl_l3l_sd_heaac, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_L3L_SD, AVC_AUDIO_PROFILE_HEAAC },
+
+  { &avc_mp4_bl_l3_sd_aac, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_L3_SD, AVC_AUDIO_PROFILE_AAC },
+
+  { &avc_mp4_bl_cif30_aac_mult5, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF30, AVC_AUDIO_PROFILE_AAC_MULT5 },
+  { &avc_mp4_bl_cif30_heaac_l2, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF30, AVC_AUDIO_PROFILE_HEAAC },
+  { &avc_mp4_bl_cif30_mpeg1_l3, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF30, AVC_AUDIO_PROFILE_MP3 },
+  { &avc_mp4_bl_cif30_ac3, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF30, AVC_AUDIO_PROFILE_AC3 },
+  { &avc_mp4_bl_cif30_aac_ltp, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF30, AVC_AUDIO_PROFILE_AAC_LTP },
+  { &avc_mp4_bl_cif30_aac_ltp_mult5, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF30, AVC_AUDIO_PROFILE_AAC_LTP_MULT5 },
+  { &avc_mp4_bl_cif30_bsac, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF30, AVC_AUDIO_PROFILE_BSAC },
+  { &avc_mp4_bl_cif30_bsac_mult5, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF30, AVC_AUDIO_PROFILE_BSAC_MULT5 },
+  
+  { &avc_mp4_bl_l2_cif30_aac, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_L2_CIF30, AVC_AUDIO_PROFILE_AAC },
+  
+  { &avc_mp4_bl_cif15_heaac, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF15, AVC_AUDIO_PROFILE_HEAAC },
+  { &avc_mp4_bl_cif15_amr, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF15, AVC_AUDIO_PROFILE_AMR },
+  { &avc_mp4_bl_cif15_aac, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF15, AVC_AUDIO_PROFILE_AAC },
+  { &avc_mp4_bl_cif15_aac_520, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF15, AVC_AUDIO_PROFILE_AAC_520 },
+  { &avc_mp4_bl_cif15_aac_ltp, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF15, AVC_AUDIO_PROFILE_AAC_LTP },
+  { &avc_mp4_bl_cif15_aac_ltp_520, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF15, AVC_AUDIO_PROFILE_AAC_LTP_520 },
+  { &avc_mp4_bl_cif15_bsac, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_CIF15, AVC_AUDIO_PROFILE_BSAC },
+
+  { &avc_mp4_bl_l12_cif15_heaac, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_L12_CIF15, AVC_AUDIO_PROFILE_HEAAC },
+
+  { &avc_mp4_bl_l1b_qcif15_heaac, CT_MOV,
+    AVC_VIDEO_PROFILE_BL_L1B_QCIF, AVC_AUDIO_PROFILE_HEAAC },
+
+  { NULL }
+};
+  
 static dlna_profile_t *
 probe_avc (AVFormatContext *ctx)
 {
