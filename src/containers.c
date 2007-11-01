@@ -7,6 +7,7 @@
 #include <ffmpeg/avformat.h>
 
 #include "containers.h"
+#include "profiles.h"
 
 #define MPEG_PACK_HEADER 0xba
 #define MPEG_TS_SYNC_CODE 0x47
@@ -75,6 +76,19 @@ mpeg_find_container_type (const char *filename)
   return CT_UNKNOWN;
 }
 
+static dlna_container_type_t
+mov_find_container_type (const char *filename)
+{
+  if (!filename)
+    return CT_UNKNOWN;
+
+  if (!strcasecmp (get_file_extension (filename), "3gp") ||
+      !strcasecmp (get_file_extension (filename), "3g2"))
+    return CT_3GP;
+
+  return CT_MP4;
+}
+
 dlna_container_type_t
 stream_get_container (AVFormatContext *ctx)
 {
@@ -90,6 +104,8 @@ stream_get_container (AVFormatContext *ctx)
       case CT_FF_MPEG:
       case CT_FF_MPEG_TS:
         return mpeg_find_container_type (ctx->filename);
+      case CT_MOV:
+        return mov_find_container_type (ctx->filename);
       default:
         return avf_format_mapping[i].type;
       }

@@ -639,51 +639,51 @@ static const struct {
   mpeg4_audio_profile_t ap;
 } mpeg4_profiles_mapping[] = {
   /* MPEG-4 Container */
-  { &mpeg4_p2_mp4_sp_aac, CT_MOV,
+  { &mpeg4_p2_mp4_sp_aac, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_SP_L3, MPEG4_AUDIO_PROFILE_AAC },
-  { &mpeg4_p2_mp4_sp_heaac, CT_MOV,
+  { &mpeg4_p2_mp4_sp_heaac, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_SP_L3, MPEG4_AUDIO_PROFILE_HEAAC },
-  { &mpeg4_p2_mp4_sp_atrac3plus, CT_MOV,
+  { &mpeg4_p2_mp4_sp_atrac3plus, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_SP_L3, MPEG4_AUDIO_PROFILE_ATRAC },
-  { &mpeg4_p2_mp4_sp_aac_ltp, CT_MOV,
+  { &mpeg4_p2_mp4_sp_aac_ltp, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_SP_L3, MPEG4_AUDIO_PROFILE_AAC_LTP },
 
-  { &mpeg4_p2_mp4_sp_l2_aac, CT_MOV,
+  { &mpeg4_p2_mp4_sp_l2_aac, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_SP_L2, MPEG4_AUDIO_PROFILE_AAC },
-  { &mpeg4_p2_mp4_sp_l2_amr, CT_MOV,
+  { &mpeg4_p2_mp4_sp_l2_amr, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_SP_L2, MPEG4_AUDIO_PROFILE_AMR },
 
-  { &mpeg4_p2_mp4_sp_vga_aac, CT_MOV,
+  { &mpeg4_p2_mp4_sp_vga_aac, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_SP_L3_VGA, MPEG4_AUDIO_PROFILE_AAC },
-  { &mpeg4_p2_mp4_sp_vga_heaac, CT_MOV,
+  { &mpeg4_p2_mp4_sp_vga_heaac, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_SP_L3_VGA, MPEG4_AUDIO_PROFILE_HEAAC },
 
-  { &mpeg4_p2_mp4_asp_aac, CT_MOV,
+  { &mpeg4_p2_mp4_asp_aac, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_ASP_L5, MPEG4_AUDIO_PROFILE_AAC },
-  { &mpeg4_p2_mp4_asp_heaac, CT_MOV,
+  { &mpeg4_p2_mp4_asp_heaac, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_ASP_L5, MPEG4_AUDIO_PROFILE_HEAAC },
-  { &mpeg4_p2_mp4_asp_heaac_mult5, CT_MOV,
+  { &mpeg4_p2_mp4_asp_heaac_mult5, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_ASP_L5, MPEG4_AUDIO_PROFILE_HEAAC_MULT5 },
-  { &mpeg4_p2_mp4_asp_actrac3plus, CT_MOV,
+  { &mpeg4_p2_mp4_asp_actrac3plus, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_ASP_L5, MPEG4_AUDIO_PROFILE_ATRAC },
 
-  { &mpeg4_p2_mp4_asp_l5_so_aac, CT_MOV,
+  { &mpeg4_p2_mp4_asp_l5_so_aac, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_ASP_L5, MPEG4_AUDIO_PROFILE_AAC },
-  { &mpeg4_p2_mp4_asp_l5_so_heaac, CT_MOV,
+  { &mpeg4_p2_mp4_asp_l5_so_heaac, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_ASP_L5, MPEG4_AUDIO_PROFILE_HEAAC },
-  { &mpeg4_p2_mp4_asp_l5_so_heaac_mult5, CT_MOV,
+  { &mpeg4_p2_mp4_asp_l5_so_heaac_mult5, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_ASP_L5, MPEG4_AUDIO_PROFILE_HEAAC_MULT5 },
 
-  { &mpeg4_p2_mp4_asp_l4_so_aac, CT_MOV,
+  { &mpeg4_p2_mp4_asp_l4_so_aac, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_ASP_L4, MPEG4_AUDIO_PROFILE_AAC },
-  { &mpeg4_p2_mp4_asp_l4_so_heaac, CT_MOV,
+  { &mpeg4_p2_mp4_asp_l4_so_heaac, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_ASP_L4, MPEG4_AUDIO_PROFILE_HEAAC },
-  { &mpeg4_p2_mp4_asp_l4_so_heaac_mult5, CT_MOV,
+  { &mpeg4_p2_mp4_asp_l4_so_heaac_mult5, CT_MP4,
     MPEG4_VIDEO_PROFILE_P2_ASP_L4, MPEG4_AUDIO_PROFILE_HEAAC_MULT5 },
 
-  { &mpeg4_h263_mp4_p0_l10_aac, CT_MOV,
+  { &mpeg4_h263_mp4_p0_l10_aac, CT_MP4,
     MPEG4_VIDEO_PROFILE_H263, MPEG4_AUDIO_PROFILE_AAC },
-  { &mpeg4_h263_mp4_p0_l10_aac_ltp, CT_MOV,
+  { &mpeg4_h263_mp4_p0_l10_aac_ltp, CT_MP4,
     MPEG4_VIDEO_PROFILE_H263, MPEG4_AUDIO_PROFILE_AAC_LTP },
 
   /* MPEG-TS Container */
@@ -759,13 +759,13 @@ static const struct {
     MPEG4_VIDEO_PROFILE_P2_ASP_L4, MPEG4_AUDIO_PROFILE_G726 },
 
   /* 3GPP Container */
-  { &mpeg4_h263_3gpp_p0_l10_amr_wbplus, CT_MOV,
+  { &mpeg4_h263_3gpp_p0_l10_amr_wbplus, CT_3GP,
     MPEG4_VIDEO_PROFILE_H263, MPEG4_AUDIO_PROFILE_AMR_WB },
-  { &mpeg4_p2_3gpp_sp_l0b_aac, CT_MOV,
+  { &mpeg4_p2_3gpp_sp_l0b_aac, CT_3GP,
     MPEG4_VIDEO_PROFILE_P2_SP_L0B, MPEG4_AUDIO_PROFILE_AAC },   
-  { &mpeg4_p2_3gpp_sp_l0b_amr, CT_MOV,
+  { &mpeg4_p2_3gpp_sp_l0b_amr, CT_3GP,
     MPEG4_VIDEO_PROFILE_P2_SP_L0B, MPEG4_AUDIO_PROFILE_AMR },
-  { &mpeg4_h263_3gpp_p3_l10_amr, CT_MOV,
+  { &mpeg4_h263_3gpp_p3_l10_amr, CT_3GP,
     MPEG4_VIDEO_PROFILE_H263, MPEG4_AUDIO_PROFILE_AMR },
   
   { NULL }
@@ -936,7 +936,8 @@ probe_mpeg4_part2 (AVFormatContext *ctx)
   /* check for a supported container */
   st = stream_get_container (ctx);
   if (st != CT_ASF &&
-      st != CT_MOV && /* MP4 or 3GPP */
+      st != CT_3GP &&
+      st != CT_MP4 &&
       st != CT_MPEG_TRANSPORT_STREAM &&
       st != CT_MPEG_TRANSPORT_STREAM_DLNA &&
       st != CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS)

@@ -25,6 +25,8 @@
 #include <ffmpeg/avcodec.h>
 #include <ffmpeg/avformat.h>
 
+#include "dlna.h"
+
 /* DLNA MIME types */
 #define MIME_IMAGE_JPEG                   "image/jpeg"
 #define MIME_IMAGE_PNG                    "image/png"

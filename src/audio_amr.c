@@ -24,6 +24,7 @@
 
 #include "dlna.h"
 #include "profiles.h"
+#include "containers.h"
 
 /* Profile for audio media class content */
 static dlna_profile_t amr = {
@@ -122,7 +123,7 @@ probe_amr (AVFormatContext *ctx)
   /* check for AMR NB/WB audio codec */
   if (audio_is_valid_amr (codec))
   {
-    if (!strcasecmp (get_file_extension (ctx->filename), "3gp"))
+    if (stream_get_container (ctx) == CT_3GP)
       return set_profile (&three_gpp);
     return set_profile (&amr);
   }

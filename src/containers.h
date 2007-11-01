@@ -32,6 +32,8 @@ typedef enum {
   CT_MP3,
   CT_WAV,
   CT_MOV,
+  CT_3GP,
+  CT_MP4,
   CT_FF_MPEG, /* FFMPEG "mpeg" */
   CT_FF_MPEG_TS, /* FFMPEG "mpegts" */
   CT_MPEG_ELEMENTARY_STREAM,
