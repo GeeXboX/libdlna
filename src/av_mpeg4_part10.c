@@ -38,8 +38,11 @@ typedef enum {
   AVC_VIDEO_PROFILE_BL_L1B_QCIF,
   AVC_VIDEO_PROFILE_BL_L12_CIF15,
   AVC_VIDEO_PROFILE_BL_CIF15,
+  AVC_VIDEO_PROFILE_BL_CIF15_520,
+  AVC_VIDEO_PROFILE_BL_CIF15_540,
   AVC_VIDEO_PROFILE_BL_L2_CIF30,
   AVC_VIDEO_PROFILE_BL_CIF30,
+  AVC_VIDEO_PROFILE_BL_CIF30_940,
   AVC_VIDEO_PROFILE_BL_L3L_SD,
   AVC_VIDEO_PROFILE_BL_L3_SD,
   AVC_VIDEO_PROFILE_MP_SD,
@@ -66,6 +69,70 @@ typedef enum {
   AVC_AUDIO_PROFILE_AAC_520,
   AVC_AUDIO_PROFILE_AAC
 } avc_audio_profile_t;
+
+typedef struct video_properties_s {
+  int width;
+  int height;
+} video_properties_t;
+
+static video_properties_t profile_cif_res[] = {
+  { 352, 288 }, /* CIF */
+  { 352, 240 }, /* 525SIF */
+  { 320, 240 }, /* QVGA 4:3 */
+  { 320, 180 }, /* QVGA 16:9 */
+  { 240, 180 }, /* 1/7 VGA 4:3 */
+  { 240, 135 }, /* 1/7 VGA 16:9 */
+  { 208, 160 }, /* 1/9 VGA 4:3 */
+  { 176, 144 }, /* QCIF,625QCIF */
+  { 176, 120 }, /* 525QCIF */
+  { 160, 120 }, /* SQVGA 4:3 */
+  { 160, 112 }, /* 1/16 VGA 4:3 */
+  { 160, 90  }, /* SQVGA 16:9 */
+  { 128, 96  }  /* SQCIF */
+};
+
+static video_properties_t profile_mp_l3_sd_res[] = {
+  { 720, 576 }, /* 625 D1 */
+  { 720, 480 }, /* 525 D1 */
+  { 640, 480 }, /* VGA */
+  { 640, 360 }  /* VGA 16:9 */
+};
+
+static video_properties_t profile_mp_sd_res[] = {
+  { 720, 576 }, /* 625 D1 */
+  { 720, 480 }, /* 525 D1 */
+  { 704, 576 }, /* 625 4SIF */
+  { 704, 480 }, /* 525 4SIF */
+  { 640, 480 }, /* VGA */
+  { 640, 360 }, /* VGA 16:9 */
+  { 544, 576 }, /* 625 3/4 D1 */
+  { 544, 480 }, /* 525 3/4 D1 */
+  { 480, 576 }, /* 625 2/3 D1 */
+  { 480, 480 }, /* 525 2/3 D1 */
+  { 480, 360 }, /* 9/16 VGA 4:3 */
+  { 480, 270 }, /* 9/16 VGA 16:9 */
+  { 352, 576 }, /* 625 1/2 D1 */
+  { 352, 480 }, /* 525 1/2 D1 */
+  { 352, 288 }, /* CIF, 625SIF */
+  { 352, 240 }, /* 525SIF */
+  { 320, 240 }, /* QVGA 4:3 */
+  { 320, 180 }, /* QVGA 16:9 */
+  { 240, 180 }, /* 1/7 VGA 4:3 */
+  { 208, 160 }, /* 1/9 VGA 4:3 */
+  { 176, 144 }, /* QCIF,625QCIF */
+  { 176, 120 }, /* 525QCIF */
+  { 160, 120 }, /* SQVGA 4:3 */
+  { 160, 112 }, /* 1/16 VGA 4:3 */
+  { 160, 90  }, /* SQVGA 16:9 */
+  { 128, 96  }  /* SQCIF */
+};
+
+static video_properties_t profile_mp_hd_res[] = {
+  { 1920, 1080 }, /* 1080p */
+  { 1920, 1152 },
+  { 1920, 540  }, /* 1080i */
+  { 1280, 720  }  /* 720p */
+};
 
 /********************/
 /* MPEG-4 Container */
@@ -1072,13 +1139,103 @@ static const struct {
   
   { NULL }
 };
+
+static inline int
+is_valid_video_profile (video_properties_t res[],
+                        int size, AVCodecContext *vc)
+{
+  int i;
+
+  for (i = 0; i < size / sizeof (video_properties_t); i++)
+    if (res[i].width == vc->width &&
+        res[i].height == vc->height)
+      return 1;
+
+  return 0;
+}
+
+static avc_video_profile_t
+avc_video_get_profile (AVFormatContext *ctx, AVStream *vs, AVCodecContext *vc)
+{
+  if (!vs || !vc)
+    return AVC_VIDEO_PROFILE_INVALID;
+
+  /* stupid exception to CIF15 */
+  if (vc->bit_rate <= 384000 && ctx->bit_rate <= 600000 &&
+      vc->width == 320 && vc->height == 240)
+    return AVC_VIDEO_PROFILE_BL_L12_CIF15;
   
+  /* CIF */
+  if (is_valid_video_profile (profile_cif_res,
+                              sizeof (profile_cif_res), vc))
+  {
+    /* QCIF */
+    if (vc->bit_rate <= 128000 && ctx->bit_rate <= 256000)
+    {
+      if (vs->r_frame_rate.num == 15 && vs->r_frame_rate.num == 1)
+        return AVC_VIDEO_PROFILE_BL_QCIF15;
+      else
+        return AVC_VIDEO_PROFILE_BL_L1B_QCIF;
+    }
+    
+    /* CIF15 */
+    if (ctx->bit_rate <= 520000) /* 520 kbps max system bitrate */
+      return AVC_VIDEO_PROFILE_BL_CIF15_520;
+    if (ctx->bit_rate <= 540000) /* 540 kbps max system bitrate */
+      return AVC_VIDEO_PROFILE_BL_CIF15_540;
+    
+    /* 384 kbps max video bitrate */
+    if (vc->bit_rate <= 384000 && ctx->bit_rate <= 600000)
+      return AVC_VIDEO_PROFILE_BL_CIF15;
+    
+    /* CIF30 */
+    if (ctx->bit_rate <= 940000) /* 940 kbps max system bitrate */
+      return AVC_VIDEO_PROFILE_BL_CIF30_940;
+    if (ctx->bit_rate <= 1300000) /* 1.3 Mbps kbps max system bitrate */
+      return AVC_VIDEO_PROFILE_BL_L2_CIF30;
+    
+    /* 2 Mbps max video bitrate */
+    if (vc->bit_rate <= 2000000 && ctx->bit_rate <= 3000000) 
+      return AVC_VIDEO_PROFILE_BL_CIF30;
+  }
+  
+  /* SD */
+  if (vc->bit_rate <= 4000000 /* 4 Mbps max */
+      && is_valid_video_profile (profile_mp_l3_sd_res,
+                                 sizeof (profile_mp_l3_sd_res), vc))
+    return AVC_VIDEO_PROFILE_BL_L3_SD;
+  /* what is BL_L3L ?? */
+  
+  if (vc->bit_rate <= 10000000 /* 10 Mbps max */
+      && is_valid_video_profile (profile_mp_sd_res,
+                                 sizeof (profile_mp_sd_res), vc))
+    return AVC_VIDEO_PROFILE_MP_SD;
+
+  /* HD */
+  if (vc->bit_rate <= 20000000) /* 20 Mbps max */
+  {
+    if (is_valid_video_profile (profile_mp_hd_res,
+                                sizeof (profile_mp_hd_res), vc))
+      return AVC_VIDEO_PROFILE_MP_HD;
+
+    /* dirty hack to support some excentric 480/720/1080(i,p) files
+       where only one of the size is correct */
+    if (vc->width == 1920 || vc->width == 1280 || vc->width == 720)
+      return AVC_VIDEO_PROFILE_MP_HD;
+    if (vc->height == 1080 || vc->height == 720 || vc->height == 480)
+      return AVC_VIDEO_PROFILE_MP_HD;
+  }
+  
+  return AVC_VIDEO_PROFILE_INVALID;
+}
+
 static dlna_profile_t *
 probe_avc (AVFormatContext *ctx)
 {
   av_codecs_t *codecs;
   dlna_container_type_t st;
-
+  avc_video_profile_t vp;
+  
   /* grab codecs info */
   codecs = av_profile_get_codecs (ctx);
   if (!codecs)
@@ -1096,6 +1253,19 @@ probe_avc (AVFormatContext *ctx)
       st != CT_MPEG_TRANSPORT_STREAM &&
       st != CT_MPEG_TRANSPORT_STREAM_DLNA &&
       st != CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS)
+    goto probe_avc_end;
+
+  dump_format (ctx, 0, NULL, 0);
+
+  /* ensure we have a valid video codec bit rate */
+  if (codecs->vc->bit_rate == 0)
+    codecs->vc->bit_rate = codecs->ac->bit_rate ?
+      ctx->bit_rate - codecs->ac->bit_rate : ctx->bit_rate;
+
+  /* check for valid video profile */
+  vp = avc_video_get_profile (ctx, codecs->vs, codecs->vc);
+  printf ("VP: %d\n", vp);
+  if (vp == AVC_VIDEO_PROFILE_INVALID)
     goto probe_avc_end;
   
  probe_avc_end:
