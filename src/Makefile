@@ -6,6 +6,7 @@ SRCS =  profiles.c \
 	containers.c \
 	image_jpeg.c \
 	image_png.c \
+	audio_aac.c \
 	audio_ac3.c \
 	audio_amr.c \
 	audio_atrac3.c \
@@ -13,7 +14,6 @@ SRCS =  profiles.c \
 	audio_lpcm.c \
 	audio_mp2.c \
 	audio_mp3.c \
-	audio_mpeg4.c \
 	audio_wma.c \
 	av_mpeg1.c \
 	av_mpeg2.c \
