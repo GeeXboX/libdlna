@@ -40,6 +40,7 @@ extern dlna_registered_profile_t dlna_profile_audio_wma;
 extern dlna_registered_profile_t dlna_profile_av_mpeg1;
 extern dlna_registered_profile_t dlna_profile_av_mpeg2;
 extern dlna_registered_profile_t dlna_profile_av_mpeg4_part2;
+extern dlna_registered_profile_t dlna_profile_av_mpeg4_part10;
 extern dlna_registered_profile_t dlna_profile_av_wmv9;
 
 static void
@@ -73,6 +74,7 @@ dlna_register_all_media_profiles (void)
   dlna_register_profile (&dlna_profile_av_mpeg1);
   dlna_register_profile (&dlna_profile_av_mpeg2);
   dlna_register_profile (&dlna_profile_av_mpeg4_part2);
+  dlna_register_profile (&dlna_profile_av_mpeg4_part10);
   dlna_register_profile (&dlna_profile_av_wmv9);
 }
 
@@ -116,6 +118,9 @@ dlna_register_media_profile (dlna_media_profile_t profile)
     break;
   case DLNA_PROFILE_AV_MPEG4_PART2:
     dlna_register_profile (&dlna_profile_av_mpeg4_part2);
+    break;
+  case DLNA_PROFILE_AV_MPEG4_PART10:
+    dlna_register_profile (&dlna_profile_av_mpeg4_part10);
     break;
   case DLNA_PROFILE_AV_WMV9:
     dlna_register_profile (&dlna_profile_av_wmv9);
