@@ -893,10 +893,10 @@ mpeg4_audio_get_profile (AVStream *as, AVCodecContext *ac)
   if (audio_profile_guess_atrac (ac) == AUDIO_PROFILE_ATRAC)
     return MPEG4_AUDIO_PROFILE_ATRAC;
   
-  if (audio_is_valid_amr (ac))
+  if (audio_profile_guess_amr (ac) == AUDIO_PROFILE_AMR)
     return MPEG4_AUDIO_PROFILE_AMR;
   
-  if (audio_is_valid_amr_wb (ac))
+  if (audio_profile_guess_amr (ac) == AUDIO_PROFILE_AMR_WB)
     return MPEG4_AUDIO_PROFILE_AMR_WB;
   
   if (audio_profile_guess_mp2 (ac) == AUDIO_PROFILE_MP2)

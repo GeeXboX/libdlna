@@ -47,7 +47,7 @@ static dlna_profile_t amr_wbplus = {
   .label = LABEL_AUDIO_2CH
 };
 
-int
+static int
 audio_is_valid_amr (AVCodecContext *ac)
 {
   if (!ac)
@@ -83,7 +83,7 @@ audio_is_valid_amr (AVCodecContext *ac)
   return 0;
 }
 
-int
+static int
 audio_is_valid_amr_wb (AVCodecContext *ac)
 {
   if (!ac)
@@ -109,6 +109,20 @@ audio_is_valid_amr_wb (AVCodecContext *ac)
     return 0;
 
   return 1;
+}
+
+audio_profile_t
+audio_profile_guess_amr (AVCodecContext *ac)
+{
+  if (!ac)
+    return AUDIO_PROFILE_INVALID;
+
+  if (audio_is_valid_amr (ac))
+    return AUDIO_PROFILE_AMR;
+  else if (audio_is_valid_amr_wb (ac))
+    return AUDIO_PROFILE_AMR_WB;
+  
+  return AUDIO_PROFILE_INVALID;
 }
 
 static dlna_profile_t *

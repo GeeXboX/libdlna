@@ -121,6 +121,7 @@ typedef enum {
 
 audio_profile_t audio_profile_guess (AVCodecContext *ac);
 
+audio_profile_t audio_profile_guess_amr (AVCodecContext *ac);
 audio_profile_t audio_profile_guess_atrac (AVCodecContext *ac);
 audio_profile_t audio_profile_guess_g726 (AVCodecContext *ac);
 audio_profile_t audio_profile_guess_lpcm (AVCodecContext *ac);
@@ -128,8 +129,6 @@ audio_profile_t audio_profile_guess_mp2 (AVCodecContext *ac);
 audio_profile_t audio_profile_guess_mp3 (AVCodecContext *ac);
 audio_profile_t audio_profile_guess_wma (AVCodecContext *ac);
 
-int audio_is_valid_amr (AVCodecContext *ac);
-int audio_is_valid_amr_wb (AVCodecContext *ac);
 int audio_is_valid_ac3 (AVCodecContext *ac);
 int audio_is_valid_aac_stereo (AVCodecContext *ac);
 int audio_is_valid_aac_mult5 (AVCodecContext *ac);
