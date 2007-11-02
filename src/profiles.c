@@ -364,3 +364,50 @@ dlna_write_protocol_info (dlna_protocol_info_type_t type,
 
   return strdup (protocol);
 }
+
+audio_profile_t
+audio_profile_guess (AVCodecContext *ac)
+{
+  audio_profile_t ap = AUDIO_PROFILE_INVALID;
+  
+  if (!ac)
+    return ap;
+
+/*   ap = audio_profile_guess_aac (ac); */
+/*   if (ap != AUDIO_PROFILE_INVALID) */
+/*     return ap; */
+
+/*   ap = audio_profile_guess_ac3 (ac); */
+/*   if (ap != AUDIO_PROFILE_INVALID) */
+/*     return ap; */
+
+/*   ap = audio_profile_guess_amr (ac); */
+/*   if (ap != AUDIO_PROFILE_INVALID) */
+/*     return ap; */
+
+/*   ap = audio_profile_guess_atrac (ac); */
+/*   if (ap != AUDIO_PROFILE_INVALID) */
+/*     return ap; */
+
+/*   ap = audio_profile_guess_g726 (ac); */
+/*   if (ap != AUDIO_PROFILE_INVALID) */
+/*     return ap; */
+
+/*   ap = audio_profile_guess_lpcm (ac); */
+/*   if (ap != AUDIO_PROFILE_INVALID) */
+/*     return ap; */
+
+/*   ap = audio_profile_guess_mp2 (ac); */
+/*   if (ap != AUDIO_PROFILE_INVALID) */
+/*     return ap; */
+
+/*   ap = audio_profile_guess_mp3 (ac); */
+/*   if (ap != AUDIO_PROFILE_INVALID) */
+/*     return ap; */
+
+/*   ap = audio_profile_guess_wma (ac); */
+/*   if (ap != AUDIO_PROFILE_INVALID) */
+/*     return ap; */
+
+  return AUDIO_PROFILE_INVALID;
+}

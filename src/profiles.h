@@ -119,6 +119,8 @@ typedef enum {
   AUDIO_PROFILE_WMA_PRO
 } audio_profile_t;
 
+audio_profile_t audio_profile_guess (AVCodecContext *ac);
+
 int audio_is_valid_amr (AVCodecContext *ac);
 int audio_is_valid_amr_wb (AVCodecContext *ac);
 int audio_is_valid_ac3 (AVCodecContext *ac);
