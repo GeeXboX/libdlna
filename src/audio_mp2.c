@@ -25,25 +25,25 @@
 #include "dlna.h"
 #include "profiles.h"
 
-int
-audio_is_valid_mp2 (AVCodecContext *ac)
+audio_profile_t
+audio_profile_guess_mp2 (AVCodecContext *ac)
 {
   if (!ac)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
 
   if (ac->codec_id != CODEC_ID_MP2)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
   
   if (ac->channels > 5)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
 
   if (ac->sample_rate != 32000 &&
       ac->sample_rate != 44100 &&
       ac->sample_rate != 48000)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
   
   if (ac->bit_rate < 32000 || ac->bit_rate > 448000)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
   
-  return 1;
+  return AUDIO_PROFILE_MP2;
 }
