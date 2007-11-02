@@ -1214,6 +1214,7 @@ probe_avc (AVFormatContext *ctx)
   av_codecs_t *codecs;
   dlna_container_type_t st;
   avc_video_profile_t vp;
+  audio_profile_t ap;
   
   /* grab codecs info */
   codecs = av_profile_get_codecs (ctx);
@@ -1245,7 +1246,13 @@ probe_avc (AVFormatContext *ctx)
   printf ("VP: %d\n", vp);
   if (vp == AVC_VIDEO_PROFILE_INVALID)
     goto probe_avc_end;
-  
+
+  /* check for valid audio profile */
+  ap = audio_profile_guess (codecs->ac);
+  printf ("AP: %d\n", ap);
+  if (ap == AUDIO_PROFILE_INVALID)
+    goto probe_avc_end;
+
  probe_avc_end:
   if (codecs)
     free (codecs);
