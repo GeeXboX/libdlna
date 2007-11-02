@@ -121,6 +121,7 @@ typedef enum {
 
 audio_profile_t audio_profile_guess (AVCodecContext *ac);
 
+audio_profile_t audio_profile_guess_lpcm (AVCodecContext *ac);
 audio_profile_t audio_profile_guess_mp2 (AVCodecContext *ac);
 audio_profile_t audio_profile_guess_mp3 (AVCodecContext *ac);
 audio_profile_t audio_profile_guess_wma (AVCodecContext *ac);

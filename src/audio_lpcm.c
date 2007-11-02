@@ -32,6 +32,28 @@ static dlna_profile_t lpcm = {
   .label = LABEL_AUDIO_2CH
 };
 
+audio_profile_t
+audio_profile_guess_lpcm (AVCodecContext *ac)
+{
+  if (!ac)
+    return AUDIO_PROFILE_INVALID;
+
+  /* check for 16-bit signed network-endian PCM codec  */
+  if (ac->codec_id != CODEC_ID_PCM_S16BE &&
+      ac->codec_id != CODEC_ID_PCM_S16LE)
+    return AUDIO_PROFILE_INVALID;
+
+  /* supported channels: mono or stereo */
+  if (ac->channels > 2)
+    return AUDIO_PROFILE_INVALID;
+
+  /* supported sampling rate: 44.1 and 48 kHz */
+  if (ac->sample_rate != 44100 && ac->sample_rate != 48000)
+    return AUDIO_PROFILE_INVALID;
+  
+  return AUDIO_PROFILE_LPCM;
+}
+
 static dlna_profile_t *
 probe_lpcm (AVFormatContext *ctx)
 {
@@ -43,19 +65,9 @@ probe_lpcm (AVFormatContext *ctx)
   if (!codec)
     return NULL;
 
-  /* check for 16-bit signed network-endian PCM codec  */
-  if (codec->codec_id != CODEC_ID_PCM_S16BE &&
-      codec->codec_id != CODEC_ID_PCM_S16LE)
+  if (audio_profile_guess_lpcm (codec) != AUDIO_PROFILE_LPCM)
     return NULL;
-
-  /* supported channels: mono or stereo */
-  if (codec->channels > 2)
-    return NULL;
-
-  /* supported sampling rate: 44.1 and 48 kHz */
-  if (codec->sample_rate != 44100 && codec->sample_rate != 48000)
-    return NULL;
-
+  
   p = set_profile (&lpcm);
   sprintf (mime, "%s;rate=%d;channels=%d",
            MIME_AUDIO_LPCM, codec->sample_rate, codec->channels);
