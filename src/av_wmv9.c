@@ -53,6 +53,14 @@
 #include "profiles.h"
 #include "containers.h"
 
+typedef enum {
+  WMV_VIDEO_PROFILE_INVALID,
+  WMV_VIDEO_PROFILE_SIMPLE_LOW,
+  WMV_VIDEO_PROFILE_SIMPLE_MEDIUM,
+  WMV_VIDEO_PROFILE_MAIN_MEDIUM,
+  WMV_VIDEO_PROFILE_MAIN_HIGH
+} wmv_video_profile_t;
+
 typedef struct wmv9_profile_s {
   int max_width;
   int max_height;
@@ -152,6 +160,30 @@ static dlna_profile_t wmvspml_mp3 = {
   .label = LABEL_VIDEO_CIF15
 };
 
+static const struct {
+  dlna_profile_t *profile;
+  wmv_video_profile_t vp;
+  audio_profile_t ap;
+} wmv_profiles_mapping[] = {
+  { &wmvmed_base,  WMV_VIDEO_PROFILE_MAIN_MEDIUM,
+                   AUDIO_PROFILE_WMA_BASELINE },
+  { &wmvmed_full,  WMV_VIDEO_PROFILE_MAIN_MEDIUM,
+                   AUDIO_PROFILE_WMA_FULL },
+  { &wmvmed_pro,   WMV_VIDEO_PROFILE_MAIN_MEDIUM,
+                   AUDIO_PROFILE_WMA_PRO },
+  { &wmvhigh_full, WMV_VIDEO_PROFILE_MAIN_HIGH,
+                   AUDIO_PROFILE_WMA_FULL },
+  { &wmvhigh_pro,  WMV_VIDEO_PROFILE_MAIN_HIGH,
+                   AUDIO_PROFILE_WMA_FULL },
+  { &wmvspll_base, WMV_VIDEO_PROFILE_SIMPLE_LOW,
+                   AUDIO_PROFILE_WMA_BASELINE },
+  { &wmvspml_base, WMV_VIDEO_PROFILE_SIMPLE_MEDIUM,
+                   AUDIO_PROFILE_WMA_BASELINE },
+  { &wmvspml_mp3,  WMV_VIDEO_PROFILE_SIMPLE_MEDIUM,
+                   AUDIO_PROFILE_MP3 },
+  { NULL }
+};
+
 static int
 is_valid_wmv9_video_profile (wmv9_profile_t profile[], int size,
                              AVStream *vs, AVCodecContext *vc)
@@ -170,11 +202,39 @@ is_valid_wmv9_video_profile (wmv9_profile_t profile[], int size,
   return 0;
 }
 
+static wmv_video_profile_t
+wmv_video_profile_get (AVStream *vs, AVCodecContext *vc)
+{
+  if (!vs || !vc)
+    return WMV_VIDEO_PROFILE_INVALID;
+
+  if (is_valid_wmv9_video_profile (wmv9_profile_simple_low,
+                                   sizeof (wmv9_profile_simple_low), vs, vc))
+    return WMV_VIDEO_PROFILE_SIMPLE_LOW;
+
+  if (is_valid_wmv9_video_profile (wmv9_profile_simple_medium,
+                                   sizeof (wmv9_profile_simple_medium),
+                                   vs, vc))
+    return WMV_VIDEO_PROFILE_SIMPLE_MEDIUM;
+
+  if (is_valid_wmv9_video_profile (wmv9_profile_main_medium,
+                                   sizeof (wmv9_profile_main_medium), vs, vc))
+    return WMV_VIDEO_PROFILE_MAIN_MEDIUM;
+  
+  if (is_valid_wmv9_video_profile (wmv9_profile_main_high,
+                                   sizeof (wmv9_profile_main_high), vs, vc))
+    return WMV_VIDEO_PROFILE_MAIN_HIGH;
+  
+  return WMV_VIDEO_PROFILE_INVALID;
+}
+
 static dlna_profile_t *
 probe_wmv9 (AVFormatContext *ctx)
 {
   av_codecs_t *codecs;
+  wmv_video_profile_t vp;
   audio_profile_t ap;
+  int i;
   
   /* need to be in ASF container only */
   if (stream_get_container (ctx) != CT_ASF)
@@ -188,57 +248,22 @@ probe_wmv9 (AVFormatContext *ctx)
   if (codecs->vc->codec_id != CODEC_ID_WMV3)
     goto probe_wmv9_end;
 
+  /* get video profile */
+  vp = wmv_video_profile_get (codecs->vs, codecs->vc);
+  if (vp == WMV_VIDEO_PROFILE_INVALID)
+    goto probe_wmv9_end;
+  
   /* get audio profile */
   ap = audio_profile_guess (codecs->ac);
   if (ap == AUDIO_PROFILE_INVALID)
-    return NULL;
-
-  /* we'll determine profile and level according to bitrate */
-  if (is_valid_wmv9_video_profile (wmv9_profile_simple_low,
-                                   sizeof (wmv9_profile_simple_low),
-                                   codecs->vs, codecs->vc))
-  {
-    if (ap == AUDIO_PROFILE_WMA_BASELINE)
-      return set_profile (&wmvspll_base);
-
     goto probe_wmv9_end;
-  }
-  else if (is_valid_wmv9_video_profile (wmv9_profile_simple_medium,
-                                        sizeof (wmv9_profile_simple_medium),
-                                        codecs->vs, codecs->vc))
-  {
-    if (ap == AUDIO_PROFILE_WMA_BASELINE)
-      return set_profile (&wmvspml_base);
-    else if (ap == AUDIO_PROFILE_MP3)
-      return set_profile (&wmvspml_mp3);
 
-    goto probe_wmv9_end;
-  }
-  else if (is_valid_wmv9_video_profile (wmv9_profile_main_medium,
-                                        sizeof (wmv9_profile_main_medium),
-                                        codecs->vs, codecs->vc))
-  {
-    if (ap == AUDIO_PROFILE_WMA_BASELINE)
-      return set_profile (&wmvmed_base);
-    else if (ap == AUDIO_PROFILE_WMA_FULL)
-      return set_profile (&wmvmed_full);
-    else if (ap == AUDIO_PROFILE_WMA_PRO)
-      return set_profile (&wmvmed_pro);
-
-    goto probe_wmv9_end;
-  }
-  else if (is_valid_wmv9_video_profile (wmv9_profile_main_high,
-                                        sizeof (wmv9_profile_main_high),
-                                        codecs->vs, codecs->vc))
-  {
-    if (ap == AUDIO_PROFILE_WMA_FULL)
-      return set_profile (&wmvhigh_full);
-    else if (ap == AUDIO_PROFILE_WMA_PRO)
-      return set_profile (&wmvhigh_pro);
-
-    goto probe_wmv9_end;
-  }
-
+  /* find profile according to container type, video and audio profiles */
+  for (i = 0; wmv_profiles_mapping[i].profile; i++)
+    if (wmv_profiles_mapping[i].vp == vp &&
+        wmv_profiles_mapping[i].ap == ap)
+      return set_profile (wmv_profiles_mapping[i].profile);
+  
  probe_wmv9_end:
   if (codecs)
     free (codecs);
