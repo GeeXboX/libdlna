@@ -1254,6 +1254,10 @@ probe_avc (AVFormatContext *ctx)
   if (ap == AUDIO_PROFILE_INVALID)
     goto probe_avc_end;
 
+  /* ugly hack needed until we have a nice way to check for AAC variants */
+  if (ap == AUDIO_PROFILE_AAC)
+    ap = AUDIO_PROFILE_AAC_LTP;
+
   /* find profile according to container type, video and audio profiles */
   for (i = 0; avc_profiles_mapping[i].profile; i++)
     if (avc_profiles_mapping[i].st == st &&
