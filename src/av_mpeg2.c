@@ -307,17 +307,7 @@ static dlna_profile_t mpeg_es_ntsc_xac3 = {
 static int
 is_mpeg_ps_es_audio_stream_lpcm (AVFormatContext *ctx, av_codecs_t *codecs)
 {
-  /* check for 16-bit signed network-endian PCM codec  */
-  if (codecs->ac->codec_id != CODEC_ID_PCM_S16BE &&
-      codecs->ac->codec_id != CODEC_ID_PCM_S16LE)
-    return 0;
-
-  /* sampling rate is 48 KHz */
-  if (codecs->ac->sample_rate != 48000)
-    return 0;
-
-  /* channels mode: 1/0, 2/0, 1/0 + 1/0 */
-  if (codecs->ac->channels > 2)
+  if (audio_profile_guess_lpcm (codecs->ac) != AUDIO_PROFILE_LPCM)
     return 0;
   
   /* audio bit rate: 1.536 Mbps for stereo, 768 Kbps for mono */
@@ -330,66 +320,23 @@ is_mpeg_ps_es_audio_stream_lpcm (AVFormatContext *ctx, av_codecs_t *codecs)
 }
 
 static int
-common_ac3_check (AVFormatContext *ctx, av_codecs_t *codecs)
-{
-  /* check for AC3 */
-  if (codecs->ac->codec_id != CODEC_ID_AC3)
-    return 0;
-
-  /* sampling rate is 48 KHz */
-  if (codecs->ac->sample_rate != 48000)
-    return 0;
-
-  /* supported channels: 1/0, 1/0 + 1/0, 2/0, 3/0, 2/1, 3/1, 2/2, 3/2 */
-  if (codecs->ac->channels > 5)
-    return 0;
-
-  return 1;
-}
-
-static int
 is_mpeg_ps_es_audio_stream_extended_ac3 (AVFormatContext *ctx,
                                       av_codecs_t *codecs)
 {
-  int res;
-  
-  res = common_ac3_check (ctx, codecs);
-  if (!res)
-    return 0;
-
-  /* supported bitrate: 64 Kbps - 640 Kbps */
-  if (codecs->ac->bit_rate < 64000 || codecs->ac->bit_rate > 640000)
-    return 0;
-
-  return 1;
+  return (audio_profile_guess_ac3 (codecs->ac) == AUDIO_PROFILE_AC3_EXTENDED)
+    ? 1 : 0;
 }
 
 static int
 is_mpeg_ps_es_audio_stream_ac3 (AVFormatContext *ctx, av_codecs_t *codecs)
 {
-  int res;
-  
-  res = common_ac3_check (ctx, codecs);
-  if (!res)
-    return 0;
-
-  /* supported bitrate: 64 Kbps - 448 Kbps */
-  if (codecs->ac->bit_rate < 64000 || codecs->ac->bit_rate > 448000)
-    return 0;
-  
-  return 1;
+  return (audio_profile_guess_ac3 (codecs->ac) == AUDIO_PROFILE_AC3) ? 1 : 0;
 }
 
 static int
 is_mpeg_ps_es_audio_stream_mp2 (AVFormatContext *ctx, av_codecs_t *codecs)
 {
-  /* check for MPEG-1 Layer-2 audio codec */
-  if (codecs->ac->codec_id != CODEC_ID_MP2 &&
-      codecs->ac->codec_id != CODEC_ID_MP3)
-    return 0;
-
-  /* sampling rate is 44.1 or 48 KHz */
-  if (codecs->ac->sample_rate != 44100 && codecs->ac->sample_rate != 48000)
+  if (audio_profile_guess_mp2 (codecs->ac) != AUDIO_PROFILE_MP2)
     return 0;
 
   /* supported channels: 1/0, 1/0 + 1/0, 2/0 */
@@ -410,49 +357,13 @@ is_mpeg_ps_es_audio_stream_mp2 (AVFormatContext *ctx, av_codecs_t *codecs)
 static int
 is_mpeg_ts_audio_stream_mp2 (AVFormatContext *ctx, av_codecs_t *codecs)
 {
-  /* check for MPEG-1 Layer-2 audio codec */
-  if (codecs->ac->codec_id != CODEC_ID_MP2 &&
-      codecs->ac->codec_id != CODEC_ID_MP3)
-    return 0;
-
-  /* sampling rate is 32, 44.1 or 48 KHz */
-  if (codecs->ac->sample_rate != 32000 &&
-      codecs->ac->sample_rate != 44100 &&
-      codecs->ac->sample_rate != 48000)
-    return 0;
-
-  if (codecs->ac->channels > 5)
-    return 0;
-
-  /* from 32 to 448 Kbps */
-  if (codecs->ac->bit_rate < 32000 || codecs->ac->bit_rate > 448000)
-    return 0;
-  
-  return 1;
+  return (audio_profile_guess_mp2 (codecs->ac) == AUDIO_PROFILE_MP2) ? 1 : 0;
 }
 
 static int
 is_mpeg_ts_audio_stream_ac3 (AVFormatContext *ctx, av_codecs_t *codecs)
 {
-  /* check for AC3 */
-  if (codecs->ac->codec_id != CODEC_ID_AC3)
-    return 0;
-
-  /* sampling rate is 32, 44.1 or 48 KHz */
-  if (codecs->ac->sample_rate != 32000 &&
-      codecs->ac->sample_rate != 44100 &&
-      codecs->ac->sample_rate != 48000)
-    return 0;
-
-  /* supported channels: 1/0, 1/0 + 1/0, 2/0, 3/0, 2/1, 3/1, 2/2, 3/2 */
-  if (codecs->ac->channels > 5)
-    return 0;
-
-  /* supported bitrate: 32 Kbps - 640 Kbps */
-  if (codecs->ac->bit_rate < 32000 || codecs->ac->bit_rate > 640000)
-    return 0;
-  
-  return 1;
+  return (audio_profile_guess_ac3 (codecs->ac) == AUDIO_PROFILE_AC3) ? 1 : 0;
 }
 
 static dlna_profile_t *
