@@ -885,9 +885,9 @@ mpeg4_audio_get_profile (AVStream *as, AVCodecContext *ac)
   if (!as || !ac)
     return MPEG4_AUDIO_PROFILE_INVALID;
 
-  if (audio_is_valid_aac_mult5 (ac))
+  if (audio_profile_guess_aac (ac) == AUDIO_PROFILE_AAC_MULT5)
     return MPEG4_AUDIO_PROFILE_AAC_MULT5;
-  if (audio_is_valid_aac_stereo (ac))
+  if (audio_profile_guess_aac (ac) == AUDIO_PROFILE_AAC)
     return MPEG4_AUDIO_PROFILE_AAC;
 
   if (audio_profile_guess_atrac (ac) == AUDIO_PROFILE_ATRAC)

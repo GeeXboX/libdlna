@@ -160,15 +160,18 @@ static dlna_profile_t bsac_mult5_iso __attribute__ ((unused)) = {
   .label = LABEL_AUDIO_MULTI
 };
 
-static int
-audio_is_valid_aac (AVCodecContext *ac)
+audio_profile_t
+audio_profile_guess_aac (AVCodecContext *ac)
 {
   if (!ac)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
+
+  if (!ac)
+    return AUDIO_PROFILE_INVALID;
   
   /* TODO: need to check for HE-AAC, LTP and BSAC */
   if (ac->codec_id != CODEC_ID_AAC)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
   
   /* supported sampling rate:
      8, 11.025, 12, 16, 22.05, 24, 32, 44.1 and 48 kHz */
@@ -181,51 +184,33 @@ audio_is_valid_aac (AVCodecContext *ac)
       ac->sample_rate != 32000 &&
       ac->sample_rate != 44100 &&
       ac->sample_rate != 48000)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
 
-  return 1;
-}
-
-int
-audio_is_valid_aac_stereo (AVCodecContext *ac)
-{
-  if (!ac)
-    return 0;
-
-  if (!audio_is_valid_aac (ac))
-    return 0;
+  switch (ac->channels)
+  {
+  case 1:
+  case 2:
+    if (ac->bit_rate <= 576000)
+      return AUDIO_PROFILE_AAC;
+    break;
+  case 5:
+    if (ac->bit_rate <= 1444000)
+      return AUDIO_PROFILE_AAC_MULT5;
+    break;
+  case 7:
+    return AUDIO_PROFILE_AAC_LTP_MULT7;
+  default:
+    break;
+  }
   
-  if (ac->channels > 2)
-    return 0;
-  
-  if (ac->bit_rate > 576000)
-    return 0;
-    
-  return 1;
-}
-
-int
-audio_is_valid_aac_mult5 (AVCodecContext *ac)
-{
-  if (!ac)
-    return 0;
-
-  if (!audio_is_valid_aac (ac))
-    return 0;
-  
-  if (ac->channels != 5)
-    return 0;
-  
-  if (ac->bit_rate > 1444000)
-    return 0;
-    
-  return 1;
+  return AUDIO_PROFILE_INVALID;
 }
 
 static dlna_profile_t *
 probe_mpeg4 (AVFormatContext *ctx)
 {
   AVCodecContext *codec = NULL;
+  audio_profile_t ap;
   int adts = 0;
   
   if (!strcasecmp (get_file_extension (ctx->filename), "aac"))
@@ -237,12 +222,16 @@ probe_mpeg4 (AVFormatContext *ctx)
   
   /* check for AAC codec */
   /* TODO: need to check for HE-AAC, LTP and BSAC */
+  ap = audio_profile_guess_aac (codec);
+  if (ap == AUDIO_PROFILE_INVALID)
+    return NULL;
+  
   if (codec->codec_id == CODEC_ID_AAC)
   {
-    if (audio_is_valid_aac_mult5 (codec))
+    if (ap == AUDIO_PROFILE_AAC_MULT5)
       return adts ?
         set_profile (&aac_mult5_adts): set_profile (&aac_mult5_iso);
-    else if (audio_is_valid_aac_stereo (codec))
+    else if (AUDIO_PROFILE_AAC)
       return adts ?
         set_profile (&aac_adts_320) : set_profile (&aac_iso_320);
     else
