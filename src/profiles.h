@@ -80,6 +80,45 @@ AVCodecContext * audio_profile_get_codec (AVFormatContext *ctx);
 av_codecs_t *av_profile_get_codecs (AVFormatContext *ctx);
 
 /* audio profile checks */
+
+typedef enum {
+  AUDIO_PROFILE_INVALID = 0,
+
+  /* Advanced Audio Codec variants */
+  AUDIO_PROFILE_AAC,
+  AUDIO_PROFILE_AAC_MULT5,
+  AUDIO_PROFILE_AAC_BSAC,  
+  AUDIO_PROFILE_AAC_BSAC_MULT5,
+  AUDIO_PROFILE_AAC_HE_L2,
+  AUDIO_PROFILE_AAC_HE_L3,
+  AUDIO_PROFILE_AAC_HE_MULT5,
+  AUDIO_PROFILE_AAC_LTP,  
+  AUDIO_PROFILE_AAC_LTP_MULT5,
+  AUDIO_PROFILE_AAC_LTP_MULT7,
+  
+  AUDIO_PROFILE_AC3,
+  AUDIO_PROFILE_AC3_EXTENDED,
+  
+  AUDIO_PROFILE_AMR,
+  AUDIO_PROFILE_AMR_WB,
+  
+  AUDIO_PROFILE_ATRAC,
+
+  AUDIO_PROFILE_G726,
+
+  AUDIO_PROFILE_LPCM,
+
+  /* MPEG audio variants */
+  AUDIO_PROFILE_MP2,
+  AUDIO_PROFILE_MP3,
+  AUDIO_PROFILE_MP3_EXTENDED,
+
+  /* Windows Media Audio variants */
+  AUDIO_PROFILE_WMA_BASELINE,
+  AUDIO_PROFILE_WMA_FULL,
+  AUDIO_PROFILE_WMA_PRO
+} audio_profile_t;
+
 int audio_is_valid_amr (AVCodecContext *ac);
 int audio_is_valid_amr_wb (AVCodecContext *ac);
 int audio_is_valid_ac3 (AVCodecContext *ac);
