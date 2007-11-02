@@ -57,7 +57,7 @@ audio_is_valid_mp3_common (AVCodecContext *ac)
   return 1;
 }
 
-int
+static int
 audio_is_valid_mp3 (AVCodecContext *ac)
 {
   if (!ac)
@@ -95,7 +95,7 @@ audio_is_valid_mp3 (AVCodecContext *ac)
   return 0;
 }
 
-int
+static int
 audio_is_valid_mp3x (AVCodecContext *ac)
 {
   if (!ac)
@@ -136,21 +136,44 @@ audio_is_valid_mp3x (AVCodecContext *ac)
   return 0;
 }
 
+audio_profile_t
+audio_profile_guess_mp3 (AVCodecContext *ac)
+{
+  audio_profile_t ap = AUDIO_PROFILE_INVALID;
+  
+  if (!ac)
+    return ap;
+
+  if (audio_is_valid_mp3x (ac))
+    return AUDIO_PROFILE_MP3_EXTENDED;
+
+  if (audio_is_valid_mp3 (ac))
+    return AUDIO_PROFILE_MP3;
+  
+  return AUDIO_PROFILE_INVALID;
+}
+
 /* Audio encoding must be MPEG-1 Layer 3 */
 static dlna_profile_t *
 probe_mp3 (AVFormatContext *ctx)
 {
   AVCodecContext *codec;
+  audio_profile_t ap;
   
   codec = audio_profile_get_codec (ctx);
   if (!codec)
     return NULL;
 
-  if (audio_is_valid_mp3x (codec))
-    return set_profile (&mp3x);
-
-  if (audio_is_valid_mp3 (codec))
+  ap = audio_profile_guess_wma (codec);
+  switch (ap)
+  {
+  case AUDIO_PROFILE_MP3:
     return set_profile (&mp3);
+  case AUDIO_PROFILE_MP3_EXTENDED:
+    return set_profile (&mp3x);
+  default:
+    break;
+  }
   
   return NULL;
 }
