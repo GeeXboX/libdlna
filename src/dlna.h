@@ -22,6 +22,15 @@
 #ifndef _DLNA_H_
 #define _DLNA_H_
 
+#define DLNA_STRINGIFY(s)         DLNA_TOSTRING(s)
+#define DLNA_TOSTRING(s) #s
+
+#define LIBDLNA_VERSION_INT  ((0<<16)+(1<<8)+0)
+#define LIBDLNA_VERSION      0.1.0
+#define LIBDLNA_BUILD        LIBDLNA_VERSION_INT
+
+#define LIBDLNA_IDENT        "DLNA " DLNA_STRINGIFY(LIBDLNA_VERSION)
+
 typedef enum {
   DLNA_PROTOCOL_INFO_TYPE_UNKNOWN,
   DLNA_PROTOCOL_INFO_TYPE_HTTP,
