@@ -24,7 +24,6 @@
 
 #include "dlna.h"
 #include "profiles.h"
-#include "image.h"
 
 #define PNG_KNOWN_EXTENSIONS "png"
 
@@ -32,28 +31,28 @@
 static dlna_profile_t png_tn = {
   .id = "PNG_TN",
   .mime = MIME_IMAGE_PNG,
-  .label = IMAGE_TYPE_ICON
+  .label = LABEL_IMAGE_ICON
 };
 
 /* Profile for small icons */
 static dlna_profile_t png_sm_ico = {
   .id = "PNG_SM_ICO",
   .mime = MIME_IMAGE_PNG,
-  .label = IMAGE_TYPE_ICON
+  .label = LABEL_IMAGE_ICON
 };
 
 /* Profile for large icons */
 static dlna_profile_t png_lrg_ico = {
   .id = "PNG_LRG_ICO",
   .mime = MIME_IMAGE_PNG,
-  .label = IMAGE_TYPE_ICON
+  .label = LABEL_IMAGE_ICON
 };
 
 /* Profile for image class content of high resolution */
 static dlna_profile_t png_lrg = {
   .id = "PNG_LRG",
   .mime = MIME_IMAGE_PNG,
-  .label = IMAGE_TYPE_PICTURE
+  .label = LABEL_IMAGE_PICTURE
 };
 
 static dlna_profile_t *

@@ -48,6 +48,9 @@
 #define MIME_VIDEO_WMV                    "video/x-ms-wmv"
 
 /* DLNA Labels */
+#define LABEL_IMAGE_PICTURE               "picture"
+#define LABEL_IMAGE_ICON                  "icon"
+
 #define LABEL_AUDIO_MONO                  "mono"
 #define LABEL_AUDIO_2CH                   "2-ch"
 #define LABEL_AUDIO_2CH_MULTI             "2-ch multi"
