@@ -25,23 +25,23 @@
 #include "dlna.h"
 #include "profiles.h"
 
-int
-audio_is_valid_g726 (AVCodecContext *ac)
+audio_profile_t
+audio_profile_guess_g726 (AVCodecContext *ac)
 {
   if (!ac)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
 
   if (ac->codec_id != CODEC_ID_ADPCM_G726)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
   
   if (ac->channels != 1)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
 
   if (ac->sample_rate != 8000)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
 
   if (ac->bit_rate != 32000)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
 
-  return 1;
+  return AUDIO_PROFILE_G726;
 }
