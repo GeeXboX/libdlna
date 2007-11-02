@@ -20,6 +20,8 @@ main (int argc, char **argv)
     return -1;
   }
 
+  printf ("Using %s\n", LIBDLNA_IDENT);
+  
   dlna_init ();
   dlna_register_all_media_profiles ();
   
