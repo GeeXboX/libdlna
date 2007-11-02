@@ -1235,7 +1235,7 @@ probe_avc (AVFormatContext *ctx)
       st != CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS)
     goto probe_avc_end;
 
-  dump_format (ctx, 0, NULL, 0);
+  //dump_format (ctx, 0, NULL, 0);
 
   /* ensure we have a valid video codec bit rate */
   if (codecs->vc->bit_rate == 0)
@@ -1244,13 +1244,11 @@ probe_avc (AVFormatContext *ctx)
 
   /* check for valid video profile */
   vp = avc_video_get_profile (ctx, codecs->vs, codecs->vc);
-  printf ("VP: %d\n", vp);
   if (vp == AVC_VIDEO_PROFILE_INVALID)
     goto probe_avc_end;
 
   /* check for valid audio profile */
   ap = audio_profile_guess (codecs->ac);
-  printf ("AP: %d\n", ap);
   if (ap == AUDIO_PROFILE_INVALID)
     goto probe_avc_end;
 
