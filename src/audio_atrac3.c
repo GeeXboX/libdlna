@@ -32,16 +32,16 @@ static dlna_profile_t atrac3 = {
   .label = LABEL_AUDIO_2CH_MULTI
 };
 
-int
-audio_is_valid_atrac (AVCodecContext *ac)
+audio_profile_t
+audio_profile_guess_atrac (AVCodecContext *ac)
 {
   if (!ac)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
 
   if (ac->codec_id != CODEC_ID_ATRAC3)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
 
-  return 1;
+  return AUDIO_PROFILE_ATRAC;
 }
 
 static dlna_profile_t *
@@ -53,7 +53,7 @@ probe_atrac3 (AVFormatContext *ctx)
   if (!codec)
     return NULL;
 
-  if (audio_is_valid_atrac (codec))
+  if (audio_profile_guess_atrac (codec) == AUDIO_PROFILE_ATRAC)
     return set_profile (&atrac3);
 
   return NULL;

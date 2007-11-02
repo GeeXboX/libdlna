@@ -385,9 +385,9 @@ audio_profile_guess (AVCodecContext *ac)
 /*   if (ap != AUDIO_PROFILE_INVALID) */
 /*     return ap; */
 
-/*   ap = audio_profile_guess_atrac (ac); */
-/*   if (ap != AUDIO_PROFILE_INVALID) */
-/*     return ap; */
+  ap = audio_profile_guess_atrac (ac);
+  if (ap != AUDIO_PROFILE_INVALID)
+    return ap;
 
   ap = audio_profile_guess_g726 (ac);
   if (ap != AUDIO_PROFILE_INVALID)
