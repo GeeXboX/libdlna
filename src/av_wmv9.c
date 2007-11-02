@@ -53,14 +53,6 @@
 #include "profiles.h"
 #include "containers.h"
 
-typedef enum {
-  WMV9_AUDIO_UNKNOWN,
-  WMV9_AUDIO_WMA_BASELINE,
-  WMV9_AUDIO_WMA_FULL,
-  WMV9_AUDIO_WMA_PRO,
-  WMV9_AUDIO_MP3
-} wmv9_profile_audio_t;
-
 typedef struct wmv9_profile_s {
   int max_width;
   int max_height;
@@ -178,74 +170,11 @@ is_valid_wmv9_video_profile (wmv9_profile_t profile[], int size,
   return 0;
 }
 
-static wmv9_profile_audio_t
-wmv9_get_audio_profile (AVCodecContext *ac)
-{
-  /* check for WMA codec */
-  if (ac->codec_id == CODEC_ID_WMAV1 || ac->codec_id == CODEC_ID_WMAV2)
-  {
-    if (ac->sample_rate <= 48000)
-    {
-      if (ac->bit_rate <= 193000)
-      {
-        /* WMA Baseline: stereo, up to 48 KHz, up to 192,999 bps */
-        if (ac->channels > 2)
-          return WMV9_AUDIO_UNKNOWN;
-
-        return WMV9_AUDIO_WMA_BASELINE;
-      }
-      else if (ac->bit_rate <= 385000)
-      {
-        /* WMA Full: stereo, up to 48 KHz, up to 385 Kbps */
-        if (ac->channels > 2)
-          return WMV9_AUDIO_UNKNOWN;
-        
-        return WMV9_AUDIO_WMA_FULL;
-      }
-    
-      /* bitrate > 385 Kbps */
-      return WMV9_AUDIO_UNKNOWN;
-    }
-    else if (ac->sample_rate <= 96000)
-    {
-      /* WMA Professional: up to 7.1 channels, up to 1.5 Mbps and 96 KHz */
-      if (ac->channels > 8)
-        return WMV9_AUDIO_UNKNOWN;
-
-      if (ac->bit_rate > 1500000)
-        return WMV9_AUDIO_UNKNOWN;
-
-      return WMV9_AUDIO_WMA_PRO;
-    }
-
-    /* sampling rate > 96 Kbps */
-    return WMV9_AUDIO_UNKNOWN;
-  }
-  else if (ac->codec_id != CODEC_ID_MP3) /* check for MP3 codec */
-  {
-    /* only mono and stereo are supported */
-    if (ac->channels > 2)
-      return WMV9_AUDIO_UNKNOWN;
-
-    if (ac->sample_rate != 32000 &&
-        ac->sample_rate != 44100 &&
-        ac->sample_rate != 48000)
-      return WMV9_AUDIO_UNKNOWN;
-    
-    if (ac->bit_rate > 128000)
-      return WMV9_AUDIO_UNKNOWN;
-
-    return WMV9_AUDIO_MP3;
-  }
-  
-  return WMV9_AUDIO_UNKNOWN;
-}
-
 static dlna_profile_t *
 probe_wmv9 (AVFormatContext *ctx)
 {
   av_codecs_t *codecs;
-  wmv9_profile_audio_t ap;
+  audio_profile_t ap;
   
   /* need to be in ASF container only */
   if (stream_get_container (ctx) != CT_ASF)
@@ -260,14 +189,16 @@ probe_wmv9 (AVFormatContext *ctx)
     goto probe_wmv9_end;
 
   /* get audio profile */
-  ap = wmv9_get_audio_profile (codecs->ac);
+  ap = audio_profile_guess (codecs->ac);
+  if (ap == AUDIO_PROFILE_INVALID)
+    return NULL;
 
   /* we'll determine profile and level according to bitrate */
   if (is_valid_wmv9_video_profile (wmv9_profile_simple_low,
                                    sizeof (wmv9_profile_simple_low),
                                    codecs->vs, codecs->vc))
   {
-    if (ap == WMV9_AUDIO_WMA_BASELINE)
+    if (ap == AUDIO_PROFILE_WMA_BASELINE)
       return set_profile (&wmvspll_base);
 
     goto probe_wmv9_end;
@@ -276,9 +207,9 @@ probe_wmv9 (AVFormatContext *ctx)
                                         sizeof (wmv9_profile_simple_medium),
                                         codecs->vs, codecs->vc))
   {
-    if (ap == WMV9_AUDIO_WMA_BASELINE)
+    if (ap == AUDIO_PROFILE_WMA_BASELINE)
       return set_profile (&wmvspml_base);
-    else if (ap == WMV9_AUDIO_MP3)
+    else if (ap == AUDIO_PROFILE_MP3)
       return set_profile (&wmvspml_mp3);
 
     goto probe_wmv9_end;
@@ -287,11 +218,11 @@ probe_wmv9 (AVFormatContext *ctx)
                                         sizeof (wmv9_profile_main_medium),
                                         codecs->vs, codecs->vc))
   {
-    if (ap == WMV9_AUDIO_WMA_BASELINE)
+    if (ap == AUDIO_PROFILE_WMA_BASELINE)
       return set_profile (&wmvmed_base);
-    else if (ap == WMV9_AUDIO_WMA_FULL)
+    else if (ap == AUDIO_PROFILE_WMA_FULL)
       return set_profile (&wmvmed_full);
-    else if (ap == WMV9_AUDIO_WMA_PRO)
+    else if (ap == AUDIO_PROFILE_WMA_PRO)
       return set_profile (&wmvmed_pro);
 
     goto probe_wmv9_end;
@@ -300,9 +231,9 @@ probe_wmv9 (AVFormatContext *ctx)
                                         sizeof (wmv9_profile_main_high),
                                         codecs->vs, codecs->vc))
   {
-    if (ap == WMV9_AUDIO_WMA_FULL)
+    if (ap == AUDIO_PROFILE_WMA_FULL)
       return set_profile (&wmvhigh_full);
-    else if (ap == WMV9_AUDIO_WMA_PRO)
+    else if (ap == AUDIO_PROFILE_WMA_PRO)
       return set_profile (&wmvhigh_pro);
 
     goto probe_wmv9_end;
