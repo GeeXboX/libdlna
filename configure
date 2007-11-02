@@ -606,6 +606,7 @@ append_config "MAKE=$make"
 append_config "CC=$cc"
 append_config "AR=$ar"
 append_config "RANLIB=$ranlib"
+append_config "LN=ln"
 if enabled dostrip; then
   append_config "STRIP=$strip"
   append_config "INSTALLSTRIP=$installstrip"
