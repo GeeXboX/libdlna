@@ -41,6 +41,7 @@ clean:
 
 install: $(LIBNAME)
 	$(INSTALL) -c $(LIBNAME) $(libdir)
+	$(LN) -sf $(LIBNAME) $(libdir)/$(LIBNAME).0
 	$(INSTALL) -c -m 644 dlna.h $(includedir)
 
 depend:
