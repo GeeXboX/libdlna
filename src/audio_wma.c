@@ -46,6 +46,43 @@ static dlna_profile_t wmapro = {
   .label = LABEL_AUDIO_2CH_MULTI
 };
 
+audio_profile_t
+audio_profile_guess_wma (AVCodecContext *ac)
+{
+  audio_profile_t ap = AUDIO_PROFILE_INVALID;
+  
+  if (!ac)
+    return ap;
+
+  /* check for WMA codec */
+  if (ac->codec_id != CODEC_ID_WMAV1 && ac->codec_id != CODEC_ID_WMAV2)
+    return ap;
+
+  if (ac->sample_rate <= 48000)
+  {
+    if (ac->bit_rate <= 193000)
+    {
+      /* WMA Baseline: stereo, up to 48 KHz, up to 192,999 bps */
+      if (ac->channels <= 2)
+        return AUDIO_PROFILE_WMA_BASELINE;
+    }
+    else if (ac->bit_rate <= 385000)
+    {
+      /* WMA Full: stereo, up to 48 KHz, up to 385 Kbps */
+      if (ac->channels <= 2)
+        return AUDIO_PROFILE_WMA_FULL;
+    }
+  }
+  else if (ac->sample_rate <= 96000)
+  {
+    /* WMA Professional: up to 7.1 channels, up to 1.5 Mbps and 96 KHz */
+    if (ac->channels <= 8 && ac->bit_rate <= 1500000)
+      return AUDIO_PROFILE_WMA_PRO;
+  }
+
+  return AUDIO_PROFILE_INVALID;
+}
+
 static dlna_profile_t *
 probe_wma (AVFormatContext *ctx)
 {

@@ -405,9 +405,9 @@ audio_profile_guess (AVCodecContext *ac)
 /*   if (ap != AUDIO_PROFILE_INVALID) */
 /*     return ap; */
 
-/*   ap = audio_profile_guess_wma (ac); */
-/*   if (ap != AUDIO_PROFILE_INVALID) */
-/*     return ap; */
+  ap = audio_profile_guess_wma (ac);
+  if (ap != AUDIO_PROFILE_INVALID)
+    return ap;
 
   return AUDIO_PROFILE_INVALID;
 }
