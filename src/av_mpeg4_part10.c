@@ -1215,6 +1215,7 @@ probe_avc (AVFormatContext *ctx)
   dlna_container_type_t st;
   avc_video_profile_t vp;
   audio_profile_t ap;
+  int i;
   
   /* grab codecs info */
   codecs = av_profile_get_codecs (ctx);
@@ -1253,6 +1254,13 @@ probe_avc (AVFormatContext *ctx)
   if (ap == AUDIO_PROFILE_INVALID)
     goto probe_avc_end;
 
+  /* find profile according to container type, video and audio profiles */
+  for (i = 0; avc_profiles_mapping[i].profile; i++)
+    if (avc_profiles_mapping[i].st == st &&
+        avc_profiles_mapping[i].vp == vp &&
+        avc_profiles_mapping[i].ap == ap)
+      return set_profile (avc_profiles_mapping[i].profile);
+  
  probe_avc_end:
   if (codecs)
     free (codecs);
