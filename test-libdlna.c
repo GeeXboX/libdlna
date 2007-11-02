@@ -30,7 +30,6 @@ main (int argc, char **argv)
   {
     char *protocol_info;
     
-    printf ("Found demuxer\n");
     printf ("ID: %s\n", p->id);
     printf ("MIME: %s\n", p->mime);
     printf ("Label: %s\n", p->label);
