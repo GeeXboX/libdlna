@@ -905,7 +905,7 @@ mpeg4_audio_get_profile (AVStream *as, AVCodecContext *ac)
   if (audio_profile_guess_mp3 (ac) == AUDIO_PROFILE_MP3)
     return MPEG4_AUDIO_PROFILE_MP3;
   
-  if (audio_is_valid_ac3 (ac))
+  if (audio_profile_guess_ac3 (ac) == AUDIO_PROFILE_AC3)
     return MPEG4_AUDIO_PROFILE_AC3;
   
   if (audio_profile_guess_g726 (ac) == AUDIO_PROFILE_G726)

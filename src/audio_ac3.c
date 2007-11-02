@@ -32,44 +32,59 @@ static dlna_profile_t ac3 = {
   .label = LABEL_AUDIO_2CH_MULTI
 };
 
-int
-audio_is_valid_ac3 (AVCodecContext *ac)
+audio_profile_t
+audio_profile_guess_ac3 (AVCodecContext *ac)
 {
   if (!ac)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
 
   /* check for AC3 codec */
   if (ac->codec_id != CODEC_ID_AC3)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
   
   /* supported channels: 1/0, 2/0, 3/0, 2/1, 3/1, 2/2, 3/2 */
   if (ac->channels > 5)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
 
   /* supported sampling rate: 32, 44.1 and 48 kHz */
   if (ac->sample_rate != 32000 &&
       ac->sample_rate != 44100 &&
       ac->sample_rate != 48000)
-    return 0;
+    return AUDIO_PROFILE_INVALID;
 
   /* supported bitrate: 32 Kbps - 640 Kbps */
-  if (ac->bit_rate < 32000 || ac->bit_rate > 640000)
-    return 0;
+  if (ac->bit_rate < 32000)
+    return AUDIO_PROFILE_INVALID;
 
-  return 1;
+  if (ac->bit_rate <= 448000)
+    return AUDIO_PROFILE_AC3;
+
+  if (ac->bit_rate <= 640000)
+    return AUDIO_PROFILE_AC3_EXTENDED;
+
+  return AUDIO_PROFILE_INVALID;
 }
 
 static dlna_profile_t *
 probe_ac3 (AVFormatContext *ctx)
 {
   AVCodecContext *codec;
+  audio_profile_t ap;
   
   codec = audio_profile_get_codec (ctx);
   if (!codec)
     return NULL;
-  
-  if (audio_is_valid_ac3 (codec))
+
+  ap = audio_profile_guess_ac3 (codec);
+  switch (ap)
+  {
+  case AUDIO_PROFILE_AC3:
+  case AUDIO_PROFILE_AC3_EXTENDED:
     return set_profile (&ac3);
+  default:
+    break;
+  }
+  
   return NULL;
 }
 
