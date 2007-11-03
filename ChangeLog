@@ -1,5 +1,6 @@
 2007-11-02  Benjamin Zores  <ben@geexbox.org>
 
+        * First public release (version 0.1.0)
         * support for all DLNA profiles discovery as found in
 	  "DLNA Networked Device Interoperability Guidelines,
 	  Volume 2: Media Format Profiles".
