@@ -9,6 +9,15 @@ Media Server, but will be used to build both DLNA servers and players.
 libdlna relies on FFMPEG librairies (libavformat and libavcodec)
 to handle and demux A/V streams.
 
+HOMEPAGE
+========
+
+Web site and file area for libdlna is hosted on GeeXboX server :
+
+   http://libdlna.geexbox.org/
+
+The latest version of libdlna should always be available on this site.
+
 DEVELOPERS
 ~~~~~~~~~~
 
