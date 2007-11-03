@@ -1,0 +1,5 @@
+2007-11-02  Benjamin Zores  <ben@geexbox.org>
+
+        * support for all DLNA profiles discovery as found in
+	  "DLNA Networked Device Interoperability Guidelines,
+	  Volume 2: Media Format Profiles".
