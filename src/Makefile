@@ -23,6 +23,10 @@ SRCS =  profiles.c \
 
 CFLAGS += -fPIC
 
+ifeq ($(DEBUG),yes)
+CFLAGS += -DHAVE_DEBUG
+endif
+
 OBJS = $(SRCS:.c=.o)
 
 .SUFFIXES: .c .o
