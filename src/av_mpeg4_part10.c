@@ -1235,8 +1235,6 @@ probe_avc (AVFormatContext *ctx)
       st != CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS)
     goto probe_avc_end;
 
-  //dump_format (ctx, 0, NULL, 0);
-
   /* ensure we have a valid video codec bit rate */
   if (codecs->vc->bit_rate == 0)
     codecs->vc->bit_rate = codecs->ac->bit_rate ?
