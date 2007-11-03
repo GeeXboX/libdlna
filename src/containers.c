@@ -96,7 +96,7 @@ stream_get_container (AVFormatContext *ctx)
   int i;
 
 #ifdef HAVE_DEBUG
-  printf ("Found container: %s\n", ctx->iformat->name);
+  fprintf (stderr, "Found container: %s\n", ctx->iformat->name);
 #endif /* HAVE_DEBUG */
   
   for (i = 0; avf_format_mapping[i].name; i++)

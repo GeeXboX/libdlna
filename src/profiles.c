@@ -147,7 +147,7 @@ dlna_guess_media_profile (const char *filename)
   if (av_open_input_file (&pFormatCtx, filename, NULL, 0, NULL) != 0)
   {
 #ifdef HAVE_DEBUG
-    printf ("can't open file: %s\n", filename);
+    fprintf (stderr, "can't open file: %s\n", filename);
 #endif /* HAVE_DEBUG */
     return NULL;
   }
@@ -155,7 +155,7 @@ dlna_guess_media_profile (const char *filename)
   if (av_find_stream_info (pFormatCtx) < 0)
   {
 #ifdef HAVE_DEBUG
-    printf ("can't find stream info\n");
+    fprintf (stderr, "can't find stream info\n");
 #endif /* HAVE_DEBUG */
     return NULL;
   }
