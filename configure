@@ -34,6 +34,7 @@ show_help(){
   echo "  --with-ffmpeg-dir=DIR       check for ffmpeg installed in DIR"
   echo ""
   echo "Advanced options (experts only):"
+  echo "  --enable-debug              enable debugging symbols"
   echo "  --disable-debug             disable debugging symbols"
   echo "  --disable-strip             disable stripping of executables at installation"
   echo "  --disable-optimize          disable compiler optimization"
@@ -371,6 +372,8 @@ for opt do
   --libdir=*) libdir="$optval"; force_libdir=yes
   ;;
   --includedir=*) includedir="$optval"
+  ;;
+  --enable-debug) debug="yes"
   ;;
   --disable-debug) debug="no"
   ;;
