@@ -25,8 +25,6 @@
 #include "dlna.h"
 #include "profiles.h"
 
-#define JPEG_KNOWN_EXTENSIONS "jpg,jpe,jpeg"
-
 /* Profile for image media class content of small resolution */
 static dlna_profile_t jpeg_sm = {
   .id = "JPEG_SM",
@@ -75,10 +73,6 @@ probe_jpeg (AVFormatContext *ctx)
   AVStream *stream;
   AVCodecContext *codec;
 
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, JPEG_KNOWN_EXTENSIONS))
-    return NULL;
-
   /* should only have 1 stream */
   if (ctx->nb_streams > 1)
     return NULL;
@@ -115,6 +109,7 @@ probe_jpeg (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_image_jpeg = {
   .id = DLNA_PROFILE_IMAGE_JPEG,
+  .extensions = "jpg,jpe,jpeg",
   .probe = probe_jpeg,
   .next = NULL
 };

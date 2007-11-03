@@ -25,8 +25,6 @@
 #include "dlna.h"
 #include "profiles.h"
 
-#define PNG_KNOWN_EXTENSIONS "png"
-
 /* Profile for image thumbnails */
 static dlna_profile_t png_tn = {
   .id = "PNG_TN",
@@ -61,10 +59,6 @@ probe_png (AVFormatContext *ctx)
   AVStream *stream;
   AVCodecContext *codec;
 
-  /* check for valid file extension */
-  if (!match_file_extension (ctx->filename, PNG_KNOWN_EXTENSIONS))
-    return NULL;
-
   /* should only have 1 stream */
   if (ctx->nb_streams > 1)
     return NULL;
@@ -94,6 +88,7 @@ probe_png (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_image_png = {
   .id = DLNA_PROFILE_IMAGE_PNG,
+  .extensions = "png",
   .probe = probe_png,
   .next = NULL
 };
