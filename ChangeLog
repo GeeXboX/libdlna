@@ -1,3 +1,8 @@
+2007-11-04  Benjamin Zores  <ben@geexbox.org>
+
+        * New public release (version 0.1.1)
+	  Fixes build with ATRAC codec with old revisions of FFMPEG.
+	
 2007-11-02  Benjamin Zores  <ben@geexbox.org>
 
         * First public release (version 0.1.0)
