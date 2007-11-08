@@ -376,11 +376,11 @@ probe_mpeg4 (AVFormatContext *ctx)
 {
   AVCodecContext *codec = NULL;
   audio_profile_t ap;
-  int adts = 0;
+  aac_container_type_t ct;
   int i;
   
   /* check for raw AAC */
-  adts = (stream_get_container (ctx) == CT_UNKNOWN) ? AAC_RAW : AAC_MUXED;
+  ct = (stream_get_container (ctx) == CT_UNKNOWN) ? AAC_RAW : AAC_MUXED;
   
   codec = audio_profile_get_codec (ctx);
   if (!codec)
@@ -393,7 +393,7 @@ probe_mpeg4 (AVFormatContext *ctx)
 
   /* find profile according to container type and audio profiles */
   for (i = 0; aac_profiles_mapping[i].profile; i++)
-    if (aac_profiles_mapping[i].ct == adts &&
+    if (aac_profiles_mapping[i].ct == ct &&
         aac_profiles_mapping[i].ap == ap)
       return set_profile (aac_profiles_mapping[i].profile);
   
