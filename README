@@ -45,11 +45,6 @@ SUPPORTED FILE CONTAINERS
 - AV:    3gp, 3gpp, asf, hdmov, m1v, m2v, mov, mp2p, mp2t, mp4, mpe, mpeg,
          mpg, pes, ps, ts, wmv
 
-KNOWN BUGS AND LIMITATIONS
-==========================
-
-AAC variants detection is quite buggy at the moment.
-
 AUTHORS
 ~~~~~~~
 
