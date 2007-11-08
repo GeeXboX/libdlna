@@ -296,7 +296,7 @@ probe_mpeg4 (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_audio_mpeg4 = {
   .id = DLNA_PROFILE_AUDIO_MPEG4,
-  .extensions = "aac,3gp,mp4,mov,qt,m4a",
+  .extensions = "aac,adts,3gp,mp4,mov,qt,m4a",
   .probe = probe_mpeg4,
   .next = NULL
 };
