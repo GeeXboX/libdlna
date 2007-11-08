@@ -24,6 +24,7 @@
 
 #include "dlna.h"
 #include "profiles.h"
+#include "containers.h"
 
 /* Profile for audio media class content */
 static dlna_profile_t aac_adts = {
@@ -161,6 +162,11 @@ static dlna_profile_t bsac_mult5_iso __attribute__ ((unused)) = {
 };
 
 typedef enum {
+  AAC_MUXED,          /* AAC is muxed in a container */
+  AAC_RAW             /* AAC is raw (ADTS) */
+} aac_container_type_t;
+
+typedef enum {
   AAC_INVALID   =  0, 
   AAC_MAIN      =  1, /* AAC Main */
   AAC_LC        =  2, /* AAC Low complexity */
@@ -264,10 +270,10 @@ probe_mpeg4 (AVFormatContext *ctx)
   AVCodecContext *codec = NULL;
   audio_profile_t ap;
   int adts = 0;
-  
-  if (!strcasecmp (get_file_extension (ctx->filename), "aac"))
-    adts = 1;
 
+  /* check for raw AAC */
+  adts = (stream_get_container (ctx) == CT_UNKNOWN) ? AAC_RAW : AAC_MUXED;
+  
   codec = audio_profile_get_codec (ctx);
   if (!codec)
     return NULL;
