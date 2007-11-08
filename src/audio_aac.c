@@ -222,38 +222,121 @@ audio_profile_guess_aac (AVCodecContext *ac)
   if (!ac)
     return AUDIO_PROFILE_INVALID;
 
-  type = aac_object_type_get (ac->extradata, ac->extradata_size);
-  
-  /* TODO: need to check for HE-AAC, LTP and BSAC */
+  /* check for AAC variants codec */
   if (ac->codec_id != CODEC_ID_AAC)
     return AUDIO_PROFILE_INVALID;
   
-  /* supported sampling rate:
-     8, 11.025, 12, 16, 22.05, 24, 32, 44.1 and 48 kHz */
-  if (ac->sample_rate != 8000 &&
-      ac->sample_rate != 11025 &&
-      ac->sample_rate != 12000 &&
-      ac->sample_rate != 16000 &&
-      ac->sample_rate != 22050 &&
-      ac->sample_rate != 24000 &&
-      ac->sample_rate != 32000 &&
-      ac->sample_rate != 44100 &&
-      ac->sample_rate != 48000)
-    return AUDIO_PROFILE_INVALID;
+  type = aac_object_type_get (ac->extradata, ac->extradata_size);
 
-  switch (ac->channels)
+  switch (type)
   {
-  case 1:
-  case 2:
-    if (ac->bit_rate <= 576000)
-      return AUDIO_PROFILE_AAC;
+  /* AAC Low Complexity variants */
+  case AAC_LC:
+  case AAC_LC_ER:
+  {
+    if (ac->sample_rate < 8000 || ac->sample_rate > 48000)
+      break;
+
+    if (ac->channels <= 2) /* AAC @ Level 1/2 */
+    {
+      if (ac->bit_rate <= 320000)
+        return AUDIO_PROFILE_AAC_320;
+
+      if (ac->bit_rate <= 576000)
+        return AUDIO_PROFILE_AAC;
+
+      break;
+    }
+    else if (ac->channels <= 6)
+    {
+      if (ac->bit_rate <= 1440000)
+        return AUDIO_PROFILE_AAC_MULT5;
+
+      break;
+    }
     break;
-  case 5:
-    if (ac->bit_rate <= 1444000)
-      return AUDIO_PROFILE_AAC_MULT5;
+  }
+
+  /* AAC Long Term Prediction variants */
+  case AAC_LTP:
+  case AAC_LTP_ER:
+  {
+    if (ac->sample_rate < 8000)
+      break;
+
+    if (ac->sample_rate <= 48000)
+    {
+      if (ac->channels <= 2 && ac->bit_rate <= 576000)
+        return AUDIO_PROFILE_AAC_LTP;
+
+      break;
+    }
+    else if (ac->sample_rate <= 96000)
+    {
+      if (ac->channels <= 6 && ac->bit_rate <= 2880000)
+        return AUDIO_PROFILE_AAC_LTP_MULT5;
+
+      if (ac->channels <= 8 && ac->bit_rate <= 4032000)
+        return AUDIO_PROFILE_AAC_LTP_MULT7;
+
+      break;
+    }
+
     break;
-  case 7:
-    return AUDIO_PROFILE_AAC_LTP_MULT7;
+  }
+
+  /* AAC High efficiency (with SBR) variants */
+  case AAC_HE:
+  case AAC_HE_L3:
+  {
+    if (ac->sample_rate < 8000)
+      break;
+
+    if (ac->sample_rate <= 24000) /* HE-AAC @ Level 2 */
+    {
+      if (ac->channels > 2)
+        break;
+
+      if (ac->bit_rate <= 320000)
+        return AUDIO_PROFILE_AAC_HE_L2_320;
+
+      if (ac->bit_rate <= 576000)
+        return AUDIO_PROFILE_AAC_HE_L2;
+
+      break;
+    }
+    else if (ac->sample_rate <= 48000)
+    {
+      /* HE-AAC @ Level 3 */
+      if (ac->channels <= 2 && ac->bit_rate <= 576000)
+        return AUDIO_PROFILE_AAC_HE_L3;
+
+      /* HE-AAC @ Level 4/5 */
+      if (ac->channels <= 6 && ac->bit_rate <= 1440000)
+        return AUDIO_PROFILE_AAC_HE_MULT5;
+
+      break;
+    }
+    
+    break;
+  }
+
+  case AAC_BSAC_ER:
+  {
+    if (ac->sample_rate < 16000 || ac->sample_rate > 48000)
+      break;
+
+    if (ac->bit_rate > 128000)
+      break;
+
+    if (ac->channels <= 2)
+      return AUDIO_PROFILE_AAC_BSAC;
+    else if (ac->channels <= 6)
+      return AUDIO_PROFILE_AAC_BSAC_MULT5;
+ 
+    break;
+  }
+
   default:
     break;
   }
@@ -276,7 +359,6 @@ probe_mpeg4 (AVFormatContext *ctx)
     return NULL;
   
   /* check for AAC codec */
-  /* TODO: need to check for HE-AAC, LTP and BSAC */
   ap = audio_profile_guess_aac (codec);
   if (ap == AUDIO_PROFILE_INVALID)
     return NULL;
