@@ -907,6 +907,12 @@ probe_mpeg4_part2 (AVFormatContext *ctx)
   if (ap == AUDIO_PROFILE_INVALID)
     goto probe_mpeg4_end;
 
+  /* AAC fixup: _320 profiles are audio-only profiles */
+  if (ap == AUDIO_PROFILE_AAC_320)
+    ap = AUDIO_PROFILE_AAC;
+  if (ap == AUDIO_PROFILE_AAC_HE_L2_320)
+    ap =  AUDIO_PROFILE_AAC_HE_L2;
+  
   /* find profile according to container type, video and audio profiles */
   for (i = 0; mpeg4_profiles_mapping[i].profile; i++)
     if (mpeg4_profiles_mapping[i].st == st &&
