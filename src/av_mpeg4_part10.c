@@ -1259,7 +1259,12 @@ probe_avc (AVFormatContext *ctx)
     if (avc_profiles_mapping[i].st == st &&
         avc_profiles_mapping[i].vp == vp &&
         avc_profiles_mapping[i].ap == ap)
+    {
+      if (codecs)
+        free (codecs);
+      
       return set_profile (avc_profiles_mapping[i].profile);
+    }
   
  probe_avc_end:
   if (codecs)

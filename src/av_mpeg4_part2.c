@@ -912,7 +912,12 @@ probe_mpeg4_part2 (AVFormatContext *ctx)
     if (mpeg4_profiles_mapping[i].st == st &&
         mpeg4_profiles_mapping[i].vp == vp &&
         mpeg4_profiles_mapping[i].ap == ap)
+    {
+      if (codecs)
+        free (codecs);
+      
       return set_profile (mpeg4_profiles_mapping[i].profile);
+    }
  
  probe_mpeg4_end:
   if (codecs)

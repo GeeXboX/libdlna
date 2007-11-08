@@ -88,6 +88,9 @@ probe_mpeg1 (AVFormatContext *ctx)
   if (codecs->ac->bit_rate != 224000)
     goto probe_mpeg1_end;
 
+  if (codecs)
+    free (codecs);
+  
   return set_profile (&mpeg1);
 
  probe_mpeg1_end:

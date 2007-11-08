@@ -262,7 +262,12 @@ probe_wmv9 (AVFormatContext *ctx)
   for (i = 0; wmv_profiles_mapping[i].profile; i++)
     if (wmv_profiles_mapping[i].vp == vp &&
         wmv_profiles_mapping[i].ap == ap)
+    {
+      if (codecs)
+        free (codecs);
+      
       return set_profile (wmv_profiles_mapping[i].profile);
+    }
   
  probe_wmv9_end:
   if (codecs)
