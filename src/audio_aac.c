@@ -57,21 +57,21 @@ static dlna_profile_t aac_iso_320 = {
 /* Profile for audio media class content. In the case of AAC LTP profiles,
    both the ISO file formats and the ADTS format are supported by
    the same profile. */
-static dlna_profile_t aac_ltp_iso __attribute__ ((unused)) = {
+static dlna_profile_t aac_ltp_iso = {
   .id = "AAC_LTP_ISO",
   .mime = NULL,
   .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content with up to 5.1 channels */
-static dlna_profile_t aac_ltp_mult5_iso __attribute__ ((unused)) = {
+static dlna_profile_t aac_ltp_mult5_iso = {
   .id = "AAC_LTP_MULT5_ISO",
   .mime = NULL,
   .label = LABEL_AUDIO_MULTI
 };
 
 /* Profile for audio media class content with up to 7.1 channels */
-static dlna_profile_t aac_ltp_mult7_iso __attribute__ ((unused)) = {
+static dlna_profile_t aac_ltp_mult7_iso = {
   .id = "AAC_LTP_MULT7_ISO",
   .mime = NULL,
   .label = LABEL_AUDIO_MULTI
@@ -92,70 +92,70 @@ static dlna_profile_t aac_mult5_iso = {
 };
 
 /* Profile for audio media class content */
-static dlna_profile_t heaac_l2_adts __attribute__ ((unused)) = {
+static dlna_profile_t heaac_l2_adts = {
   .id = "HEAAC_L2_ADTS",
   .mime = MIME_AUDIO_ADTS,
   .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
-static dlna_profile_t heaac_l2_iso __attribute__ ((unused)) = {
+static dlna_profile_t heaac_l2_iso = {
   .id = "HEAAC_L2_ISO",
   .mime = NULL,
   .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
-static dlna_profile_t heaac_l3_adts __attribute__ ((unused)) = {
+static dlna_profile_t heaac_l3_adts = {
   .id = "HEAAC_L3_ADTS",
   .mime = MIME_AUDIO_ADTS,
   .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
-static dlna_profile_t heaac_l3_iso __attribute__ ((unused)) = {
+static dlna_profile_t heaac_l3_iso = {
   .id = "HEAAC_L3_ISO",
   .mime = NULL,
   .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content with up to 5.1 channels */
-static dlna_profile_t heaac_mult5_adts __attribute__ ((unused)) = {
+static dlna_profile_t heaac_mult5_adts = {
   .id = "HEAAC_MULT5_ADTS",
   .mime = MIME_AUDIO_ADTS,
   .label = LABEL_AUDIO_MULTI
 };
 
 /* Profile for audio media class content with up to 5.1 channels */
-static dlna_profile_t heaac_mult5_iso __attribute__ ((unused)) = {
+static dlna_profile_t heaac_mult5_iso = {
   .id = "HEAAC_MULT5_ISO",
   .mime = NULL,
   .label = LABEL_AUDIO_MULTI
 };
 
 /* Profile for audio media class content */
-static dlna_profile_t heaac_l2_adts_320 __attribute__ ((unused)) = {
+static dlna_profile_t heaac_l2_adts_320 = {
   .id = "HEAAC_L2_ADTS_320",
   .mime = MIME_AUDIO_ADTS,
   .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
-static dlna_profile_t heaac_l2_iso_320 __attribute__ ((unused)) = {
+static dlna_profile_t heaac_l2_iso_320 = {
   .id = "HEAAC_L2_ISO_320",
   .mime = NULL,
   .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
-static dlna_profile_t bsac_iso __attribute__ ((unused)) = {
+static dlna_profile_t bsac_iso = {
   .id = "BSAC_ISO",
   .mime = NULL,
   .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content with up to 5.1 channels */
-static dlna_profile_t bsac_mult5_iso __attribute__ ((unused)) = {
+static dlna_profile_t bsac_mult5_iso = {
   .id = "BSAC_MULT5_ISO",
   .mime = NULL,
   .label = LABEL_AUDIO_MULTI
@@ -195,6 +195,33 @@ typedef enum {
   AAC_SSC       = 28, /* AAC SSC */
   AAC_HE_L3     = 31, /* Reserved : seems to be HeAAC L3 */
 } aac_object_type_t;
+
+static const struct {
+  dlna_profile_t *profile;
+  aac_container_type_t ct;
+  audio_profile_t ap;
+} aac_profiles_mapping[] = {
+  { &aac_adts,          AAC_RAW,   AUDIO_PROFILE_AAC },
+  { &aac_adts_320,      AAC_RAW,   AUDIO_PROFILE_AAC_320 },
+  { &aac_iso,           AAC_MUXED, AUDIO_PROFILE_AAC },
+  { &aac_iso_320,       AAC_MUXED, AUDIO_PROFILE_AAC_320 },
+  { &aac_ltp_iso,       AAC_MUXED, AUDIO_PROFILE_AAC_LTP },
+  { &aac_ltp_mult5_iso, AAC_MUXED, AUDIO_PROFILE_AAC_LTP_MULT5 },
+  { &aac_ltp_mult7_iso, AAC_MUXED, AUDIO_PROFILE_AAC_LTP_MULT7 },
+  { &aac_mult5_adts,    AAC_RAW,   AUDIO_PROFILE_AAC_MULT5 },
+  { &aac_mult5_iso,     AAC_MUXED, AUDIO_PROFILE_AAC_MULT5 },
+  { &heaac_l2_adts,     AAC_RAW,   AUDIO_PROFILE_AAC_HE_L2 },
+  { &heaac_l2_iso,      AAC_MUXED, AUDIO_PROFILE_AAC_HE_L2 },
+  { &heaac_l3_adts,     AAC_RAW,   AUDIO_PROFILE_AAC_HE_L3 },
+  { &heaac_l3_iso,      AAC_MUXED, AUDIO_PROFILE_AAC_HE_L3 },
+  { &heaac_mult5_adts,  AAC_RAW,   AUDIO_PROFILE_AAC_HE_MULT5 },
+  { &heaac_mult5_iso,   AAC_MUXED, AUDIO_PROFILE_AAC_HE_MULT5 },
+  { &heaac_l2_adts_320, AAC_RAW,   AUDIO_PROFILE_AAC_HE_L2_320 },
+  { &heaac_l2_iso_320,  AAC_MUXED, AUDIO_PROFILE_AAC_HE_L2_320 },
+  { &bsac_iso,          AAC_MUXED, AUDIO_PROFILE_AAC_BSAC },
+  { &bsac_mult5_iso,    AAC_MUXED, AUDIO_PROFILE_AAC_BSAC_MULT5 },
+  { NULL }
+};
 
 static aac_object_type_t
 aac_object_type_get (uint8_t *data, int len)
@@ -350,7 +377,8 @@ probe_mpeg4 (AVFormatContext *ctx)
   AVCodecContext *codec = NULL;
   audio_profile_t ap;
   int adts = 0;
-
+  int i;
+  
   /* check for raw AAC */
   adts = (stream_get_container (ctx) == CT_UNKNOWN) ? AAC_RAW : AAC_MUXED;
   
@@ -362,20 +390,13 @@ probe_mpeg4 (AVFormatContext *ctx)
   ap = audio_profile_guess_aac (codec);
   if (ap == AUDIO_PROFILE_INVALID)
     return NULL;
-  
-  if (codec->codec_id == CODEC_ID_AAC)
-  {
-    if (ap == AUDIO_PROFILE_AAC_MULT5)
-      return adts ?
-        set_profile (&aac_mult5_adts): set_profile (&aac_mult5_iso);
-    else if (AUDIO_PROFILE_AAC)
-      return adts ?
-        set_profile (&aac_adts_320) : set_profile (&aac_iso_320);
-    else
-      return adts ?
-        set_profile (&aac_adts) : set_profile (&aac_iso);
-  }
 
+  /* find profile according to container type and audio profiles */
+  for (i = 0; aac_profiles_mapping[i].profile; i++)
+    if (aac_profiles_mapping[i].ct == adts &&
+        aac_profiles_mapping[i].ap == ap)
+      return set_profile (aac_profiles_mapping[i].profile);
+  
   return NULL;
 }
 
