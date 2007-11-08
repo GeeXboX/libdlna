@@ -1250,10 +1250,6 @@ probe_avc (AVFormatContext *ctx)
   if (ap == AUDIO_PROFILE_INVALID)
     goto probe_avc_end;
 
-  /* ugly hack needed until we have a nice way to check for AAC variants */
-  if (ap == AUDIO_PROFILE_AAC)
-    ap = AUDIO_PROFILE_AAC_LTP;
-
   /* AAC fixup: _320 profiles are audio-only profiles */
   if (ap == AUDIO_PROFILE_AAC_320)
     ap = AUDIO_PROFILE_AAC;
