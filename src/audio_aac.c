@@ -59,21 +59,21 @@ static dlna_profile_t aac_iso_320 = {
    the same profile. */
 static dlna_profile_t aac_ltp_iso = {
   .id = "AAC_LTP_ISO",
-  .mime = NULL,
+  .mime = MIME_AUDIO_MPEG_4,
   .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content with up to 5.1 channels */
 static dlna_profile_t aac_ltp_mult5_iso = {
   .id = "AAC_LTP_MULT5_ISO",
-  .mime = NULL,
+  .mime = MIME_AUDIO_MPEG_4,
   .label = LABEL_AUDIO_MULTI
 };
 
 /* Profile for audio media class content with up to 7.1 channels */
 static dlna_profile_t aac_ltp_mult7_iso = {
   .id = "AAC_LTP_MULT7_ISO",
-  .mime = NULL,
+  .mime = MIME_AUDIO_MPEG_4,
   .label = LABEL_AUDIO_MULTI
 };
 
@@ -101,7 +101,7 @@ static dlna_profile_t heaac_l2_adts = {
 /* Profile for audio media class content */
 static dlna_profile_t heaac_l2_iso = {
   .id = "HEAAC_L2_ISO",
-  .mime = NULL,
+  .mime = MIME_AUDIO_MPEG_4,
   .label = LABEL_AUDIO_2CH
 };
 
@@ -115,7 +115,7 @@ static dlna_profile_t heaac_l3_adts = {
 /* Profile for audio media class content */
 static dlna_profile_t heaac_l3_iso = {
   .id = "HEAAC_L3_ISO",
-  .mime = NULL,
+  .mime = MIME_AUDIO_MPEG_4,
   .label = LABEL_AUDIO_2CH
 };
 
@@ -129,7 +129,7 @@ static dlna_profile_t heaac_mult5_adts = {
 /* Profile for audio media class content with up to 5.1 channels */
 static dlna_profile_t heaac_mult5_iso = {
   .id = "HEAAC_MULT5_ISO",
-  .mime = NULL,
+  .mime = MIME_AUDIO_MPEG_4,
   .label = LABEL_AUDIO_MULTI
 };
 
@@ -143,21 +143,21 @@ static dlna_profile_t heaac_l2_adts_320 = {
 /* Profile for audio media class content */
 static dlna_profile_t heaac_l2_iso_320 = {
   .id = "HEAAC_L2_ISO_320",
-  .mime = NULL,
+  .mime = MIME_AUDIO_MPEG_4,
   .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content */
 static dlna_profile_t bsac_iso = {
   .id = "BSAC_ISO",
-  .mime = NULL,
+  .mime = MIME_AUDIO_MPEG_4,
   .label = LABEL_AUDIO_2CH
 };
 
 /* Profile for audio media class content with up to 5.1 channels */
 static dlna_profile_t bsac_mult5_iso = {
   .id = "BSAC_MULT5_ISO",
-  .mime = NULL,
+  .mime = MIME_AUDIO_MPEG_4,
   .label = LABEL_AUDIO_MULTI
 };
 
