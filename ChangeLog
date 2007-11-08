@@ -1,3 +1,7 @@
+2007-11-08  Benjamin Zores  <ben@geexbox.org>
+
+	* Added support for AAC variants decoding.
+
 2007-11-04  Benjamin Zores  <ben@geexbox.org>
 
         * New public release (version 0.1.1)
