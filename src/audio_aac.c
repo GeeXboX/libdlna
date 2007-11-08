@@ -222,9 +222,6 @@ audio_profile_guess_aac (AVCodecContext *ac)
   if (!ac)
     return AUDIO_PROFILE_INVALID;
 
-  if (!ac)
-    return AUDIO_PROFILE_INVALID;
-
   type = aac_object_type_get (ac->extradata, ac->extradata_size);
   
   /* TODO: need to check for HE-AAC, LTP and BSAC */
