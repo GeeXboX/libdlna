@@ -160,14 +160,66 @@ static dlna_profile_t bsac_mult5_iso __attribute__ ((unused)) = {
   .label = LABEL_AUDIO_MULTI
 };
 
+typedef enum {
+  AAC_INVALID   =  0, 
+  AAC_MAIN      =  1, /* AAC Main */
+  AAC_LC        =  2, /* AAC Low complexity */
+  AAC_SSR       =  3, /* AAC SSR */
+  AAC_LTP       =  4, /* AAC Long term prediction */
+  AAC_HE        =  5, /* AAC High efficiency (SBR) */
+  AAC_SCALE     =  6, /* Scalable */
+  AAC_TWINVQ    =  7, /* TwinVQ */
+  AAC_CELP      =  8, /* CELP */
+  AAC_HVXC      =  9, /* HVXC */
+  AAC_TTSI      = 12, /* TTSI */
+  AAC_MS        = 13, /* Main synthetic */
+  AAC_WAVE      = 14, /* Wavetable synthesis */
+  AAC_MIDI      = 15, /* General MIDI */
+  AAC_FX        = 16, /* Algorithmic Synthesis and Audio FX */
+  AAC_LC_ER     = 17, /* AAC Low complexity with error recovery */
+  AAC_LTP_ER    = 19, /* AAC Long term prediction with error recovery */
+  AAC_SCALE_ER  = 20, /* AAC scalable with error recovery */
+  AAC_TWINVQ_ER = 21, /* TwinVQ with error recovery */
+  AAC_BSAC_ER   = 22, /* BSAC with error recovery */
+  AAC_LD_ER     = 23, /* AAC LD with error recovery */
+  AAC_CELP_ER   = 24, /* CELP with error recovery */
+  AAC_HXVC_ER   = 25, /* HXVC with error recovery */
+  AAC_HILN_ER   = 26, /* HILN with error recovery */
+  AAC_PARAM_ER  = 27, /* Parametric with error recovery */
+  AAC_SSC       = 28, /* AAC SSC */
+  AAC_HE_L3     = 31, /* Reserved : seems to be HeAAC L3 */
+} aac_object_type_t;
+
+static aac_object_type_t
+aac_object_type_get (uint8_t *data, int len)
+{
+  uint8_t t = AAC_INVALID;
+  
+  if (!data || len < 1)
+    goto aac_object_type_error;
+
+  t = data[0] >> 3; /* Get 5 first bits */
+  
+ aac_object_type_error:
+#ifdef HAVE_DEBUG
+    fprintf (stderr, "AAC Object Type: %d\n", t);
+#endif /* HAVE_DEBUG */
+  
+  return t;
+}
+
 audio_profile_t
 audio_profile_guess_aac (AVCodecContext *ac)
 {
+  aac_object_type_t type;
+  
   if (!ac)
     return AUDIO_PROFILE_INVALID;
 
   if (!ac)
     return AUDIO_PROFILE_INVALID;
+
+  type = aac_object_type_get (ac->extradata, ac->extradata_size);
   
   /* TODO: need to check for HE-AAC, LTP and BSAC */
   if (ac->codec_id != CODEC_ID_AAC)
