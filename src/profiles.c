@@ -160,8 +160,6 @@ dlna_guess_media_profile (const char *filename)
     return NULL;
   }
 
-  stream_get_container (pFormatCtx);
-
 #ifdef HAVE_DEBUG
   dump_format (pFormatCtx, 0, NULL, 0);
 #endif /* HAVE_DEBUG */
