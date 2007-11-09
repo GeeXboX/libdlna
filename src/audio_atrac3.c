@@ -43,7 +43,7 @@ audio_profile_guess_atrac (AVCodecContext *ac)
     return AUDIO_PROFILE_ATRAC;
 #endif
 
-  return AUDIO_PROFILE_ATRAC;
+  return AUDIO_PROFILE_INVALID;
 }
 
 static dlna_profile_t *
