@@ -10,17 +10,17 @@ main (int argc, char **argv)
   dlna_profile_t *p;
   dlna_org_flags_t flags;
 
-  flags = DLNA_ORG_FLAG_STREAMING_TRANSFER_MODE |
-    DLNA_ORG_FLAG_BACKGROUND_TRANSFERT_MODE |
-    DLNA_ORG_FLAG_CONNECTION_STALL |
-    DLNA_ORG_FLAG_DLNA_V15;
-
   if (argc < 2)
   {
     printf ("usage: %s media_filename\n", argv[0]);
     return -1;
   }
 
+  flags = DLNA_ORG_FLAG_STREAMING_TRANSFER_MODE |
+    DLNA_ORG_FLAG_BACKGROUND_TRANSFERT_MODE |
+    DLNA_ORG_FLAG_CONNECTION_STALL |
+    DLNA_ORG_FLAG_DLNA_V15;
+  
   printf ("Using %s\n", LIBDLNA_IDENT);
   
   dlna = dlna_init ();
