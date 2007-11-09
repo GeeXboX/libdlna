@@ -367,61 +367,41 @@ audio_profile_get_codec (AVFormatContext *ctx)
 av_codecs_t *
 av_profile_get_codecs (AVFormatContext *ctx)
 {
-  AVStream *stream = NULL;
-  AVCodecContext *codec = NULL;
   av_codecs_t *codecs = NULL;
-  int i;
+  int i, audio_stream = -1, video_stream = -1;
  
   codecs = malloc (sizeof (av_codecs_t));
-  
-  /* find first audio stream */
+
   for (i = 0; i < ctx->nb_streams; i++)
   {
-    stream = ctx->streams[i];
-    if (!stream)
-      goto av_profile_get_codecs_end;
-    
-    codec = stream->codec;
-    if (!codec)
-      goto av_profile_get_codecs_end;
-
-    if (codec->codec_type == CODEC_TYPE_AUDIO)
+    if (audio_stream == -1 &&
+        ctx->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO)
     {
-      codecs->as = stream;
-      codecs->ac = codec;
-      break;
+      audio_stream = i;
+      continue;
+    }
+    else if (video_stream == -1 &&
+             ctx->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
+    {
+      video_stream = i;
+      continue;
     }
   }
 
-  /* find first video stream */
-  for (i = 0; i < ctx->nb_streams; i++)
-  {
-    stream = ctx->streams[i];
-    if (!stream)
-      goto av_profile_get_codecs_end;
-    
-    codec = stream->codec;
-    if (!codec)
-      goto av_profile_get_codecs_end;
+  codecs->as = audio_stream >= 0 ? ctx->streams[audio_stream] : NULL;
+  codecs->ac = audio_stream >= 0 ? ctx->streams[audio_stream]->codec : NULL;
 
-    if (codec->codec_type == CODEC_TYPE_VIDEO)
-    {
-      codecs->vs = stream;
-      codecs->vc = codec;
-      break;
-    }
-  }
+  codecs->vs = video_stream >= 0 ? ctx->streams[video_stream] : NULL;
+  codecs->vc = video_stream >= 0 ? ctx->streams[video_stream]->codec : NULL;
 
   /* check for at least one video stream and one audio stream in container */
   if (!codecs->ac || !codecs->vc)
-    goto av_profile_get_codecs_end;
+  {
+    free (codecs);
+    return NULL;
+  }
   
   return codecs;
-
- av_profile_get_codecs_end:
-  if (codecs)
-    free (codecs);
-  return NULL;
 }
 
 char *

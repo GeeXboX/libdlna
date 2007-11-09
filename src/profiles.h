@@ -70,8 +70,10 @@ typedef struct dlna_registered_profile_s {
 } dlna_registered_profile_t;
 
 typedef struct av_codecs_s {
+  /* audio stream and codec */
   AVStream *as;
   AVCodecContext *ac;
+  /* video stream and codec */
   AVStream *vs;
   AVCodecContext *vc;
 } av_codecs_t;
