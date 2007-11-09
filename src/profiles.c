@@ -199,17 +199,15 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   
   if (av_open_input_file (&pFormatCtx, filename, NULL, 0, NULL) != 0)
   {
-#ifdef HAVE_DEBUG
-    fprintf (stderr, "can't open file: %s\n", filename);
-#endif /* HAVE_DEBUG */
+    if (dlna->verbosity)
+      fprintf (stderr, "can't open file: %s\n", filename);
     return NULL;
   }
 
   if (av_find_stream_info (pFormatCtx) < 0)
   {
-#ifdef HAVE_DEBUG
-    fprintf (stderr, "can't find stream info\n");
-#endif /* HAVE_DEBUG */
+    if (dlna->verbosity)
+      fprintf (stderr, "can't find stream info\n");
     return NULL;
   }
 
