@@ -22,6 +22,13 @@
 #ifndef _DLNA_H_
 #define _DLNA_H_
 
+#ifdef __cplusplus
+extern "C" {
+#if 0 /* avoid EMACS indent */
+}
+#endif /* 0 */
+#endif /* __cplusplus */
+
 #define DLNA_STRINGIFY(s)         DLNA_TOSTRING(s)
 #define DLNA_TOSTRING(s) #s
 
@@ -144,5 +151,12 @@ char * dlna_write_protocol_info (dlna_protocol_info_type_t type,
                                  dlna_org_operation_t op,
                                  dlna_org_flags_t flags,
                                  dlna_profile_t *p);
+
+#ifdef __cplusplus
+#if 0 /* avoid EMACS indent */
+{
+#endif /* 0 */
+}
+#endif /* __cplusplus */
 
 #endif /* _DLNA_H_ */
