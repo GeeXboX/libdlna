@@ -26,8 +26,6 @@
 #include "profiles.h"
 #include "containers.h"
 
-static dlna_registered_profile_t *first_profile = NULL;
-
 extern dlna_registered_profile_t dlna_profile_image_jpeg;
 extern dlna_registered_profile_t dlna_profile_image_png;
 extern dlna_registered_profile_t dlna_profile_audio_ac3;
@@ -46,7 +44,7 @@ extern dlna_registered_profile_t dlna_profile_av_wmv9;
 static void
 dlna_register_profile (dlna_t *dlna, dlna_registered_profile_t *profile)
 {
-  dlna_registered_profile_t **p;
+  void **p;
 
   if (!dlna)
     return;
@@ -54,12 +52,12 @@ dlna_register_profile (dlna_t *dlna, dlna_registered_profile_t *profile)
   if (!dlna->inited)
     dlna = dlna_init ();
   
-  p = &first_profile;
+  p = &dlna->first_profile;
   while (*p != NULL)
   {
-    if ((*p)->id == profile->id)
+    if (((dlna_registered_profile_t *) *p)->id == profile->id)
       return; /* already registered */
-    p = &(*p)->next;
+    p = (void *) &((dlna_registered_profile_t *) *p)->next;
   }
   *p = profile;
   profile->next = NULL;
@@ -156,6 +154,7 @@ dlna_init (void)
   dlna = malloc (sizeof (dlna_t));
   dlna->inited = 1;
   dlna->verbosity = 0;
+  dlna->first_profile = NULL;
   
   /* register all FFMPEG demuxers */
   av_register_all ();
@@ -172,6 +171,7 @@ dlna_uninit (dlna_t *dlna)
   dlna->inited = 0;
   if (dlna->verbosity)
     fprintf (stderr, "DLNA: uninit\n");
+  dlna->first_profile = NULL;
   free (dlna);
 }
 
@@ -217,7 +217,7 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   dump_format (pFormatCtx, 0, NULL, 0);
 #endif /* HAVE_DEBUG */
   
-  p = first_profile;
+  p = dlna->first_profile;
   while (p)
   {
     dlna_profile_t *prof;

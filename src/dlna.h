@@ -145,6 +145,7 @@ typedef struct dlna_profile_s {
 typedef struct dlna_s {
   int inited;
   int verbosity;
+  void *first_profile;
 } dlna_t;
 
 dlna_t *dlna_init (void);
