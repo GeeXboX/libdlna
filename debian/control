@@ -3,7 +3,7 @@ Priority: extra
 Maintainer: Ubuntu MOTU Developers <ubuntu-motu@lists.ubuntu.com>
 Uploaders: Alexis Saettler <alexis@saettler.org>
 XSBC-Original-Maintainer: Alexis Saettler <alexis@saettler.org>
-Build-Depends: debhelper (>= 5), cdbs (>= 0.4.23-1.1)
+Build-Depends: debhelper (>= 5), cdbs (>= 0.4.23-1.1), libavcodec-dev, libavformat-dev
 Standards-Version: 3.7.2
 Section: libs
 
