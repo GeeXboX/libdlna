@@ -1,0 +1,32 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+DEB_DH_INSTALL_SOURCEDIR:=debian/tmp
+
+common-configure-arch common-configure-indep:: debian/stamp-autotools-files
+debian/stamp-autotools-files:
+	./configure --disable-debug --prefix=/usr
+	touch $@
+
+common-build-arch common-build-indep:: debian/stamp-makefile-build
+debian/stamp-makefile-build:
+	$(MAKE) -C src
+	touch $@
+
+common-install-arch common-install-indep:: common-install-impl
+common-install-impl::
+	$(MAKE) install DESTDIR=$(DEB_DESTDIR)
+
+clean::
+	-$(MAKE) distclean
+	-$(RM) -f debian/stamp-autotools-files
+	-$(RM) -f debian/stamp-makefile-build
+
+
+# used to build a debian package
+#  run 'debian/rules dpkg-buildpackage'
+dpkg-buildpackage:
+	dpkg-buildpackage -rfakeroot -i"\.hg|.*\.kdevelop.*"
+
+.PHONY: dpkg-buildpackage

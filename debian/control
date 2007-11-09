@@ -1,0 +1,44 @@
+Source: libdlna
+Priority: extra
+Maintainer: Ubuntu MOTU Developers <ubuntu-motu@lists.ubuntu.com>
+Uploaders: Alexis Saettler <alexis@saettler.org>
+XSBC-Original-Maintainer: Alexis Saettler <alexis@saettler.org>
+Build-Depends: debhelper (>= 5), cdbs (>= 0.4.23-1.1)
+Standards-Version: 3.7.2
+Section: libs
+
+Package: libdlna-dev
+Section: libdevel
+Architecture: any
+Depends: libdlna0 (= ${binary:Version})
+Description: development files for libdlna
+ The reference open-source implementation of DLNA (Digital Living Network
+ Alliance) standards. The primary goal is to provide DLNA support to uShare,
+ an embedded UPnP A/V Media Server, but will be used to build both DLNA
+ servers and players.
+ .
+ libdlna relies on FFMPEG librairies (libavformat and libavcodec)
+ to handle and demux A/V streams.
+ .
+ The libdlna-dev package contains the header files, and
+ debug versions of library.
+ .
+ More informations on http://libdlna.geexbox.org
+
+Package: libdlna0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: ushare
+Description: DLNA codec library
+ The reference open-source implementation of DLNA (Digital Living Network
+ Alliance) standards. The primary goal is to provide DLNA support to uShare,
+ an embedded UPnP A/V Media Server, but will be used to build both DLNA
+ servers and players.
+ .
+ libdlna relies on FFMPEG librairies (libavformat and libavcodec)
+ to handle and demux A/V streams.
+ .
+ The libdlna0 package contains the runtime libraries for uPnP.
+ .
+ More informations on http://libdlna.geexbox.org
