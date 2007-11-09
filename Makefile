@@ -11,18 +11,20 @@ all: lib test
 lib:
 	$(MAKE) -C src
 
-test:
-	$(CC) $(SRCS) $(OPTFLAGS) $(CFLAGS) $(LDFLAGS) -o $(LIBTEST)
+test: $(LIBTEST)
+
+$(LIBTEST): $(SRCS)
+	$(CC) $? $(OPTFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 
 clean:
 	$(MAKE) -C src clean
-	rm -f $(LIBTEST)
+	-$(RM) -f $(LIBTEST)
 
 distclean: clean
-	rm -f config.log
-	rm -f config.mak
+	-$(RM) -f config.log
+	-$(RM) -f config.mak
 
 install:
 	$(MAKE) -C src install
 
-.phony: clean distclean
+.PHONY: clean distclean

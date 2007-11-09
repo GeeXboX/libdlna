@@ -1,6 +1,8 @@
 include ../config.mak
 
-LIBNAME = libdlna.so
+LIBNAMEBASE = libdlna.so
+LIBNAMEEXT = $(LIBNAMEBASE).$(VERSION)
+LIBNAME = $(LIBNAMEBASE).0
 
 SRCS =  profiles.c \
 	containers.c \
@@ -31,27 +33,32 @@ OBJS = $(SRCS:.c=.o)
 
 .SUFFIXES: .c .o
 
-all: depend $(LIBNAME)
+all: depend $(LIBNAMEEXT)
 
 .c.o:
 	$(CC) -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
 
-$(LIBNAME): $(OBJS)
-	$(CC) -shared $(OBJS) $(LDFLAGS) $(EXTRALIBS) -o $(LIBNAME)
+$(LIBNAMEEXT): $(OBJS)
+	$(CC) -shared -Wl,-soname,$(LIBNAME) $? $(LDFLAGS) $(EXTRALIBS) -o $@
+	$(LN) -sf $@ $(LIBNAME)
+	$(LN) -sf $@ $(LIBNAMEBASE)
 
 clean:
-	rm -f *.o *.a *.so
-	rm -f .depend
+	-$(RM) -f *.o *.a *.so*
+	-$(RM) -f .depend
 
 install: $(LIBNAME)
-	$(INSTALL) -c $(LIBNAME) $(libdir)
-	$(LN) -sf $(LIBNAME) $(libdir)/$(LIBNAME).0
-	$(INSTALL) -c -m 644 dlna.h $(includedir)
+	$(INSTALL) -d $(libdir)
+	$(INSTALL) $(LIBNAMEEXT) $(libdir)
+	$(LN) -sf $(LIBNAMEEXT) $(libdir)/$(LIBNAME)
+	$(LN) -sf $(LIBNAMEEXT) $(libdir)/$(LIBNAMEBASE)
+	$(INSTALL) -d $(includedir)
+	$(INSTALL) -m 644 dlna.h $(includedir)
 
 depend:
 	$(CC) -MM $(CFLAGS) $(SRCS) 1>.depend
 
-.phony: clean depend
+.PHONY: clean depend
 
 #
 # include dependency files if they exist
