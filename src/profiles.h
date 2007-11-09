@@ -64,6 +64,7 @@
 
 typedef struct dlna_registered_profile_s {
   dlna_media_profile_t id;
+  dlna_media_class_t class;
   char *extensions;
   dlna_profile_t * (*probe) (AVFormatContext *ctx);
   struct dlna_registered_profile_s *next;

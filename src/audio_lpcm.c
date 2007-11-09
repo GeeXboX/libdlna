@@ -78,6 +78,7 @@ probe_lpcm (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_audio_lpcm = {
   .id = DLNA_PROFILE_AUDIO_LPCM,
+  .class = DLNA_CLASS_AUDIO,
   .extensions = "pcm,lpcm,wav,aiff",
   .probe = probe_lpcm,
   .next = NULL

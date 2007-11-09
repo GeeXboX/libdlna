@@ -649,6 +649,7 @@ probe_mpeg2 (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_av_mpeg2 = {
   .id = DLNA_PROFILE_AV_MPEG2,
+  .class = DLNA_CLASS_AV,
   .extensions = "mpg,mpeg,mpe,m2v,mp2p,mp2t,ts,ps,pes",
   .probe = probe_mpeg2,
   .next = NULL

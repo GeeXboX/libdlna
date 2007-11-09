@@ -934,6 +934,7 @@ probe_mpeg4_part2 (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_av_mpeg4_part2 = {
   .id = DLNA_PROFILE_AV_MPEG4_PART2,
+  .class = DLNA_CLASS_AV,
   .extensions = "mov,hdmov,mp4,3gp,3gpp,asf,mpg,mpeg,mpe,mp2t,ts",
   .probe = probe_mpeg4_part2,
   .next = NULL

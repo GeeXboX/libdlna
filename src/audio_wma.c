@@ -111,6 +111,7 @@ probe_wma (AVFormatContext *ctx)
 
 dlna_registered_profile_t dlna_profile_audio_wma = {
   .id = DLNA_PROFILE_AUDIO_WMA,
+  .class = DLNA_CLASS_AUDIO,
   .extensions = "wma,asf",
   .probe = probe_wma,
   .next = NULL
