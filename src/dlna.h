@@ -112,7 +112,7 @@ typedef enum {
   DLNA_CLASS_IMAGE,
   DLNA_CLASS_AUDIO,
   DLNA_CLASS_AV,
-  DLAN_CLASS_COLLECTION
+  DLNA_CLASS_COLLECTION
 } dlna_media_class_t;
 
 typedef enum {
