@@ -24,6 +24,7 @@ main (int argc, char **argv)
   printf ("Using %s\n", LIBDLNA_IDENT);
   
   dlna = dlna_init ();
+  dlna_set_verbosity (dlna, 1);
   dlna_register_all_media_profiles (dlna);
   
   p = dlna_guess_media_profile (dlna, argv[1]);
