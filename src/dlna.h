@@ -142,7 +142,15 @@ typedef struct dlna_profile_s {
   dlna_media_class_t class;
 } dlna_profile_t;
 
-void dlna_init (void);
+typedef struct dlna_s {
+  int inited;
+  int verbosity;
+} dlna_t;
+
+dlna_t *dlna_init (void);
+void dlna_uninit (dlna_t *dlna);
+void dlna_set_verbosity (dlna_t *dlna, int level);
+
 void dlna_register_all_media_profiles (void);
 void dlna_register_media_profile (dlna_media_profile_t profile);
 

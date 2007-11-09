@@ -130,11 +130,40 @@ dlna_register_media_profile (dlna_media_profile_t profile)
   }
 }
 
-void
+dlna_t *
 dlna_init (void)
 {
+  dlna_t *dlna;
+
+  dlna = malloc (sizeof (dlna_t));
+  dlna->inited = 1;
+  dlna->verbosity = 0;
+  
   /* register all FFMPEG demuxers */
   av_register_all ();
+
+  return dlna;
+}
+
+void
+dlna_uninit (dlna_t *dlna)
+{
+  if (!dlna)
+    return;
+
+  dlna->inited = 0;
+  if (dlna->verbosity)
+    fprintf (stderr, "DLNA: uninit\n");
+  free (dlna);
+}
+
+void
+dlna_set_verbosity (dlna_t *dlna, int level)
+{
+  if (!dlna)
+    return;
+
+  dlna->verbosity = level;
 }
 
 dlna_profile_t *
