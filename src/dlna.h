@@ -138,6 +138,7 @@ typedef struct dlna_profile_s {
   const char *id;
   const char *mime;
   const char *label;
+  dlna_media_class_t class;
 } dlna_profile_t;
 
 void dlna_init (void);

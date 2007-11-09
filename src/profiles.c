@@ -183,6 +183,33 @@ dlna_guess_media_profile (const char *filename)
     if (prof)
     {
       profile = prof;
+
+      switch (p->id)
+      {
+      case DLNA_PROFILE_IMAGE_JPEG:
+      case DLNA_PROFILE_IMAGE_PNG:
+        profile->class = DLNA_CLASS_IMAGE;
+        break;
+      case DLNA_PROFILE_AUDIO_AC3:
+      case DLNA_PROFILE_AUDIO_AMR:
+      case DLNA_PROFILE_AUDIO_ATRAC3:
+      case DLNA_PROFILE_AUDIO_LPCM:
+      case DLNA_PROFILE_AUDIO_MP3:
+      case DLNA_PROFILE_AUDIO_MPEG4:
+      case DLNA_PROFILE_AUDIO_WMA:
+        profile->class = DLNA_CLASS_AUDIO;
+        break;
+      case DLNA_PROFILE_AV_MPEG1:
+      case DLNA_PROFILE_AV_MPEG2:
+      case DLNA_PROFILE_AV_MPEG4_PART2:
+      case DLNA_PROFILE_AV_MPEG4_PART10:
+      case DLNA_PROFILE_AV_WMV9:
+        profile->class = DLNA_CLASS_AV;
+        break;
+      default:
+        break;
+      }
+      
       break;
     }
     p = p->next;
