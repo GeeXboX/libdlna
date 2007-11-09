@@ -1,3 +1,8 @@
+2007-11-08  Benjamin Zores  <ben@geexbox.org>
+
+	* Release 0.1.4.
+	* Support for inclusion in C++ programs.
+
 2007-11-09  Alexis Saettler  <alexis@saettler.org>
 
 	* Added lib's version in configure, and use it to build the lib file
