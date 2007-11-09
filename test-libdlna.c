@@ -33,6 +33,7 @@ main (int argc, char **argv)
     printf ("ID: %s\n", p->id);
     printf ("MIME: %s\n", p->mime);
     printf ("Label: %s\n", p->label);
+    printf ("Class: %d\n", p->class);
 
     protocol_info = dlna_write_protocol_info (DLNA_PROTOCOL_INFO_TYPE_HTTP,
                                               DLNA_ORG_PLAY_SPEED_NORMAL,
