@@ -108,6 +108,7 @@ typedef enum {
 } dlna_org_flags_t;
 
 typedef enum {
+  DLNA_CLASS_UNKNOWN,
   DLNA_CLASS_IMAGE,
   DLNA_CLASS_AUDIO,
   DLNA_CLASS_AV,

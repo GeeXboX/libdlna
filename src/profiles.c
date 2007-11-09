@@ -207,6 +207,7 @@ dlna_guess_media_profile (const char *filename)
         profile->class = DLNA_CLASS_AV;
         break;
       default:
+        profile->class = DLNA_CLASS_UNKNOWN;
         break;
       }
       
