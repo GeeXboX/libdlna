@@ -6,6 +6,7 @@
 int
 main (int argc, char **argv)
 {
+  dlna_t *dlna;
   dlna_profile_t *p;
   dlna_org_flags_t flags;
 
@@ -22,10 +23,10 @@ main (int argc, char **argv)
 
   printf ("Using %s\n", LIBDLNA_IDENT);
   
-  dlna_init ();
-  dlna_register_all_media_profiles ();
+  dlna = dlna_init ();
+  dlna_register_all_media_profiles (dlna);
   
-  p = dlna_guess_media_profile (argv[1]);
+  p = dlna_guess_media_profile (dlna, argv[1]);
   if (p)
   {
     char *protocol_info;
@@ -45,6 +46,8 @@ main (int argc, char **argv)
   }
   else
     printf ("Unknown format\n");
+
+  dlna_uninit (dlna);
   
   return 0;
 }

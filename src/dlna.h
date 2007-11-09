@@ -151,10 +151,10 @@ dlna_t *dlna_init (void);
 void dlna_uninit (dlna_t *dlna);
 void dlna_set_verbosity (dlna_t *dlna, int level);
 
-void dlna_register_all_media_profiles (void);
-void dlna_register_media_profile (dlna_media_profile_t profile);
+void dlna_register_all_media_profiles (dlna_t *dlna);
+void dlna_register_media_profile (dlna_t *dlna, dlna_media_profile_t profile);
 
-dlna_profile_t *dlna_guess_media_profile (const char *filename);
+dlna_profile_t *dlna_guess_media_profile (dlna_t *dlna, const char *filename);
 char * dlna_write_protocol_info (dlna_protocol_info_type_t type,
                                  dlna_org_play_speed_t speed,
                                  dlna_org_conversion_t ci,

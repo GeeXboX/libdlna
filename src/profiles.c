@@ -44,9 +44,15 @@ extern dlna_registered_profile_t dlna_profile_av_mpeg4_part10;
 extern dlna_registered_profile_t dlna_profile_av_wmv9;
 
 static void
-dlna_register_profile (dlna_registered_profile_t *profile)
+dlna_register_profile (dlna_t *dlna, dlna_registered_profile_t *profile)
 {
   dlna_registered_profile_t **p;
+
+  if (!dlna)
+    return;
+
+  if (!dlna->inited)
+    dlna = dlna_init ();
   
   p = &first_profile;
   while (*p != NULL)
@@ -60,70 +66,82 @@ dlna_register_profile (dlna_registered_profile_t *profile)
 }
 
 void
-dlna_register_all_media_profiles (void)
+dlna_register_all_media_profiles (dlna_t *dlna)
 {
-  dlna_register_profile (&dlna_profile_image_jpeg);
-  dlna_register_profile (&dlna_profile_image_png);
-  dlna_register_profile (&dlna_profile_audio_ac3);
-  dlna_register_profile (&dlna_profile_audio_amr);
-  dlna_register_profile (&dlna_profile_audio_atrac3);
-  dlna_register_profile (&dlna_profile_audio_lpcm);
-  dlna_register_profile (&dlna_profile_audio_mp3);
-  dlna_register_profile (&dlna_profile_audio_mpeg4);
-  dlna_register_profile (&dlna_profile_audio_wma);
-  dlna_register_profile (&dlna_profile_av_mpeg1);
-  dlna_register_profile (&dlna_profile_av_mpeg2);
-  dlna_register_profile (&dlna_profile_av_mpeg4_part2);
-  dlna_register_profile (&dlna_profile_av_mpeg4_part10);
-  dlna_register_profile (&dlna_profile_av_wmv9);
+  if (!dlna)
+    return;
+  
+  if (!dlna->inited)
+    dlna = dlna_init ();
+  
+  dlna_register_profile (dlna, &dlna_profile_image_jpeg);
+  dlna_register_profile (dlna, &dlna_profile_image_png);
+  dlna_register_profile (dlna, &dlna_profile_audio_ac3);
+  dlna_register_profile (dlna, &dlna_profile_audio_amr);
+  dlna_register_profile (dlna, &dlna_profile_audio_atrac3);
+  dlna_register_profile (dlna, &dlna_profile_audio_lpcm);
+  dlna_register_profile (dlna, &dlna_profile_audio_mp3);
+  dlna_register_profile (dlna, &dlna_profile_audio_mpeg4);
+  dlna_register_profile (dlna, &dlna_profile_audio_wma);
+  dlna_register_profile (dlna, &dlna_profile_av_mpeg1);
+  dlna_register_profile (dlna, &dlna_profile_av_mpeg2);
+  dlna_register_profile (dlna, &dlna_profile_av_mpeg4_part2);
+  dlna_register_profile (dlna, &dlna_profile_av_mpeg4_part10);
+  dlna_register_profile (dlna, &dlna_profile_av_wmv9);
 }
 
 void
-dlna_register_media_profile (dlna_media_profile_t profile)
+dlna_register_media_profile (dlna_t *dlna, dlna_media_profile_t profile)
 {
+  if (!dlna)
+    return;
+  
+  if (!dlna->inited)
+    dlna = dlna_init ();
+  
   switch (profile)
   {
   case DLNA_PROFILE_IMAGE_JPEG:
-    dlna_register_profile (&dlna_profile_image_jpeg);
+    dlna_register_profile (dlna, &dlna_profile_image_jpeg);
     break;
   case DLNA_PROFILE_IMAGE_PNG:
-    dlna_register_profile (&dlna_profile_image_png);
+    dlna_register_profile (dlna, &dlna_profile_image_png);
     break;
   case DLNA_PROFILE_AUDIO_AC3:
-    dlna_register_profile (&dlna_profile_audio_ac3);
+    dlna_register_profile (dlna, &dlna_profile_audio_ac3);
     break;
   case DLNA_PROFILE_AUDIO_AMR:
-    dlna_register_profile (&dlna_profile_audio_amr);
+    dlna_register_profile (dlna, &dlna_profile_audio_amr);
     break;
   case DLNA_PROFILE_AUDIO_ATRAC3:
-    dlna_register_profile (&dlna_profile_audio_atrac3);
+    dlna_register_profile (dlna, &dlna_profile_audio_atrac3);
     break;
   case DLNA_PROFILE_AUDIO_LPCM:
-    dlna_register_profile (&dlna_profile_audio_lpcm);
+    dlna_register_profile (dlna, &dlna_profile_audio_lpcm);
     break;
   case DLNA_PROFILE_AUDIO_MP3:
-    dlna_register_profile (&dlna_profile_audio_mp3);
+    dlna_register_profile (dlna, &dlna_profile_audio_mp3);
     break;
   case DLNA_PROFILE_AUDIO_MPEG4:
-    dlna_register_profile (&dlna_profile_audio_mpeg4);
+    dlna_register_profile (dlna, &dlna_profile_audio_mpeg4);
     break;
   case DLNA_PROFILE_AUDIO_WMA:
-    dlna_register_profile (&dlna_profile_audio_wma);
+    dlna_register_profile (dlna, &dlna_profile_audio_wma);
     break;
   case DLNA_PROFILE_AV_MPEG1:
-    dlna_register_profile (&dlna_profile_av_mpeg1);
+    dlna_register_profile (dlna, &dlna_profile_av_mpeg1);
     break;
   case DLNA_PROFILE_AV_MPEG2:
-    dlna_register_profile (&dlna_profile_av_mpeg2);
+    dlna_register_profile (dlna, &dlna_profile_av_mpeg2);
     break;
   case DLNA_PROFILE_AV_MPEG4_PART2:
-    dlna_register_profile (&dlna_profile_av_mpeg4_part2);
+    dlna_register_profile (dlna, &dlna_profile_av_mpeg4_part2);
     break;
   case DLNA_PROFILE_AV_MPEG4_PART10:
-    dlna_register_profile (&dlna_profile_av_mpeg4_part10);
+    dlna_register_profile (dlna, &dlna_profile_av_mpeg4_part10);
     break;
   case DLNA_PROFILE_AV_WMV9:
-    dlna_register_profile (&dlna_profile_av_wmv9);
+    dlna_register_profile (dlna, &dlna_profile_av_wmv9);
     break;
   default:
     break;
@@ -167,12 +185,18 @@ dlna_set_verbosity (dlna_t *dlna, int level)
 }
 
 dlna_profile_t *
-dlna_guess_media_profile (const char *filename)
+dlna_guess_media_profile (dlna_t *dlna, const char *filename)
 {
   AVFormatContext *pFormatCtx;
   dlna_registered_profile_t *p;
   dlna_profile_t *profile = NULL;
 
+  if (!dlna)
+    return NULL;
+  
+  if (!dlna->inited)
+    dlna = dlna_init ();
+  
   if (av_open_input_file (&pFormatCtx, filename, NULL, 0, NULL) != 0)
   {
 #ifdef HAVE_DEBUG
