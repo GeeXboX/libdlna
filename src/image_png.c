@@ -70,20 +70,18 @@ probe_png (AVFormatContext *ctx,
            dlna_container_type_t st,
            av_codecs_t *codecs)
 {
-  AVCodecContext *codec;
   int i;
 
   if (!stream_ctx_is_image (ctx, codecs, st))
     return NULL;
   
   /* check for PNG compliant codec */
-  codec= codecs->vc;
-  if (codec->codec_id != CODEC_ID_PNG)
+  if (codecs->vc->codec_id != CODEC_ID_PNG)
     return NULL;
 
   for (i = 0; png_profiles_mapping[i].profile; i++)
-    if (codec->width  <= png_profiles_mapping[i].max_width &&
-        codec->height <= png_profiles_mapping[i].max_height)
+    if (codecs->vc->width  <= png_profiles_mapping[i].max_width &&
+        codecs->vc->height <= png_profiles_mapping[i].max_height)
       return set_profile (png_profiles_mapping[i].profile);
   
   return NULL;

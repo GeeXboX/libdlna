@@ -86,23 +86,21 @@ probe_jpeg (AVFormatContext *ctx,
             dlna_container_type_t st,
             av_codecs_t *codecs)
 {
-  AVCodecContext *codec;
   int i;
 
   if (!stream_ctx_is_image (ctx, codecs, st))
     return NULL;
 
   /* check for JPEG compliant codec */
-  codec= codecs->vc;
-  if (codec->codec_id != CODEC_ID_MJPEG &&
-      codec->codec_id != CODEC_ID_MJPEGB &&
-      codec->codec_id != CODEC_ID_LJPEG &&
-      codec->codec_id != CODEC_ID_JPEGLS)
+  if (codecs->vc->codec_id != CODEC_ID_MJPEG &&
+      codecs->vc->codec_id != CODEC_ID_MJPEGB &&
+      codecs->vc->codec_id != CODEC_ID_LJPEG &&
+      codecs->vc->codec_id != CODEC_ID_JPEGLS)
     return NULL;
 
   for (i = 0; jpeg_profiles_mapping[i].profile; i++)
-    if (codec->width  <= jpeg_profiles_mapping[i].max_width &&
-        codec->height <= jpeg_profiles_mapping[i].max_height)
+    if (codecs->vc->width  <= jpeg_profiles_mapping[i].max_width &&
+        codecs->vc->height <= jpeg_profiles_mapping[i].max_height)
       return set_profile (jpeg_profiles_mapping[i].profile);
   
   return NULL;
