@@ -592,6 +592,7 @@ restore_flags
 #################################################
 echolog ""
 echolog "libdlna: configure is OK"
+echolog "  version            $VERSION"
 echolog "configuration:"
 echolog "  install prefix     $PREFIX"
 echolog "  C compiler         $cc"
