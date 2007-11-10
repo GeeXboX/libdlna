@@ -139,11 +139,7 @@ probe_amr (AVFormatContext *ctx,
   
   /* check for AMR NB/WB audio codec */
   if (audio_is_valid_amr (codecs->ac))
-  {
-    if (st == CT_3GP)
-      return set_profile (&three_gpp);
-    return set_profile (&amr);
-  }
+    return (st == CT_3GP) ? set_profile (&three_gpp) : set_profile (&amr);
 
   if (audio_is_valid_amr_wb (codecs->ac))
     return set_profile (&amr_wbplus);
