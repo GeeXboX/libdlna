@@ -59,6 +59,12 @@ of DLNA (Digital Living Network Alliance) standards. Its primary goal is to prov
 	<li>Audio: AC3, AMR, ATRAC3, LPCM, MP3, MPEG-4 (AAC), WMA</li>
 	<li>AV: MPEG-1, MPEG-2, MPEG-4 Part 2 (SP and ASP), MPEG-4 Part 10 (a.k.a. AVC or H.264)</li>
       </ul>
+      Changes in 0.2.0:
+      <ul>
+        <li>Updated public API.</li>
+        <li>Code simplifications and bug fixes.</li>
+        <li>Ensure library's thread-safety.</li>
+      </ul>
       Changes in 0.1.4:
       <ul>
         <li>Complete decoding of AAC profile variants (LC/LTP/HE/BSAC).</li>
@@ -81,16 +87,16 @@ of DLNA (Digital Living Network Alliance) standards. Its primary goal is to prov
 
     <h2>Download</h2>
     <p>
-      The currently available libdlna release is 0.1.4.<br/>
-      Sources can be downloaded <a href="releases/libdlna-0.1.4.tar.bz2">here</a>.<br/>
+      The currently available libdlna release is 0.2.0.<br/>
+      Sources can be downloaded <a href="releases/libdlna-0.2.0.tar.bz2">here</a>.<br/>
     </p>
     <dl>
       <dt>Ubuntu Package</dt>
       <dd>
       If you're using Ubuntu 7.10 (Gutsy) GNU/Linux distribution, you can also grab the binaries for your architecture :
       <ul>
-        <li>i386 arch : <a href="http://www.geexbox.org/debian/pool/main/libdlna/libdlna0_0.1.4-0ubuntu1_i386.deb">libdlna0 package</a>.</li>
-        <li>amd64 arch : <a href="http://www.geexbox.org/debian/pool/main/libdlna/libdlna0_0.1.4-0ubuntu1_amd64.deb">libdlna0 package</a>.</li>
+        <li>i386 arch : <a href="http://www.geexbox.org/debian/pool/main/libdlna/libdlna0_0.2.0-0ubuntu1_i386.deb">libdlna0 package</a>.</li>
+        <li>amd64 arch : <a href="http://www.geexbox.org/debian/pool/main/libdlna/libdlna0_0.2.0-0ubuntu1_amd64.deb">libdlna0 package</a>.</li>
       </ul>
       libdlna is also available through <b>apt-get</b>. Simply add the following line to your <i>/etc/apt/sources.list</i> file :
       <pre class="code">deb http://www.geexbox.org/debian/ unstable main</pre>
