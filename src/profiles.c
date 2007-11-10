@@ -187,7 +187,7 @@ dlna_set_verbosity (dlna_t *dlna, int level)
 dlna_profile_t *
 dlna_guess_media_profile (dlna_t *dlna, const char *filename)
 {
-  AVFormatContext *pFormatCtx;
+  AVFormatContext *ctx;
   dlna_registered_profile_t *p;
   dlna_profile_t *profile = NULL;
 
@@ -197,14 +197,14 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   if (!dlna->inited)
     dlna = dlna_init ();
   
-  if (av_open_input_file (&pFormatCtx, filename, NULL, 0, NULL) != 0)
+  if (av_open_input_file (&ctx, filename, NULL, 0, NULL) != 0)
   {
     if (dlna->verbosity)
       fprintf (stderr, "can't open file: %s\n", filename);
     return NULL;
   }
 
-  if (av_find_stream_info (pFormatCtx) < 0)
+  if (av_find_stream_info (ctx) < 0)
   {
     if (dlna->verbosity)
       fprintf (stderr, "can't find stream info\n");
@@ -212,7 +212,7 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   }
 
 #ifdef HAVE_DEBUG
-  dump_format (pFormatCtx, 0, NULL, 0);
+  dump_format (ctx, 0, NULL, 0);
 #endif /* HAVE_DEBUG */
   
   p = dlna->first_profile;
@@ -230,7 +230,7 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
       }
     }
     
-    prof = p->probe (pFormatCtx);
+    prof = p->probe (ctx);
     if (prof)
     {
       profile = prof;
@@ -240,7 +240,7 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
     p = p->next;
   }
 
-  av_close_input_file (pFormatCtx);
+  av_close_input_file (ctx);
   return profile;
 }
 
