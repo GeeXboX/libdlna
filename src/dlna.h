@@ -22,6 +22,11 @@
 #ifndef _DLNA_H_
 #define _DLNA_H_
 
+/**
+ * @file dlna.h
+ * external api header.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #if 0 /* avoid EMACS indent */
@@ -135,29 +140,103 @@ typedef enum {
   DLNA_PROFILE_AV_WMV9
 } dlna_media_profile_t;
 
+/**
+ * DLNA profile.
+ * This specifies the DLNA profile one file/stream is compatible with.
+ */
 typedef struct dlna_profile_s {
+  /* Profile ID, part of DLNA.ORG_PN= string */
   const char *id;
+  /* Profile MIME type */
   const char *mime;
+  /* Profile Label */
   const char *label;
+  /* Profile type: IMAGE / AUDIO / AV */
   dlna_media_class_t class;
 } dlna_profile_t;
 
+/**
+ * DLNA Library's controller.
+ * This controls the whole library.
+ */
 typedef struct dlna_s {
+  /* has the library's been inited */
   int inited;
+  /* defines verbosity level */
   int verbosity;
+  /* defines flexibility on file extension's check */
   int check_extensions;
+  /* linked-list of registered DLNA profiles */
   void *first_profile;
 } dlna_t;
 
+/**
+ * Initialization of library.
+ *
+ * @return DLNA library's controller.
+ */
 dlna_t *dlna_init (void);
+
+/**
+ * Uninitialization of library.
+ *
+ * @param[in] dlna The DLNA library's controller.
+ */
 void dlna_uninit (dlna_t *dlna);
+
+/**
+ * Set library's verbosity level.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] level Level of verbosity (0 to disable, 1 to enable).
+ */
 void dlna_set_verbosity (dlna_t *dlna, int level);
+
+/**
+ * Set library's check level on files extension.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] level Level of check (0 for no check, 1 to enable checks).
+ */
 void dlna_set_extension_check (dlna_t *dlna, int level);
 
+/**
+ * Register all known/supported DLNA profiles.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ */
 void dlna_register_all_media_profiles (dlna_t *dlna);
+
+/**
+ * Register one specific known/supported DLNA profiles.
+ *
+ * @param[in] dlna     The DLNA library's controller.
+ * @param[in] profile  The profile ID to be registered.
+ */
 void dlna_register_media_profile (dlna_t *dlna, dlna_media_profile_t profile);
 
+
+/**
+ * Guess which DLNA profile one input file/stream is compatible with.
+ *
+ * @param[in] dlna     The DLNA library's controller.
+ * @param[in] filename The file to be checked for compliance.
+ * @return The file's DLNA profile if compatible, NULL otherwise.
+ */
 dlna_profile_t *dlna_guess_media_profile (dlna_t *dlna, const char *filename);
+
+/**
+ * Output the protocol information string that must be send by a DMS to a DMP
+ * for the file to be played/recognized.
+ *
+ * @param[in] type    Streaming method.
+ * @param[in] speed   DLNA.ORG_PS parameter.
+ * @param[in] ci      DLNA.ORG_CI parameter.
+ * @param[in] op      DLNA.ORG_OP parameter.
+ * @param[in] flags   DLNA.ORG_FLAGS parameter.
+ * @param[in] profile The DLNA's file profile that has been guessed.
+ * @return            The protocol information string.
+ */
 char * dlna_write_protocol_info (dlna_protocol_info_type_t type,
                                  dlna_org_play_speed_t speed,
                                  dlna_org_conversion_t ci,
