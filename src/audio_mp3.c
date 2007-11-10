@@ -169,7 +169,7 @@ probe_mp3 (AVFormatContext *ctx,
   if (codecs->vc)
     return NULL;
   
-  ap = audio_profile_guess_wma (codecs->ac);
+  ap = audio_profile_guess_mp3 (codecs->ac);
   switch (ap)
   {
   case AUDIO_PROFILE_MP3:
