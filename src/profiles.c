@@ -347,47 +347,6 @@ set_profile (dlna_profile_t *profile)
   return p;
 }
 
-AVCodecContext *
-audio_profile_get_codec (AVFormatContext *ctx)
-{
-  AVStream *stream = NULL;
-  AVCodecContext *codec = NULL;
-  int i;
-  
-  /* check there is no video stream in container
-   (otherwise it would be part of AV profile) */
-  for (i = 0; i < ctx->nb_streams; i++)
-  {
-    stream = ctx->streams[i];
-    if (!stream)
-      return NULL;
-    
-    codec = stream->codec;
-    if (!codec)
-      return NULL;
-
-    if (codec->codec_type == CODEC_TYPE_VIDEO)
-      return NULL;
-  }
-
-  /* find first audio stream */
-  for (i = 0; i < ctx->nb_streams; i++)
-  {
-    stream = ctx->streams[i];
-    if (!stream)
-      return NULL;
-    
-    codec = stream->codec;
-    if (!codec)
-      return NULL;
-
-    if (codec->codec_type == CODEC_TYPE_AUDIO)
-      break;
-  }
-
-  return codec;
-}
-
 char *
 dlna_write_protocol_info (dlna_protocol_info_type_t type,
                           dlna_org_play_speed_t speed,
