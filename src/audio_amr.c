@@ -126,23 +126,27 @@ audio_profile_guess_amr (AVCodecContext *ac)
 }
 
 static dlna_profile_t *
-probe_amr (AVFormatContext *ctx)
+probe_amr (AVFormatContext *ctx,
+           dlna_container_type_t st,
+           av_codecs_t *codecs)
 {
-  AVCodecContext *codec;
-  
-  codec = audio_profile_get_codec (ctx);
-  if (!codec)
+  /* we need an audio codec ... */
+  if (!codecs->ac)
+    return NULL;
+
+  /* ... but no video one */
+  if (codecs->vc)
     return NULL;
   
   /* check for AMR NB/WB audio codec */
-  if (audio_is_valid_amr (codec))
+  if (audio_is_valid_amr (codecs->ac))
   {
-    if (stream_get_container (ctx) == CT_3GP)
+    if (st == CT_3GP)
       return set_profile (&three_gpp);
     return set_profile (&amr);
   }
 
-  if (audio_is_valid_amr_wb (codec))
+  if (audio_is_valid_amr_wb (codecs->ac))
     return set_profile (&amr_wbplus);
   
   return NULL;

@@ -66,16 +66,21 @@ audio_profile_guess_ac3 (AVCodecContext *ac)
 }
 
 static dlna_profile_t *
-probe_ac3 (AVFormatContext *ctx)
+probe_ac3 (AVFormatContext *ctx,
+           dlna_container_type_t st,
+           av_codecs_t *codecs)
 {
-  AVCodecContext *codec;
   audio_profile_t ap;
-  
-  codec = audio_profile_get_codec (ctx);
-  if (!codec)
+
+  /* we need an audio codec ... */
+  if (!codecs->ac)
     return NULL;
 
-  ap = audio_profile_guess_ac3 (codec);
+  /* ... but no video one */
+  if (codecs->vc)
+    return NULL;
+  
+  ap = audio_profile_guess_ac3 (codecs->ac);
   switch (ap)
   {
   case AUDIO_PROFILE_AC3:

@@ -864,33 +864,30 @@ mpeg4_video_get_profile (mpeg4_vcodec_type_t vctype,
 }
 
 static dlna_profile_t *
-probe_mpeg4_part2 (AVFormatContext *ctx)
+probe_mpeg4_part2 (AVFormatContext *ctx,
+                   dlna_container_type_t st,
+                   av_codecs_t *codecs)
 {
-  av_codecs_t *codecs;
-  dlna_container_type_t st;
   mpeg4_vcodec_type_t vctype;
   mpeg4_video_profile_t vp;
   audio_profile_t ap;
   int i;
-  
-  /* grab codecs info */
-  codecs = av_profile_get_codecs (ctx);
-  if (!codecs)
-    goto probe_mpeg4_end;
 
+  if (!codecs->as || !codecs->ac || !codecs->vs || !codecs->vc)
+    return NULL;
+  
   vctype = mpeg4_get_vcodec (codecs->vc);
   if (vctype == MPEG4_VCODEC_INVALID)
-    goto probe_mpeg4_end;
+    return NULL;
 
   /* check for a supported container */
-  st = stream_get_container (ctx);
   if (st != CT_ASF &&
       st != CT_3GP &&
       st != CT_MP4 &&
       st != CT_MPEG_TRANSPORT_STREAM &&
       st != CT_MPEG_TRANSPORT_STREAM_DLNA &&
       st != CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS)
-    goto probe_mpeg4_end;
+    return NULL;
 
   /* ensure we have a valid video codec bit rate */
   if (codecs->vc->bit_rate == 0)
@@ -900,12 +897,12 @@ probe_mpeg4_part2 (AVFormatContext *ctx)
   /* check for valid video profile */
   vp = mpeg4_video_get_profile (vctype, codecs->vs, codecs->vc);
   if (vp == MPEG4_VIDEO_PROFILE_INVALID)
-    goto probe_mpeg4_end;
+    return NULL;
   
   /* check for valid audio profile */
   ap = audio_profile_guess (codecs->ac);
   if (ap == AUDIO_PROFILE_INVALID)
-    goto probe_mpeg4_end;
+    return NULL;
 
   /* AAC fixup: _320 profiles are audio-only profiles */
   if (ap == AUDIO_PROFILE_AAC_320)
@@ -918,17 +915,8 @@ probe_mpeg4_part2 (AVFormatContext *ctx)
     if (mpeg4_profiles_mapping[i].st == st &&
         mpeg4_profiles_mapping[i].vp == vp &&
         mpeg4_profiles_mapping[i].ap == ap)
-    {
-      if (codecs)
-        free (codecs);
-      
       return set_profile (mpeg4_profiles_mapping[i].profile);
-    }
  
- probe_mpeg4_end:
-  if (codecs)
-    free (codecs);
-  
   return NULL;
 }
 

@@ -26,6 +26,7 @@
 #include <ffmpeg/avformat.h>
 
 #include "dlna.h"
+#include "containers.h"
 
 /* DLNA MIME types */
 #define MIME_IMAGE_JPEG                   "image/jpeg"
@@ -62,14 +63,6 @@
 #define LABEL_VIDEO_SD                    "SD"
 #define LABEL_VIDEO_HD                    "HD"
 
-typedef struct dlna_registered_profile_s {
-  dlna_media_profile_t id;
-  dlna_media_class_t class;
-  char *extensions;
-  dlna_profile_t * (*probe) (AVFormatContext *ctx);
-  struct dlna_registered_profile_s *next;
-} dlna_registered_profile_t;
-
 typedef struct av_codecs_s {
   /* audio stream and codec */
   AVStream *as;
@@ -78,6 +71,16 @@ typedef struct av_codecs_s {
   AVStream *vs;
   AVCodecContext *vc;
 } av_codecs_t;
+
+typedef struct dlna_registered_profile_s {
+  dlna_media_profile_t id;
+  dlna_media_class_t class;
+  char *extensions;
+  dlna_profile_t * (*probe) (AVFormatContext *ctx,
+                             dlna_container_type_t st,
+                             av_codecs_t *codecs);
+  struct dlna_registered_profile_s *next;
+} dlna_registered_profile_t;
 
 char * get_file_extension (const char *filename);
 int match_file_extension (const char *filename, const char *extensions);

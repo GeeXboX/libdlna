@@ -54,19 +54,25 @@ static dlna_profile_t png_lrg = {
 };
 
 static dlna_profile_t *
-probe_png (AVFormatContext *ctx)
+probe_png (AVFormatContext *ctx,
+           dlna_container_type_t st,
+           av_codecs_t *codecs)
 {
-  AVStream *stream;
   AVCodecContext *codec;
 
   /* should only have 1 stream */
   if (ctx->nb_streams > 1)
     return NULL;
 
-  stream = ctx->streams[0];
-  codec = stream->codec;
+  /* should be image container */
+  if (st != CT_IMAGE)
+    return NULL;
 
+  if (!codecs->vc)
+    return NULL;
+  
   /* which should be a video one (even for images) */
+  codec = codecs->vc;
   if (codec->codec_type != CODEC_TYPE_VIDEO)
     return NULL;
 

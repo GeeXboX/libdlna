@@ -1209,31 +1209,28 @@ avc_video_get_profile (AVFormatContext *ctx, AVStream *vs, AVCodecContext *vc)
 }
 
 static dlna_profile_t *
-probe_avc (AVFormatContext *ctx)
+probe_avc (AVFormatContext *ctx,
+           dlna_container_type_t st,
+           av_codecs_t *codecs)
 {
-  av_codecs_t *codecs;
-  dlna_container_type_t st;
   avc_video_profile_t vp;
   audio_profile_t ap;
   int i;
   
-  /* grab codecs info */
-  codecs = av_profile_get_codecs (ctx);
-  if (!codecs)
-    goto probe_avc_end;
+  if (!codecs->as || !codecs->ac || !codecs->vs || !codecs->vc)
+    return NULL;
 
   /* check for H.264/AVC codec */
   if (codecs->vc->codec_id != CODEC_ID_H264)
-    goto probe_avc_end;
+    return NULL;
 
   /* check for a supported container */
-  st = stream_get_container (ctx);
   if (st != CT_3GP &&
       st != CT_MP4 &&
       st != CT_MPEG_TRANSPORT_STREAM &&
       st != CT_MPEG_TRANSPORT_STREAM_DLNA &&
       st != CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS)
-    goto probe_avc_end;
+    return NULL;
 
   /* ensure we have a valid video codec bit rate */
   if (codecs->vc->bit_rate == 0)
@@ -1243,12 +1240,12 @@ probe_avc (AVFormatContext *ctx)
   /* check for valid video profile */
   vp = avc_video_get_profile (ctx, codecs->vs, codecs->vc);
   if (vp == AVC_VIDEO_PROFILE_INVALID)
-    goto probe_avc_end;
+    return NULL;
 
   /* check for valid audio profile */
   ap = audio_profile_guess (codecs->ac);
   if (ap == AUDIO_PROFILE_INVALID)
-    goto probe_avc_end;
+    return NULL;
 
   /* AAC fixup: _320 profiles are audio-only profiles */
   if (ap == AUDIO_PROFILE_AAC_320)
@@ -1261,16 +1258,7 @@ probe_avc (AVFormatContext *ctx)
     if (avc_profiles_mapping[i].st == st &&
         avc_profiles_mapping[i].vp == vp &&
         avc_profiles_mapping[i].ap == ap)
-    {
-      if (codecs)
-        free (codecs);
-      
       return set_profile (avc_profiles_mapping[i].profile);
-    }
-  
- probe_avc_end:
-  if (codecs)
-    free (codecs);
   
   return NULL;
 }

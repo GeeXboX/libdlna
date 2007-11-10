@@ -372,22 +372,27 @@ audio_profile_guess_aac (AVCodecContext *ac)
 }
 
 static dlna_profile_t *
-probe_mpeg4 (AVFormatContext *ctx)
+probe_mpeg4 (AVFormatContext *ctx,
+             dlna_container_type_t st,
+             av_codecs_t *codecs)
 {
-  AVCodecContext *codec = NULL;
   audio_profile_t ap;
   aac_container_type_t ct;
   int i;
-  
-  /* check for raw AAC */
-  ct = (stream_get_container (ctx) == CT_UNKNOWN) ? AAC_RAW : AAC_MUXED;
-  
-  codec = audio_profile_get_codec (ctx);
-  if (!codec)
+
+  /* we need an audio codec ... */
+  if (!codecs->ac)
+    return NULL;
+
+  /* ... but no video one */
+  if (codecs->vc)
     return NULL;
   
+  /* check for raw AAC */
+  ct = (st == CT_UNKNOWN) ? AAC_RAW : AAC_MUXED;
+  
   /* check for AAC codec */
-  ap = audio_profile_guess_aac (codec);
+  ap = audio_profile_guess_aac (codecs->ac);
   if (ap == AUDIO_PROFILE_INVALID)
     return NULL;
 

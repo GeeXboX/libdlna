@@ -238,7 +238,7 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
       }
     }
     
-    prof = p->probe (ctx);
+    prof = p->probe (ctx, st, codecs);
     if (prof)
     {
       profile = prof;

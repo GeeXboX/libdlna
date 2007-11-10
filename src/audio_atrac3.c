@@ -47,15 +47,19 @@ audio_profile_guess_atrac (AVCodecContext *ac)
 }
 
 static dlna_profile_t *
-probe_atrac3 (AVFormatContext *ctx)
+probe_atrac3 (AVFormatContext *ctx,
+              dlna_container_type_t st,
+              av_codecs_t *codecs)
 {
-  AVCodecContext *codec;
-  
-  codec = audio_profile_get_codec (ctx);
-  if (!codec)
+  /* we need an audio codec ... */
+  if (!codecs->ac)
     return NULL;
 
-  if (audio_profile_guess_atrac (codec) == AUDIO_PROFILE_ATRAC)
+  /* ... but no video one */
+  if (codecs->vc)
+    return NULL;
+  
+  if (audio_profile_guess_atrac (codecs->ac) == AUDIO_PROFILE_ATRAC)
     return set_profile (&atrac3);
 
   return NULL;

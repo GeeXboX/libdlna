@@ -229,49 +229,41 @@ wmv_video_profile_get (AVStream *vs, AVCodecContext *vc)
 }
 
 static dlna_profile_t *
-probe_wmv9 (AVFormatContext *ctx)
+probe_wmv9 (AVFormatContext *ctx,
+            dlna_container_type_t st,
+            av_codecs_t *codecs)
 {
-  av_codecs_t *codecs;
   wmv_video_profile_t vp;
   audio_profile_t ap;
   int i;
+
+  if (!codecs->as || !codecs->ac || !codecs->vs || !codecs->vc)
+    return NULL;
   
   /* need to be in ASF container only */
-  if (stream_get_container (ctx) != CT_ASF)
+  if (st != CT_ASF)
     return NULL;
-
-  codecs = av_profile_get_codecs (ctx);
-  if (!codecs)
-    goto probe_wmv9_end;
 
   /* check for WMV3 (Simple and Main profiles) video codec */
   if (codecs->vc->codec_id != CODEC_ID_WMV3)
-    goto probe_wmv9_end;
+    return NULL;
 
   /* get video profile */
   vp = wmv_video_profile_get (codecs->vs, codecs->vc);
   if (vp == WMV_VIDEO_PROFILE_INVALID)
-    goto probe_wmv9_end;
+    return NULL;
   
   /* get audio profile */
   ap = audio_profile_guess (codecs->ac);
   if (ap == AUDIO_PROFILE_INVALID)
-    goto probe_wmv9_end;
+    return NULL;
 
   /* find profile according to container type, video and audio profiles */
   for (i = 0; wmv_profiles_mapping[i].profile; i++)
     if (wmv_profiles_mapping[i].vp == vp &&
         wmv_profiles_mapping[i].ap == ap)
-    {
-      if (codecs)
-        free (codecs);
-      
       return set_profile (wmv_profiles_mapping[i].profile);
-    }
-  
- probe_wmv9_end:
-  if (codecs)
-    free (codecs);
+
   return NULL;
 }
 

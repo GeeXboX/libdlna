@@ -608,43 +608,32 @@ probe_mpeg_ts (AVFormatContext *ctx,
 }
 
 static dlna_profile_t *
-probe_mpeg2 (AVFormatContext *ctx)
+probe_mpeg2 (AVFormatContext *ctx,
+             dlna_container_type_t st,
+             av_codecs_t *codecs)
 {
-  av_codecs_t *codecs;
-  dlna_profile_t *profile = NULL;
-  dlna_container_type_t st;
+  if (!codecs->as || !codecs->ac || !codecs->vs || !codecs->vc)
+    return NULL;
   
-  codecs = av_profile_get_codecs (ctx);
-  if (!codecs)
-    goto probe_mpeg2_end;
-
   /* check for MPEG-2 video codec */
   if (codecs->vc->codec_id != CODEC_ID_MPEG2VIDEO)
-    goto probe_mpeg2_end;
+    return NULL;
 
-  st = stream_get_container (ctx);
   switch (st)
   {
   case CT_MPEG_ELEMENTARY_STREAM:
-    profile = probe_mpeg_es (ctx, codecs);
-    break;
+    return probe_mpeg_es (ctx, codecs);
   case CT_MPEG_PROGRAM_STREAM:
-    profile = probe_mpeg_ps (ctx, codecs);
-    break;
+    return probe_mpeg_ps (ctx, codecs);
   case CT_MPEG_TRANSPORT_STREAM:
   case CT_MPEG_TRANSPORT_STREAM_DLNA:
   case CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
-    profile = probe_mpeg_ts (ctx, codecs, st);
-    break;
+    return probe_mpeg_ts (ctx, codecs, st);
   default:
     break;
   }
-
- probe_mpeg2_end:
-  if (codecs)
-    free (codecs);
   
-  return profile;
+  return NULL;
 }
 
 dlna_registered_profile_t dlna_profile_av_mpeg2 = {

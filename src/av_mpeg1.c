@@ -34,21 +34,20 @@ static dlna_profile_t mpeg1 = {
 };
 
 static dlna_profile_t *
-probe_mpeg1 (AVFormatContext *ctx)
+probe_mpeg1 (AVFormatContext *ctx,
+             dlna_container_type_t st,
+             av_codecs_t *codecs)
 {
-  av_codecs_t *codecs;
+  if (!codecs->as || !codecs->ac || !codecs->vs || !codecs->vc)
+    return NULL;
   
-  codecs = av_profile_get_codecs (ctx);
-  if (!codecs)
-    goto probe_mpeg1_end;
-
   /* check for MPEG-1 video codec */
   if (codecs->vc->codec_id != CODEC_ID_MPEG1VIDEO)
-    goto probe_mpeg1_end;
+    return NULL;
 
   /* video bitrate must be CBR at 1,151,929.1 bps */
   if (codecs->vc->bit_rate != 1150000)
-    goto probe_mpeg1_end;
+    return NULL;
 
   /* supported resolutions:
      - 352x288 @ 25 Hz (PAL)
@@ -59,7 +58,7 @@ probe_mpeg1 (AVFormatContext *ctx)
   {
     if (codecs->vs->r_frame_rate.num != 25 &&
         codecs->vs->r_frame_rate.den != 1)
-          goto probe_mpeg1_end;
+          return NULL;
   }
   else if (codecs->vc->width == 352 && codecs->vc->height == 240)
   {
@@ -67,36 +66,28 @@ probe_mpeg1 (AVFormatContext *ctx)
          codecs->vs->r_frame_rate.den != 1001) ||
         (codecs->vs->r_frame_rate.num != 24000 &&
          codecs->vs->r_frame_rate.den != 1001))
-          goto probe_mpeg1_end;
+          return NULL;
   }
   else
-    goto probe_mpeg1_end;
+    return NULL;
 
   /* check for MPEG-1 Layer-2 audio codec */
   if (codecs->ac->codec_id != CODEC_ID_MP2)
-    goto probe_mpeg1_end;
+    return NULL;
   
   /* supported channels: stereo only */
   if (codecs->ac->channels != 2)
-    goto probe_mpeg1_end;
+    return NULL;
 
   /* supported sampling rate: 44.1 kHz only */
   if (codecs->ac->sample_rate != 44100)
-    goto probe_mpeg1_end;
+    return NULL;
 
   /* supported bitrate: 224 Kbps only */
   if (codecs->ac->bit_rate != 224000)
-    goto probe_mpeg1_end;
+    return NULL;
 
-  if (codecs)
-    free (codecs);
-  
   return set_profile (&mpeg1);
-
- probe_mpeg1_end:
-  if (codecs)
-    free (codecs);
-  return NULL;
 }
 
 dlna_registered_profile_t dlna_profile_av_mpeg1 = {

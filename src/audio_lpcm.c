@@ -55,22 +55,27 @@ audio_profile_guess_lpcm (AVCodecContext *ac)
 }
 
 static dlna_profile_t *
-probe_lpcm (AVFormatContext *ctx)
+probe_lpcm (AVFormatContext *ctx,
+            dlna_container_type_t st,
+            av_codecs_t *codecs)
 {
-  AVCodecContext *codec;
   dlna_profile_t *p;
   char mime[128];
-  
-  codec = audio_profile_get_codec (ctx);
-  if (!codec)
+
+  /* we need an audio codec ... */
+  if (!codecs->ac)
     return NULL;
 
-  if (audio_profile_guess_lpcm (codec) != AUDIO_PROFILE_LPCM)
+  /* ... but no video one */
+  if (codecs->vc)
+    return NULL;
+  
+  if (audio_profile_guess_lpcm (codecs->ac) != AUDIO_PROFILE_LPCM)
     return NULL;
   
   p = set_profile (&lpcm);
   sprintf (mime, "%s;rate=%d;channels=%d",
-           MIME_AUDIO_LPCM, codec->sample_rate, codec->channels);
+           MIME_AUDIO_LPCM, codecs->ac->sample_rate, codecs->ac->channels);
   p->mime = strdup (mime);
   
   return p;
