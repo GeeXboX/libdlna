@@ -23,6 +23,10 @@ SRCS =  profiles.c \
 	av_mpeg4_part10.c \
 	av_wmv9.c \
 
+EXTRADIST = dlna.h \
+	containers.h \
+	profiles.h \
+
 CFLAGS += -fPIC
 
 ifeq ($(DEBUG),yes)
@@ -59,6 +63,11 @@ depend:
 	$(CC) -MM $(CFLAGS) $(SRCS) 1>.depend
 
 .PHONY: clean depend
+
+dist-all:
+	cp $(EXTRADIST) $(SRCS) Makefile $(DIST)
+
+.PHONY: dist-all
 
 #
 # include dependency files if they exist

@@ -1,7 +1,18 @@
 include config.mak
 
+DISTFILE = libdlna-$(VERSION).tar.bz2
+
 LIBTEST = test-libdlna
 SRCS = test-libdlna.c
+
+EXTRADIST = AUTHORS \
+	ChangeLog \
+	configure \
+	COPYING \
+	README \
+
+SUBDIRS = src \
+	web \
 
 CFLAGS += -Isrc
 LDFLAGS += -Lsrc -ldlna
@@ -28,3 +39,18 @@ install:
 	$(MAKE) -C src install
 
 .PHONY: clean distclean
+
+dist:
+	-$(RM) $(DISTFILE)
+	dist=$(shell pwd)/libdlna-$(VERSION) && \
+	for subdir in . $(SUBDIRS); do \
+		mkdir -p "$$dist/$$subdir"; \
+		$(MAKE) -C $$subdir dist-all DIST="$$dist/$$subdir"; \
+	done && \
+	tar cjf $(DISTFILE) libdlna-$(VERSION)
+	-$(RM) -rf libdlna-$(VERSION)
+
+dist-all:
+	cp $(EXTRADIST) $(SRCS) Makefile $(DIST)
+
+.PHONY: dist dist-all
