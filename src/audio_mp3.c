@@ -164,6 +164,10 @@ probe_mp3 (AVFormatContext *ctx,
   if (!stream_ctx_is_audio (codecs))
     return NULL;
 
+  /* check for supported container */
+  if (st != CT_MP3)
+    return NULL;
+  
   ap = audio_profile_guess_mp3 (codecs->ac);
   switch (ap)
   {

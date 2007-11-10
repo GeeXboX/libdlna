@@ -93,6 +93,10 @@ probe_wma (AVFormatContext *ctx,
   if (!stream_ctx_is_audio (codecs))
     return NULL;
 
+  /* check for supported container */
+  if (st != CT_ASF)
+    return NULL;
+  
   ap = audio_profile_guess_wma (codecs->ac);
   switch (ap)
   {

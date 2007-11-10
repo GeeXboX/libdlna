@@ -132,6 +132,10 @@ probe_amr (AVFormatContext *ctx,
 {
   if (!stream_ctx_is_audio (codecs))
     return NULL;
+
+  /* check for supported container */
+  if (st != CT_AMR && st != CT_3GP && st != CT_MP4)
+    return NULL;
   
   /* check for AMR NB/WB audio codec */
   if (audio_is_valid_amr (codecs->ac))
