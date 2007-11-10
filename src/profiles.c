@@ -312,15 +312,15 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
     
     if (dlna->check_extensions)
     {
-    if (p->extensions)
-    {
-      /* check for valid file extension */
-      if (!match_file_extension (filename, p->extensions))
+      if (p->extensions)
       {
-        p = p->next;
-        continue;
+        /* check for valid file extension */
+        if (!match_file_extension (filename, p->extensions))
+        {
+          p = p->next;
+          continue;
+        }
       }
-    }
     }
     
     prof = p->probe (ctx, st, codecs);
