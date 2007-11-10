@@ -190,6 +190,8 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   AVFormatContext *ctx;
   dlna_registered_profile_t *p;
   dlna_profile_t *profile = NULL;
+  dlna_container_type_t st;
+  av_codecs_t *codecs;
 
   if (!dlna)
     return NULL;
@@ -214,6 +216,12 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
 #ifdef HAVE_DEBUG
   dump_format (ctx, 0, NULL, 0);
 #endif /* HAVE_DEBUG */
+
+  /* grab codecs info */
+  codecs = av_profile_get_codecs (ctx);
+
+  /* check for container type */
+  st = stream_get_container (ctx);
   
   p = dlna->first_profile;
   while (p)
@@ -241,6 +249,7 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   }
 
   av_close_input_file (ctx);
+  free (codecs);
   return profile;
 }
 
