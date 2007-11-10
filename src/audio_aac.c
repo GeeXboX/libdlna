@@ -380,12 +380,7 @@ probe_mpeg4 (AVFormatContext *ctx,
   aac_container_type_t ct;
   int i;
 
-  /* we need an audio codec ... */
-  if (!codecs->ac)
-    return NULL;
-
-  /* ... but no video one */
-  if (codecs->vc)
+  if (!stream_ctx_is_audio (codecs))
     return NULL;
   
   /* check for raw AAC */

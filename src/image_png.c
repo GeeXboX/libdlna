@@ -60,23 +60,11 @@ probe_png (AVFormatContext *ctx,
 {
   AVCodecContext *codec;
 
-  /* should only have 1 stream */
-  if (ctx->nb_streams > 1)
-    return NULL;
-
-  /* should be image container */
-  if (st != CT_IMAGE)
-    return NULL;
-
-  if (!codecs->vc)
+  if (!stream_ctx_is_image (ctx, codecs, st))
     return NULL;
   
-  /* which should be a video one (even for images) */
-  codec = codecs->vc;
-  if (codec->codec_type != CODEC_TYPE_VIDEO)
-    return NULL;
-
   /* check for PNG compliant codec */
+  codec= codecs->vc;
   if (codec->codec_id != CODEC_ID_PNG)
     return NULL;
   

@@ -38,7 +38,7 @@ probe_mpeg1 (AVFormatContext *ctx,
              dlna_container_type_t st,
              av_codecs_t *codecs)
 {
-  if (!codecs->as || !codecs->ac || !codecs->vs || !codecs->vc)
+  if (!stream_ctx_is_av (codecs))
     return NULL;
   
   /* check for MPEG-1 video codec */

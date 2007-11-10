@@ -51,12 +51,7 @@ probe_atrac3 (AVFormatContext *ctx,
               dlna_container_type_t st,
               av_codecs_t *codecs)
 {
-  /* we need an audio codec ... */
-  if (!codecs->ac)
-    return NULL;
-
-  /* ... but no video one */
-  if (codecs->vc)
+  if (!stream_ctx_is_audio (codecs))
     return NULL;
   
   if (audio_profile_guess_atrac (codecs->ac) == AUDIO_PROFILE_ATRAC)

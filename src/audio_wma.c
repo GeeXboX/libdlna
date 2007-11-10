@@ -90,14 +90,9 @@ probe_wma (AVFormatContext *ctx,
 {
   audio_profile_t ap;
 
-  /* we need an audio codec ... */
-  if (!codecs->ac)
+  if (!stream_ctx_is_audio (codecs))
     return NULL;
 
-  /* ... but no video one */
-  if (codecs->vc)
-    return NULL;
-  
   ap = audio_profile_guess_wma (codecs->ac);
   switch (ap)
   {

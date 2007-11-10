@@ -1217,7 +1217,7 @@ probe_avc (AVFormatContext *ctx,
   audio_profile_t ap;
   int i;
   
-  if (!codecs->as || !codecs->ac || !codecs->vs || !codecs->vc)
+  if (!stream_ctx_is_av (codecs))
     return NULL;
 
   /* check for H.264/AVC codec */

@@ -237,7 +237,7 @@ probe_wmv9 (AVFormatContext *ctx,
   audio_profile_t ap;
   int i;
 
-  if (!codecs->as || !codecs->ac || !codecs->vs || !codecs->vc)
+  if (!stream_ctx_is_av (codecs))
     return NULL;
   
   /* need to be in ASF container only */

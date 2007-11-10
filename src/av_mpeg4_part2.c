@@ -873,7 +873,7 @@ probe_mpeg4_part2 (AVFormatContext *ctx,
   audio_profile_t ap;
   int i;
 
-  if (!codecs->as || !codecs->ac || !codecs->vs || !codecs->vc)
+  if (!stream_ctx_is_av (codecs))
     return NULL;
   
   vctype = mpeg4_get_vcodec (codecs->vc);

@@ -62,14 +62,9 @@ probe_lpcm (AVFormatContext *ctx,
   dlna_profile_t *p;
   char mime[128];
 
-  /* we need an audio codec ... */
-  if (!codecs->ac)
+  if (!stream_ctx_is_audio (codecs))
     return NULL;
 
-  /* ... but no video one */
-  if (codecs->vc)
-    return NULL;
-  
   if (audio_profile_guess_lpcm (codecs->ac) != AUDIO_PROFILE_LPCM)
     return NULL;
   
