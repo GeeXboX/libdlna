@@ -53,12 +53,25 @@ static dlna_profile_t png_lrg = {
   .label = LABEL_IMAGE_PICTURE
 };
 
+static const struct {
+  dlna_profile_t *profile;
+  int max_width;
+  int max_height;
+} png_profiles_mapping[] = {
+  { &png_sm_ico,    48,   48 },
+  { &png_lrg_ico,  120,  120 },
+  { &png_tn,       160,  160 },
+  { &png_lrg,     4096, 4096 },
+  { NULL }
+};
+
 static dlna_profile_t *
 probe_png (AVFormatContext *ctx,
            dlna_container_type_t st,
            av_codecs_t *codecs)
 {
   AVCodecContext *codec;
+  int i;
 
   if (!stream_ctx_is_image (ctx, codecs, st))
     return NULL;
@@ -67,15 +80,11 @@ probe_png (AVFormatContext *ctx,
   codec= codecs->vc;
   if (codec->codec_id != CODEC_ID_PNG)
     return NULL;
-  
-  if (codec->width <= 48 && codec->height <= 48)
-    return set_profile (&png_sm_ico);
-  else if (codec->width <= 120 && codec->height <= 120)
-    return set_profile (&png_lrg_ico);
-  else if (codec->width <= 160 && codec->height <= 160)
-    return set_profile (&png_tn);
-  else if (codec->width <= 4096 && codec->height <= 4096)
-    return set_profile (&png_lrg);
+
+  for (i = 0; png_profiles_mapping[i].profile; i++)
+    if (codec->width  <= png_profiles_mapping[i].max_width &&
+        codec->height <= png_profiles_mapping[i].max_height)
+      return set_profile (png_profiles_mapping[i].profile);
   
   return NULL;
 }
