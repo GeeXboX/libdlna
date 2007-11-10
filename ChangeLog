@@ -1,3 +1,9 @@
+2007-11-10  Benjamin Zores  <ben@geexbox.org>
+
+	* Updated public API.
+	* Code simplifications and bug fixes.
+	* Ensure library's thread-safety.
+
 2007-11-08  Benjamin Zores  <ben@geexbox.org>
 
 	* Release 0.1.4.
