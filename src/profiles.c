@@ -377,7 +377,7 @@ av_profile_get_codecs (AVFormatContext *ctx)
   codecs->vc = video_stream >= 0 ? ctx->streams[video_stream]->codec : NULL;
 
   /* check for at least one video stream and one audio stream in container */
-  if (!codecs->ac || !codecs->vc)
+  if (!codecs->ac && !codecs->vc)
   {
     free (codecs);
     return NULL;
