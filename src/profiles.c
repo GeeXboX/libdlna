@@ -219,6 +219,8 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
 
   /* grab codecs info */
   codecs = av_profile_get_codecs (ctx);
+  if (!codecs)
+    return NULL;
 
   /* check for container type */
   st = stream_get_container (ctx);
