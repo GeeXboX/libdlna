@@ -88,8 +88,6 @@ probe_wma (AVFormatContext *ctx,
            dlna_container_type_t st,
            av_codecs_t *codecs)
 {
-  audio_profile_t ap;
-
   if (!stream_ctx_is_audio (codecs))
     return NULL;
 
@@ -97,8 +95,7 @@ probe_wma (AVFormatContext *ctx,
   if (st != CT_ASF)
     return NULL;
   
-  ap = audio_profile_guess_wma (codecs->ac);
-  switch (ap)
+  switch (audio_profile_guess_wma (codecs->ac))
   {
   case AUDIO_PROFILE_WMA_BASELINE:
     return set_profile (&wmabase);
