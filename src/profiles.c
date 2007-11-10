@@ -224,6 +224,37 @@ av_profile_get_codecs (AVFormatContext *ctx)
   return codecs;
 }
 
+static int
+match_file_extension (const char *filename, const char *extensions)
+{
+  const char *ext, *p;
+  char ext1[32], *q;
+
+  if (!filename)
+    return 0;
+
+  ext = strrchr (filename, '.');
+  if (ext)
+  {
+    ext++;
+    p = extensions;
+    for (;;)
+    {
+      q = ext1;
+      while (*p != '\0' && *p != ',' && (q - ext1 < sizeof (ext1) - 1))
+        *q++ = *p++;
+      *q = '\0';
+      if (!strcasecmp (ext1, ext))
+        return 1;
+      if (*p == '\0')
+        break;
+      p++;
+    }
+  }
+  
+  return 0;
+}
+
 dlna_profile_t *
 dlna_guess_media_profile (dlna_t *dlna, const char *filename)
 {
@@ -305,37 +336,6 @@ get_file_extension (const char *filename)
     str++;
 
   return str;
-}
-
-int
-match_file_extension (const char *filename, const char *extensions)
-{
-  const char *ext, *p;
-  char ext1[32], *q;
-
-  if (!filename)
-    return 0;
-
-  ext = strrchr (filename, '.');
-  if (ext)
-  {
-    ext++;
-    p = extensions;
-    for (;;)
-    {
-      q = ext1;
-      while (*p != '\0' && *p != ',' && (q - ext1 < sizeof (ext1) - 1))
-        *q++ = *p++;
-      *q = '\0';
-      if (!strcasecmp (ext1, ext))
-        return 1;
-      if (*p == '\0')
-        break;
-      p++;
-    }
-  }
-  
-  return 0;
 }
 
 dlna_profile_t *

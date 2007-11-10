@@ -83,7 +83,6 @@ typedef struct dlna_registered_profile_s {
 } dlna_registered_profile_t;
 
 char * get_file_extension (const char *filename);
-int match_file_extension (const char *filename, const char *extensions);
 dlna_profile_t *set_profile (dlna_profile_t *profile);
 
 /* audio profile checks */
