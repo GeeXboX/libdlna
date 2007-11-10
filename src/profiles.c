@@ -184,6 +184,15 @@ dlna_set_verbosity (dlna_t *dlna, int level)
   dlna->verbosity = level;
 }
 
+void
+dlna_set_extension_check (dlna_t *dlna, int level)
+{
+  if (!dlna)
+    return;
+
+  dlna->check_extensions = level;
+}
+
 static av_codecs_t *
 av_profile_get_codecs (AVFormatContext *ctx)
 {
@@ -301,6 +310,8 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   {
     dlna_profile_t *prof;
     
+    if (dlna->check_extensions)
+    {
     if (p->extensions)
     {
       /* check for valid file extension */
@@ -309,6 +320,7 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
         p = p->next;
         continue;
       }
+    }
     }
     
     prof = p->probe (ctx, st, codecs);

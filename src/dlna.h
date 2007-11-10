@@ -145,12 +145,14 @@ typedef struct dlna_profile_s {
 typedef struct dlna_s {
   int inited;
   int verbosity;
+  int check_extensions;
   void *first_profile;
 } dlna_t;
 
 dlna_t *dlna_init (void);
 void dlna_uninit (dlna_t *dlna);
 void dlna_set_verbosity (dlna_t *dlna, int level);
+void dlna_set_extension_check (dlna_t *dlna, int level);
 
 void dlna_register_all_media_profiles (dlna_t *dlna);
 void dlna_register_media_profile (dlna_t *dlna, dlna_media_profile_t profile);
