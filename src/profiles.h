@@ -139,4 +139,10 @@ audio_profile_t audio_profile_guess_mp2 (AVCodecContext *ac);
 audio_profile_t audio_profile_guess_mp3 (AVCodecContext *ac);
 audio_profile_t audio_profile_guess_wma (AVCodecContext *ac);
 
+/* stream context check routines */
+int stream_ctx_is_image (AVFormatContext *ctx,
+                         av_codecs_t *codecs, dlna_container_type_t st);
+int stream_ctx_is_audio (av_codecs_t *codecs);
+int stream_ctx_is_av (av_codecs_t *codecs);
+
 #endif /* _PROFILES_H_ */

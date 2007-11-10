@@ -326,6 +326,47 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   return profile;
 }
 
+int
+stream_ctx_is_image (AVFormatContext *ctx,
+                     av_codecs_t *codecs, dlna_container_type_t st)
+{
+  /* should only have 1 stream */
+  if (ctx->nb_streams > 1)
+    return 0;
+
+  /* should be inside image container */
+  if (st != CT_IMAGE)
+    return 0;
+
+  if (!codecs->vc)
+    return 0;
+
+  return 1;
+}
+
+int
+stream_ctx_is_audio (av_codecs_t *codecs)
+{
+  /* we need an audio codec ... */
+  if (!codecs->ac)
+    return 0;
+
+  /* ... but no video one */
+  if (codecs->vc)
+    return 0;
+
+  return 1;
+}
+
+int
+stream_ctx_is_av (av_codecs_t *codecs)
+{
+  if (!codecs->as || !codecs->ac || !codecs->vs || !codecs->vc)
+    return 0;
+
+  return 1;
+}
+
 char *
 get_file_extension (const char *filename)
 {
