@@ -86,7 +86,6 @@ char * get_file_extension (const char *filename);
 int match_file_extension (const char *filename, const char *extensions);
 dlna_profile_t *set_profile (dlna_profile_t *profile);
 AVCodecContext * audio_profile_get_codec (AVFormatContext *ctx);
-av_codecs_t *av_profile_get_codecs (AVFormatContext *ctx);
 
 /* audio profile checks */
 

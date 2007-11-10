@@ -184,6 +184,46 @@ dlna_set_verbosity (dlna_t *dlna, int level)
   dlna->verbosity = level;
 }
 
+static av_codecs_t *
+av_profile_get_codecs (AVFormatContext *ctx)
+{
+  av_codecs_t *codecs = NULL;
+  int i, audio_stream = -1, video_stream = -1;
+ 
+  codecs = malloc (sizeof (av_codecs_t));
+
+  for (i = 0; i < ctx->nb_streams; i++)
+  {
+    if (audio_stream == -1 &&
+        ctx->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO)
+    {
+      audio_stream = i;
+      continue;
+    }
+    else if (video_stream == -1 &&
+             ctx->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
+    {
+      video_stream = i;
+      continue;
+    }
+  }
+
+  codecs->as = audio_stream >= 0 ? ctx->streams[audio_stream] : NULL;
+  codecs->ac = audio_stream >= 0 ? ctx->streams[audio_stream]->codec : NULL;
+
+  codecs->vs = video_stream >= 0 ? ctx->streams[video_stream] : NULL;
+  codecs->vc = video_stream >= 0 ? ctx->streams[video_stream]->codec : NULL;
+
+  /* check for at least one video stream and one audio stream in container */
+  if (!codecs->ac && !codecs->vc)
+  {
+    free (codecs);
+    return NULL;
+  }
+  
+  return codecs;
+}
+
 dlna_profile_t *
 dlna_guess_media_profile (dlna_t *dlna, const char *filename)
 {
@@ -346,46 +386,6 @@ audio_profile_get_codec (AVFormatContext *ctx)
   }
 
   return codec;
-}
-
-av_codecs_t *
-av_profile_get_codecs (AVFormatContext *ctx)
-{
-  av_codecs_t *codecs = NULL;
-  int i, audio_stream = -1, video_stream = -1;
- 
-  codecs = malloc (sizeof (av_codecs_t));
-
-  for (i = 0; i < ctx->nb_streams; i++)
-  {
-    if (audio_stream == -1 &&
-        ctx->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO)
-    {
-      audio_stream = i;
-      continue;
-    }
-    else if (video_stream == -1 &&
-             ctx->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
-    {
-      video_stream = i;
-      continue;
-    }
-  }
-
-  codecs->as = audio_stream >= 0 ? ctx->streams[audio_stream] : NULL;
-  codecs->ac = audio_stream >= 0 ? ctx->streams[audio_stream]->codec : NULL;
-
-  codecs->vs = video_stream >= 0 ? ctx->streams[video_stream] : NULL;
-  codecs->vc = video_stream >= 0 ? ctx->streams[video_stream]->codec : NULL;
-
-  /* check for at least one video stream and one audio stream in container */
-  if (!codecs->ac && !codecs->vc)
-  {
-    free (codecs);
-    return NULL;
-  }
-  
-  return codecs;
 }
 
 char *
