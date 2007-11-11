@@ -47,18 +47,18 @@ all: depend $(LIBNAMEEXT)
 
 $(LIBNAMEEXT): $(OBJS)
 	$(CC) -shared -Wl,-soname,$(LIBNAME) $(OBJS) $(LDFLAGS) $(EXTRALIBS) -o $@
-	$(LN) -sf $@ $(LIBNAME)
-	$(LN) -sf $@ $(LIBNAMEBASE)
+	$(LN) -sf $(LIBNAMEEXT) $(LIBNAME)
+	$(LN) -sf $(LIBNAME) $(LIBNAMEBASE)
 
 clean:
 	-$(RM) -f *.o *.a *.so*
 	-$(RM) -f .depend
 
-install: $(LIBNAME)
+install: $(LIBNAMEEXT)
 	$(INSTALL) -d $(libdir)
 	$(INSTALL) $(LIBNAMEEXT) $(libdir)
 	$(LN) -sf $(LIBNAMEEXT) $(libdir)/$(LIBNAME)
-	$(LN) -sf $(LIBNAMEEXT) $(libdir)/$(LIBNAMEBASE)
+	$(LN) -sf $(LIBNAME) $(libdir)/$(LIBNAMEBASE)
 	$(INSTALL) -d $(includedir)
 	$(INSTALL) -m 644 dlna.h $(includedir)
 
