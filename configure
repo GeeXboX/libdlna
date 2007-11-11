@@ -565,6 +565,7 @@ check_cflags -D_REENTRANT
 if enabled debug; then
   add_cflags -g3
   add_cflags -DHAVE_DEBUG
+  dostrip=no
 fi
 
 if enabled optimize; then
