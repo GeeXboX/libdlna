@@ -3,9 +3,9 @@ $(error "../config.mak is not present, run configure !")
 endif
 include ../config.mak
 
-LIBNAMEBASE = libdlna.so
-LIBNAMEEXT = $(LIBNAMEBASE).$(VERSION)
-LIBNAME = $(LIBNAMEBASE).$(shell echo $(VERSION) | cut -f1 -d.)
+LIBNAME = libdlna.so
+LIBNAME_VERSION = $(LIBNAME).$(VERSION)
+LIBNAME_MAJOR = $(LIBNAME).$(shell echo $(VERSION) | cut -f1 -d.)
 
 SRCS =  profiles.c \
 	containers.c \
@@ -40,25 +40,25 @@ OBJS = $(SRCS:.c=.o)
 
 .SUFFIXES: .c .o
 
-all: depend $(LIBNAMEEXT)
+all: depend $(LIBNAME_VERSION)
 
 .c.o:
 	$(CC) -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
 
-$(LIBNAMEEXT): $(OBJS)
-	$(CC) -shared -Wl,-soname,$(LIBNAME) $(OBJS) $(LDFLAGS) $(EXTRALIBS) -o $@
-	$(LN) -sf $(LIBNAMEEXT) $(LIBNAME)
-	$(LN) -sf $(LIBNAME) $(LIBNAMEBASE)
+$(LIBNAME_VERSION): $(OBJS)
+	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(OBJS) $(LDFLAGS) $(EXTRALIBS) -o $@
+	$(LN) -sf $(LIBNAME_VERSION) $(LIBNAME_MAJOR)
+	$(LN) -sf $(LIBNAME_MAJOR) $(LIBNAME)
 
 clean:
 	-$(RM) -f *.o *.a *.so*
 	-$(RM) -f .depend
 
-install: $(LIBNAMEEXT)
+install: $(LIBNAME_VERSION)
 	$(INSTALL) -d $(libdir)
-	$(INSTALL) $(LIBNAMEEXT) $(libdir)
-	$(LN) -sf $(LIBNAMEEXT) $(libdir)/$(LIBNAME)
-	$(LN) -sf $(LIBNAME) $(libdir)/$(LIBNAMEBASE)
+	$(INSTALL) $(LIBNAME_VERSION) $(libdir)
+	$(LN) -sf $(LIBNAME_VERSION) $(libdir)/$(LIBNAME_MAJOR)
+	$(LN) -sf $(LIBNAME_MAJOR) $(libdir)/$(LIBNAME)
 	$(INSTALL) -d $(includedir)
 	$(INSTALL) -m 644 dlna.h $(includedir)
 
