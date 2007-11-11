@@ -5,7 +5,7 @@ include ../config.mak
 
 LIBNAMEBASE = libdlna.so
 LIBNAMEEXT = $(LIBNAMEBASE).$(VERSION)
-LIBNAME = $(LIBNAMEBASE).0
+LIBNAME = $(LIBNAMEBASE).$(shell echo $(VERSION) | cut -f1 -d.)
 
 SRCS =  profiles.c \
 	containers.c \
