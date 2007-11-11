@@ -4,6 +4,8 @@ endif
 include config.mak
 
 DISTFILE = libdlna-$(VERSION).tar.bz2
+PKGCONFIG_DIR = $(libdir)/pkgconfig
+PKGCONFIG_FILE = libdlna.pc
 
 LIBTEST = test-libdlna
 SRCS = test-libdlna.c
@@ -37,11 +39,17 @@ clean:
 distclean: clean
 	-$(RM) -f config.log
 	-$(RM) -f config.mak
+	-$(RM) -f $(PKGCONFIG_FILE)
 
-install:
+install: install-pkgconfig
 	$(MAKE) -C src install
 
+install-pkgconfig: $(PKGCONFIG_FILE)
+	$(INSTALL) -d "$(PKGCONFIG_DIR)"
+	$(INSTALL) -m 644 $< "$(PKGCONFIG_DIR)"
+
 .PHONY: clean distclean
+.PHONY: install install-pkgconfig
 
 dist:
 	-$(RM) $(DISTFILE)

@@ -256,6 +256,29 @@ append_config(){
     echo "$@" >> $CONFIGFILE
 }
 
+pkgconfig_generate(){
+name=$1
+comment=$2
+version=$3
+libs=$4
+requires=$5
+cat <<EOF >$name.pc
+prefix=$PREFIX
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: $name
+Description: $comment
+Version: $version
+Requires: $requires
+Conflicts:
+Libs: -L\${libdir} $libs
+Cflags: -I\${includedir}
+EOF
+}
+
+
 # set temporary file name
 if test ! -z "$TMPDIR" ; then
     TMPDIR1="${TMPDIR}"
@@ -639,6 +662,11 @@ append_config "LDFLAGS=$LDFLAGS"
 append_config "INSTALL=$INSTALL"
 
 append_config "DEBUG=$debug"
+
+#################################################
+#   make pkg-config files
+#################################################
+pkgconfig_generate libdlna "DLNA (Digital Living Network Alliance) library" "$VERSION" "-ldlna $extralibs" "libavformat libavcodec"
 
 clean
 exit 0
