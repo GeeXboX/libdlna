@@ -28,7 +28,6 @@ show_help(){
   echo "  --help                      print this message"
   echo "  --log[=FILE|yes|no]         log tests and output to FILE [config.log]"
   echo "  --prefix=PREFIX             install in PREFIX [$PREFIX]"
-  echo "  --bindir=DIR                install bins in DIR [PREFIX/bin]"
   echo "  --libdir=DIR                install libs in DIR [PREFIX/lib]"
   echo "  --includedir=DIR            install includes in DIR [PREFIX/include]"
   echo "  --with-ffmpeg-dir=DIR       check for ffmpeg installed in DIR"
@@ -279,7 +278,6 @@ CONFIGFILE="config.mak"
 logging="yes"
 logfile="config.log"
 PREFIX="/usr/local"
-bindir='$(PREFIX)/bin'
 libdir='$(PREFIX)/lib'
 includedir='$(PREFIX)/include'
 cc="gcc"
@@ -367,8 +365,6 @@ for opt do
   --log=*) logging="$optval"
   ;;
   --prefix=*) PREFIX="$optval"; force_prefix=yes
-  ;;
-  --bindir=*) bindir="$optval"
   ;;
   --libdir=*) libdir="$optval"; force_libdir=yes
   ;;
@@ -621,7 +617,6 @@ append_config "VERSION=$VERSION"
 
 append_config "PREFIX=$PREFIX"
 append_config "prefix=\$(DESTDIR)\$(PREFIX)"
-append_config "bindir=\$(DESTDIR)$bindir"
 append_config "libdir=\$(DESTDIR)$libdir"
 append_config "includedir=\$(DESTDIR)$includedir"
 
