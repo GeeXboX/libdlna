@@ -173,6 +173,7 @@ typedef struct dlna_s {
 /**
  * Initialization of library.
  *
+ * @warning This function must be called before any libdlna function.
  * @return DLNA library's controller.
  */
 dlna_t *dlna_init (void);
