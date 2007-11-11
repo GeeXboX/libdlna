@@ -220,9 +220,10 @@ void dlna_register_media_profile (dlna_t *dlna, dlna_media_profile_t profile);
 /**
  * Guess which DLNA profile one input file/stream is compatible with.
  *
+ * @warning This function returns a pointer, do _NOT_ free it.
  * @param[in] dlna     The DLNA library's controller.
  * @param[in] filename The file to be checked for compliance.
- * @return The file's DLNA profile if compatible, NULL otherwise.
+ * @return A pointer on file's DLNA profile if compatible, NULL otherwise.
  */
 dlna_profile_t *dlna_guess_media_profile (dlna_t *dlna, const char *filename);
 
