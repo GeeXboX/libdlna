@@ -46,7 +46,7 @@ all: depend $(LIBNAMEEXT)
 	$(CC) -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
 
 $(LIBNAMEEXT): $(OBJS)
-	$(CC) -shared -Wl,-soname,$@ $(OBJS) $(LDFLAGS) $(EXTRALIBS) -o $@
+	$(CC) -shared -Wl,-soname,$(LIBNAME) $(OBJS) $(LDFLAGS) $(EXTRALIBS) -o $@
 	$(LN) -sf $@ $(LIBNAME)
 	$(LN) -sf $@ $(LIBNAMEBASE)
 
