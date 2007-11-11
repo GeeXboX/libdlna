@@ -394,10 +394,7 @@ get_file_extension (const char *filename)
 dlna_profile_t *
 set_profile (dlna_profile_t *profile)
 {
-  dlna_profile_t *p;
-  p = malloc (sizeof (dlna_profile_t *));
-  memcpy (p, profile, sizeof (*profile));
-  return p;
+  return profile;
 }
 
 char *
