@@ -395,7 +395,7 @@ probe_mpeg4 (AVFormatContext *ctx,
   for (i = 0; aac_profiles_mapping[i].profile; i++)
     if (aac_profiles_mapping[i].ct == ct &&
         aac_profiles_mapping[i].ap == ap)
-      return set_profile (aac_profiles_mapping[i].profile);
+      return aac_profiles_mapping[i].profile;
   
   return NULL;
 }

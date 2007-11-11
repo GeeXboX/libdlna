@@ -87,7 +87,7 @@ probe_mpeg1 (AVFormatContext *ctx,
   if (codecs->ac->bit_rate != 224000)
     return NULL;
 
-  return set_profile (&mpeg1);
+  return &mpeg1;
 }
 
 dlna_registered_profile_t dlna_profile_av_mpeg1 = {

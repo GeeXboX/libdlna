@@ -55,7 +55,7 @@ probe_atrac3 (AVFormatContext *ctx,
     return NULL;
   
   if (audio_profile_guess_atrac (codecs->ac) == AUDIO_PROFILE_ATRAC)
-    return set_profile (&atrac3);
+    return &atrac3;
 
   return NULL;
 }

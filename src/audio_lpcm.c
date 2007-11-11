@@ -59,7 +59,7 @@ probe_lpcm (AVFormatContext *ctx,
             dlna_container_type_t st,
             av_codecs_t *codecs)
 {
-  dlna_profile_t *p;
+  static dlna_profile_t p;
   char mime[128];
 
   if (!stream_ctx_is_audio (codecs))
@@ -68,12 +68,12 @@ probe_lpcm (AVFormatContext *ctx,
   if (audio_profile_guess_lpcm (codecs->ac) != AUDIO_PROFILE_LPCM)
     return NULL;
   
-  p = set_profile (&lpcm);
+  memcpy (&p, &lpcm, sizeof (lpcm));
   sprintf (mime, "%s;rate=%d;channels=%d",
            MIME_AUDIO_LPCM, codecs->ac->sample_rate, codecs->ac->channels);
-  p->mime = strdup (mime);
+  p.mime = strdup (mime);
   
-  return p;
+  return &p;
 }
 
 dlna_registered_profile_t dlna_profile_audio_lpcm = {

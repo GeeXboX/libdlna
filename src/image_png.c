@@ -82,7 +82,7 @@ probe_png (AVFormatContext *ctx,
   for (i = 0; png_profiles_mapping[i].profile; i++)
     if (codecs->vc->width  <= png_profiles_mapping[i].max_width &&
         codecs->vc->height <= png_profiles_mapping[i].max_height)
-      return set_profile (png_profiles_mapping[i].profile);
+      return png_profiles_mapping[i].profile;
   
   return NULL;
 }

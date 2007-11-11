@@ -81,7 +81,7 @@ probe_ac3 (AVFormatContext *ctx,
   {
   case AUDIO_PROFILE_AC3:
   case AUDIO_PROFILE_AC3_EXTENDED:
-    return set_profile (&ac3);
+    return &ac3;
   default:
     break;
   }

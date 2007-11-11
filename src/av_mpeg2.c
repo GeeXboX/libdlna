@@ -384,11 +384,11 @@ probe_mpeg_ps_es (AVFormatContext *ctx, av_codecs_t *codecs,
           mpeg_ps_es_valid_streams_ntsc[i].height == codecs->vc->height)
       {
         if (is_mpeg_ps_es_audio_stream_extended_ac3 (ctx, codecs))
-          return set_profile (ntsc_xac3);
+          return ntsc_xac3;
         else if (is_mpeg_ps_es_audio_stream_lpcm (ctx, codecs) ||
                  is_mpeg_ps_es_audio_stream_ac3 (ctx, codecs) ||
                  is_mpeg_ps_es_audio_stream_mp2 (ctx, codecs))
-          return set_profile (ntsc);
+          return ntsc;
 
         return NULL;
       }
@@ -407,11 +407,11 @@ probe_mpeg_ps_es (AVFormatContext *ctx, av_codecs_t *codecs,
           mpeg_ps_es_valid_streams_pal[i].height == codecs->vc->height)
       {
         if (is_mpeg_ps_es_audio_stream_extended_ac3 (ctx, codecs))
-          return set_profile (pal_xac3);
+          return pal_xac3;
         else if (is_mpeg_ps_es_audio_stream_lpcm (ctx, codecs) ||
                  is_mpeg_ps_es_audio_stream_ac3 (ctx, codecs) ||
                  is_mpeg_ps_es_audio_stream_mp2 (ctx, codecs))
-          return set_profile (pal);
+          return pal;
 
         return NULL;
       }
@@ -470,11 +470,11 @@ probe_mpeg_ts (AVFormatContext *ctx,
     switch (st)
     {
     case CT_MPEG_TRANSPORT_STREAM:
-      return set_profile (&mpeg_ts_mp_ll_aac_iso);
+      return &mpeg_ts_mp_ll_aac_iso;
     case CT_MPEG_TRANSPORT_STREAM_DLNA:
-      return set_profile (&mpeg_ts_mp_ll_aac_t);
+      return &mpeg_ts_mp_ll_aac_t;
     case CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
-      return set_profile (&mpeg_ts_mp_ll_aac);
+      return &mpeg_ts_mp_ll_aac;
     default:
       return NULL;
     }
@@ -498,11 +498,11 @@ probe_mpeg_ts (AVFormatContext *ctx,
           switch (st)
           {
           case CT_MPEG_TRANSPORT_STREAM:
-            return set_profile (&mpeg_ts_sd_eu_iso);
+            return &mpeg_ts_sd_eu_iso;
           case CT_MPEG_TRANSPORT_STREAM_DLNA:
-            return set_profile (&mpeg_ts_sd_eu_t);
+            return &mpeg_ts_sd_eu_t;
           case CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
-            return set_profile (&mpeg_ts_sd_eu);
+            return &mpeg_ts_sd_eu;
           default:
             return NULL;
           }
@@ -561,14 +561,11 @@ probe_mpeg_ts (AVFormatContext *ctx,
       switch (st)
       {
       case CT_MPEG_TRANSPORT_STREAM:
-        return xac3 ? set_profile (&mpeg_ts_sd_na_xac3_iso)
-          : set_profile (&mpeg_ts_sd_na_iso);
+        return xac3 ? &mpeg_ts_sd_na_xac3_iso : &mpeg_ts_sd_na_iso;
       case CT_MPEG_TRANSPORT_STREAM_DLNA:
-        return xac3 ? set_profile (&mpeg_ts_sd_na_xac3_t)
-          : set_profile (&mpeg_ts_sd_na_t);
+        return xac3 ? &mpeg_ts_sd_na_xac3_t : &mpeg_ts_sd_na_t;
       case CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
-        return xac3 ? set_profile (&mpeg_ts_sd_na_xac3)
-          : set_profile (&mpeg_ts_sd_na);
+        return xac3 ? &mpeg_ts_sd_na_xac3 : &mpeg_ts_sd_na;
       default:
         return NULL;
       }
@@ -589,14 +586,11 @@ probe_mpeg_ts (AVFormatContext *ctx,
       switch (st)
       {
       case CT_MPEG_TRANSPORT_STREAM:
-        return xac3 ? set_profile (&mpeg_ts_hd_na_xac3_iso)
-          : set_profile (&mpeg_ts_hd_na_iso);
+        return xac3 ? &mpeg_ts_hd_na_xac3_iso : &mpeg_ts_hd_na_iso;
       case CT_MPEG_TRANSPORT_STREAM_DLNA:
-        return xac3 ? set_profile (&mpeg_ts_hd_na_xac3_t)
-          : set_profile (&mpeg_ts_hd_na_t);
+        return xac3 ? &mpeg_ts_hd_na_xac3_t : &mpeg_ts_hd_na_t;
       case CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS:
-        return xac3 ? set_profile (&mpeg_ts_hd_na_xac3)
-          : set_profile (&mpeg_ts_hd_na);
+        return xac3 ? &mpeg_ts_hd_na_xac3 : &mpeg_ts_hd_na;
       default:
         return NULL;
       }

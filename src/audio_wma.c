@@ -98,11 +98,11 @@ probe_wma (AVFormatContext *ctx,
   switch (audio_profile_guess_wma (codecs->ac))
   {
   case AUDIO_PROFILE_WMA_BASELINE:
-    return set_profile (&wmabase);
+    return &wmabase;
   case AUDIO_PROFILE_WMA_FULL:
-    return set_profile (&wmafull);
+    return &wmafull;
   case AUDIO_PROFILE_WMA_PRO:
-    return set_profile (&wmapro);
+    return &wmapro;
   default:
     break;
   }

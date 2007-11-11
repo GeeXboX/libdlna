@@ -915,7 +915,7 @@ probe_mpeg4_part2 (AVFormatContext *ctx,
     if (mpeg4_profiles_mapping[i].st == st &&
         mpeg4_profiles_mapping[i].vp == vp &&
         mpeg4_profiles_mapping[i].ap == ap)
-      return set_profile (mpeg4_profiles_mapping[i].profile);
+      return mpeg4_profiles_mapping[i].profile;
  
   return NULL;
 }

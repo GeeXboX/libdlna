@@ -391,12 +391,6 @@ get_file_extension (const char *filename)
   return str;
 }
 
-dlna_profile_t *
-set_profile (dlna_profile_t *profile)
-{
-  return profile;
-}
-
 char *
 dlna_write_protocol_info (dlna_protocol_info_type_t type,
                           dlna_org_play_speed_t speed,

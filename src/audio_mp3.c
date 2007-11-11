@@ -169,9 +169,9 @@ probe_mp3 (AVFormatContext *ctx,
   switch (audio_profile_guess_mp3 (codecs->ac))
   {
   case AUDIO_PROFILE_MP3:
-    return set_profile (&mp3);
+    return &mp3;
   case AUDIO_PROFILE_MP3_EXTENDED:
-    return set_profile (&mp3x);
+    return &mp3x;
   default:
     break;
   }
