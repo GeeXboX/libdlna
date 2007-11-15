@@ -5,3 +5,4 @@ syntax: regexp
 config.log
 config.mak
 test-libdlna$
+^libdlna.pc
