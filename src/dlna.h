@@ -153,6 +153,8 @@ typedef struct dlna_profile_s {
   const char *label;
   /* Profile type: IMAGE / AUDIO / AV */
   dlna_media_class_t class;
+  /* UPnP ContentDirectory Object Item */
+  char *object_item;
 } dlna_profile_t;
 
 /**

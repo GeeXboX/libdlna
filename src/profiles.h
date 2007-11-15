@@ -63,6 +63,11 @@
 #define LABEL_VIDEO_SD                    "SD"
 #define LABEL_VIDEO_HD                    "HD"
 
+/* UPnP ContentDirectory Object Item */
+#define UPNP_OBJECT_ITEM_PHOTO            "object.item.imageItem.photo"
+#define UPNP_OBJECT_ITEM_AUDIO            "object.item.audioItem.musicTrack"
+#define UPNP_OBJECT_ITEM_VIDEO            "object.item.videoItem.movie"
+
 typedef struct av_codecs_s {
   /* audio stream and codec */
   AVStream *as;
@@ -75,6 +80,7 @@ typedef struct av_codecs_s {
 typedef struct dlna_registered_profile_s {
   dlna_media_profile_t id;
   dlna_media_class_t class;
+  char *object_item;
   char *extensions;
   dlna_profile_t * (*probe) (AVFormatContext *ctx,
                              dlna_container_type_t st,

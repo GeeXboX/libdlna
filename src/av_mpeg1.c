@@ -93,6 +93,7 @@ probe_mpeg1 (AVFormatContext *ctx,
 dlna_registered_profile_t dlna_profile_av_mpeg1 = {
   .id = DLNA_PROFILE_AV_MPEG1,
   .class = DLNA_CLASS_AV,
+  .object_item = UPNP_OBJECT_ITEM_VIDEO,
   .extensions = "mpg,mpeg,mpe,m1v",
   .probe = probe_mpeg1,
   .next = NULL

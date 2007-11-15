@@ -109,6 +109,7 @@ probe_jpeg (AVFormatContext *ctx,
 dlna_registered_profile_t dlna_profile_image_jpeg = {
   .id = DLNA_PROFILE_IMAGE_JPEG,
   .class = DLNA_CLASS_IMAGE,
+  .object_item = UPNP_OBJECT_ITEM_PHOTO,
   .extensions = "jpg,jpe,jpeg",
   .probe = probe_jpeg,
   .next = NULL

@@ -92,6 +92,7 @@ probe_ac3 (AVFormatContext *ctx,
 dlna_registered_profile_t dlna_profile_audio_ac3 = {
   .id = DLNA_PROFILE_AUDIO_AC3,
   .class = DLNA_CLASS_AUDIO,
+  .object_item = UPNP_OBJECT_ITEM_AUDIO,
   .extensions = "ac3",
   .probe = probe_ac3,
   .next = NULL

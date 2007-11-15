@@ -328,6 +328,7 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
     {
       profile = prof;
       profile->class = p->class;
+      profile->object_item = p->object_item;
       break;
     }
     p = p->next;

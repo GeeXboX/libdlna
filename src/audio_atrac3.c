@@ -63,6 +63,7 @@ probe_atrac3 (AVFormatContext *ctx,
 dlna_registered_profile_t dlna_profile_audio_atrac3 = {
   .id = DLNA_PROFILE_AUDIO_ATRAC3,
   .class = DLNA_CLASS_AUDIO,
+  .object_item = UPNP_OBJECT_ITEM_AUDIO,
   .extensions = "at3p,acm,wav",
   .probe = probe_atrac3,
   .next = NULL

@@ -270,6 +270,7 @@ probe_wmv9 (AVFormatContext *ctx,
 dlna_registered_profile_t dlna_profile_av_wmv9 = {
   .id = DLNA_PROFILE_AV_WMV9,
   .class = DLNA_CLASS_AV,
+  .object_item = UPNP_OBJECT_ITEM_VIDEO,
   .extensions = "asf,wmv",
   .probe = probe_wmv9,
   .next = NULL
