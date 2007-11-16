@@ -403,7 +403,6 @@ probe_mpeg4 (AVFormatContext *ctx,
 dlna_registered_profile_t dlna_profile_audio_mpeg4 = {
   .id = DLNA_PROFILE_AUDIO_MPEG4,
   .class = DLNA_CLASS_AUDIO,
-  .object_item = UPNP_OBJECT_ITEM_AUDIO,
   .extensions = "aac,adts,3gp,mp4,mov,qt,m4a",
   .probe = probe_mpeg4,
   .next = NULL

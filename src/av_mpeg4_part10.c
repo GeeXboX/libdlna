@@ -1266,7 +1266,6 @@ probe_avc (AVFormatContext *ctx,
 dlna_registered_profile_t dlna_profile_av_mpeg4_part10 = {
   .id = DLNA_PROFILE_AV_MPEG4_PART10,
   .class = DLNA_CLASS_AV,
-  .object_item = UPNP_OBJECT_ITEM_VIDEO,
   .extensions = "mov,hdmov,mp4,3gp,3gpp,mpg,mpeg,mpe,mp2t,ts",
   .probe = probe_avc,
   .next = NULL

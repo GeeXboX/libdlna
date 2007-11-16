@@ -150,7 +150,6 @@ probe_amr (AVFormatContext *ctx,
 dlna_registered_profile_t dlna_profile_audio_amr = {
   .id = DLNA_PROFILE_AUDIO_AMR,
   .class = DLNA_CLASS_AUDIO,
-  .object_item = UPNP_OBJECT_ITEM_AUDIO,
   .extensions = "amr,3gp,mp4",
   .probe = probe_amr,
   .next = NULL

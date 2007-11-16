@@ -182,7 +182,6 @@ probe_mp3 (AVFormatContext *ctx,
 dlna_registered_profile_t dlna_profile_audio_mp3 = {
   .id = DLNA_PROFILE_AUDIO_MP3,
   .class = DLNA_CLASS_AUDIO,
-  .object_item = UPNP_OBJECT_ITEM_AUDIO,
   .extensions = "mp3",
   .probe = probe_mp3,
   .next = NULL

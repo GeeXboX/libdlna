@@ -153,8 +153,6 @@ typedef struct dlna_profile_s {
   const char *label;
   /* Profile type: IMAGE / AUDIO / AV */
   dlna_media_class_t class;
-  /* UPnP ContentDirectory Object Item */
-  char *object_item;
 } dlna_profile_t;
 
 /**
@@ -228,6 +226,15 @@ void dlna_register_media_profile (dlna_t *dlna, dlna_media_profile_t profile);
  * @return A pointer on file's DLNA profile if compatible, NULL otherwise.
  */
 dlna_profile_t *dlna_guess_media_profile (dlna_t *dlna, const char *filename);
+
+/**
+ * Provides UPnP A/V ContentDirectory Object Item associated to profile.
+ *
+ * @warning This function returns a pointer, do _NOT_ free it.
+ * @param[in] profile The DLNA profile that was targeted.
+ * @return A pointer on CDS Object Item string.
+ */
+char *dlna_profile_upnp_object_item (dlna_profile_t *profile);
 
 /**
  * Output the protocol information string that must be send by a DMS to a DMP

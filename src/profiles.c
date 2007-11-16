@@ -328,7 +328,6 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
     {
       profile = prof;
       profile->class = p->class;
-      profile->object_item = p->object_item;
       break;
     }
     p = p->next;
@@ -337,6 +336,32 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   av_close_input_file (ctx);
   free (codecs);
   return profile;
+}
+
+/* UPnP ContentDirectory Object Item */
+#define UPNP_OBJECT_ITEM_PHOTO            "object.item.imageItem.photo"
+#define UPNP_OBJECT_ITEM_AUDIO            "object.item.audioItem.musicTrack"
+#define UPNP_OBJECT_ITEM_VIDEO            "object.item.videoItem.movie"
+
+char *
+dlna_profile_upnp_object_item (dlna_profile_t *profile)
+{
+  if (!profile)
+    return NULL;
+
+  switch (profile->class)
+  {
+  case DLNA_CLASS_IMAGE:
+    return UPNP_OBJECT_ITEM_PHOTO;
+  case DLNA_CLASS_AUDIO:
+    return UPNP_OBJECT_ITEM_AUDIO;
+  case DLNA_CLASS_AV:
+    return UPNP_OBJECT_ITEM_VIDEO;
+  default:
+    break;
+  }
+
+  return NULL;
 }
 
 int
