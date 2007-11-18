@@ -2,6 +2,7 @@ syntax: regexp
 \.o
 \.so
 \.depend
+\.a
 config.log
 config.mak
 test-libdlna$
