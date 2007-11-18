@@ -17,7 +17,6 @@ EXTRADIST = AUTHORS \
 	README \
 
 SUBDIRS = src \
-	web \
 
 CFLAGS += -Isrc
 LDFLAGS += -Lsrc -ldlna
