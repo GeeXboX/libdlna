@@ -1,7 +1,7 @@
 2007-11-18  Benjamin Zores  <ben@geexbox.org>
 
 	* Release 0.2.1.
-	* Corrected many compilationw warnings.
+	* Corrected many compilation warnings.
 	* Support for shared/static library build.
 	* Generates valid DMS description.
 	* Updates of public API.
