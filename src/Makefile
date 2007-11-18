@@ -3,9 +3,20 @@ $(error "../config.mak is not present, run configure !")
 endif
 include ../config.mak
 
-LIBNAME = libdlna.so
-LIBNAME_VERSION = $(LIBNAME).$(VERSION)
-LIBNAME_MAJOR = $(LIBNAME).$(shell echo $(VERSION) | cut -f1 -d.)
+ifeq ($(BUILD_STATIC),yes)
+  BUILD_RULES   += lib_static
+  INSTALL_RULES += install_static
+endif
+ifeq ($(BUILD_SHARED),yes)
+  BUILD_RULES   += lib_shared
+  INSTALL_RULES += install_shared
+endif
+
+LIBNAME = libdlna
+LIBNAME_SHARED = ${LIBNAME}.so
+LIBNAME_STATIC = ${LIBNAME}.a
+LIBNAME_VERSION = $(LIBNAME_SHARED).$(VERSION)
+LIBNAME_MAJOR = $(LIBNAME_SHARED).$(shell echo $(VERSION) | cut -f1 -d.)
 
 SRCS =  profiles.c \
 	containers.c \
@@ -41,25 +52,35 @@ OBJS = $(SRCS:.c=.o)
 
 .SUFFIXES: .c .o
 
-all: depend $(LIBNAME_VERSION)
+all: depend $(BUILD_RULES)
 
 .c.o:
 	$(CC) -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
 
-$(LIBNAME_VERSION): $(OBJS)
-	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(OBJS) $(LDFLAGS) $(EXTRALIBS) -o $@
+lib_static: $(OBJS)
+	$(AR) r $(LIBNAME_STATIC) $(OBJS)
+	$(RANLIB) $(LIBNAME_STATIC)
+
+lib_shared: $(OBJS)
+	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(OBJS) $(LDFLAGS) $(EXTRALIBS) -o $(LIBNAME_VERSION)
 	$(LN) -sf $(LIBNAME_VERSION) $(LIBNAME_MAJOR)
-	$(LN) -sf $(LIBNAME_MAJOR) $(LIBNAME)
+	$(LN) -sf $(LIBNAME_MAJOR) $(LIBNAME_SHARED)
 
 clean:
 	-$(RM) -f *.o *.a *.so*
 	-$(RM) -f .depend
 
-install: $(LIBNAME_VERSION)
+install_static: lib_static
+	$(INSTALL) -d $(libdir)
+	$(INSTALL) $(LIBNAME_STATIC) $(libdir)
+
+install_shared: lib_shared
 	$(INSTALL) -d $(libdir)
 	$(INSTALL) $(LIBNAME_VERSION) $(libdir)
 	$(LN) -sf $(LIBNAME_VERSION) $(libdir)/$(LIBNAME_MAJOR)
-	$(LN) -sf $(LIBNAME_MAJOR) $(libdir)/$(LIBNAME)
+	$(LN) -sf $(LIBNAME_MAJOR) $(libdir)/$(LIBNAME_SHARED)
+
+install: $(INSTALL_RULES)
 	$(INSTALL) -d $(includedir)
 	$(INSTALL) -m 644 dlna.h $(includedir)
 

@@ -22,6 +22,10 @@ SUBDIRS = src \
 CFLAGS += -Isrc
 LDFLAGS += -Lsrc -ldlna
 
+ifeq ($(BUILD_STATIC),yes)
+  LDFLAGS += $(EXTRALIBS)
+endif
+
 all: lib test
 
 lib:
