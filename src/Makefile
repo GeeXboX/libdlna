@@ -42,8 +42,6 @@ EXTRADIST = dlna.h \
 	containers.h \
 	profiles.h \
 
-CFLAGS += -fPIC
-
 ifeq ($(DEBUG),yes)
 CFLAGS += -DHAVE_DEBUG
 endif
