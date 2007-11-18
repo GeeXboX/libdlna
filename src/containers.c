@@ -28,7 +28,7 @@ static const struct {
   { "mov,mp4,m4a,3gp,3g2,mj2",    CT_MOV           },
   { "mpeg",                       CT_FF_MPEG       },
   { "mpegts",                     CT_FF_MPEG_TS    },
-  { NULL }
+  { NULL, 0 }
 };
 
 static dlna_container_type_t

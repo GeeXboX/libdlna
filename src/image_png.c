@@ -62,7 +62,7 @@ static const struct {
   { &png_lrg_ico,  120,  120 },
   { &png_tn,       160,  160 },
   { &png_lrg,     4096, 4096 },
-  { NULL }
+  { NULL, 0, 0 }
 };
 
 static dlna_profile_t *

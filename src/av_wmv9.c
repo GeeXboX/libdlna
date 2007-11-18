@@ -181,7 +181,7 @@ static const struct {
                    AUDIO_PROFILE_WMA_BASELINE },
   { &wmvspml_mp3,  WMV_VIDEO_PROFILE_SIMPLE_MEDIUM,
                    AUDIO_PROFILE_MP3 },
-  { NULL }
+  { NULL, 0, 0, }
 };
 
 static int
@@ -190,7 +190,7 @@ is_valid_wmv9_video_profile (wmv9_profile_t profile[], int size,
 {
   int i;
 
-  for (i = 0; i < size / sizeof (wmv9_profile_t); i++)
+  for (i = 0; i < size / (int) sizeof (wmv9_profile_t); i++)
     if (vc->width <= profile[i].max_width &&
         vc->height <= profile[i].max_height &&
         vs->r_frame_rate.num == profile[i].fps_num &&
@@ -229,7 +229,7 @@ wmv_video_profile_get (AVStream *vs, AVCodecContext *vc)
 }
 
 static dlna_profile_t *
-probe_wmv9 (AVFormatContext *ctx,
+probe_wmv9 (AVFormatContext *ctx __attribute__ ((unused)),
             dlna_container_type_t st,
             av_codecs_t *codecs)
 {

@@ -49,7 +49,7 @@ static const struct {
   { CODEC_ID_MSMPEG4V1,                 MPEG4_VCODEC_P2 },
   { CODEC_ID_MSMPEG4V2,                 MPEG4_VCODEC_P2 },
   { CODEC_ID_MSMPEG4V3,                 MPEG4_VCODEC_P2 },
-  { -1 }
+  { -1, 0 }
 };
    
 typedef enum {
@@ -752,7 +752,7 @@ static const struct {
   { &mpeg4_h263_3gpp_p3_l10_amr, CT_3GP,
     MPEG4_VIDEO_PROFILE_H263, AUDIO_PROFILE_AMR },
   
-  { NULL }
+  { NULL, 0, 0, 0 }
 };
 
 static mpeg4_vcodec_type_t
@@ -764,7 +764,7 @@ mpeg4_get_vcodec (AVCodecContext *vc)
     return MPEG4_VCODEC_INVALID;
   
   for (i = 0; avf_vcodec_mapping[i].codec_id != -1; i++)
-    if (vc->codec_id == avf_vcodec_mapping[i].codec_id)
+    if (vc->codec_id == (unsigned int) avf_vcodec_mapping[i].codec_id)
       return avf_vcodec_mapping[i].type;
 
   return MPEG4_VCODEC_INVALID;
@@ -776,7 +776,7 @@ is_valid_video_profile (video_properties_t res[], int size,
 {
   int i;
 
-  for (i = 0; i < size / sizeof (video_properties_t); i++)
+  for (i = 0; i < size / (int) sizeof (video_properties_t); i++)
   {
     if (res[i].width == vc->width &&
         res[i].height == vc->height &&

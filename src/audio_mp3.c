@@ -155,7 +155,7 @@ audio_profile_guess_mp3 (AVCodecContext *ac)
 
 /* Audio encoding must be MPEG-1 Layer 3 */
 static dlna_profile_t *
-probe_mp3 (AVFormatContext *ctx,
+probe_mp3 (AVFormatContext *ctx __attribute__ ((unused)),
            dlna_container_type_t st,
            av_codecs_t *codecs)
 {

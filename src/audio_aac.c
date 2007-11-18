@@ -220,7 +220,7 @@ static const struct {
   { &heaac_l2_iso_320,  AAC_MUXED, AUDIO_PROFILE_AAC_HE_L2_320 },
   { &bsac_iso,          AAC_MUXED, AUDIO_PROFILE_AAC_BSAC },
   { &bsac_mult5_iso,    AAC_MUXED, AUDIO_PROFILE_AAC_BSAC_MULT5 },
-  { NULL }
+  { NULL, 0, 0 }
 };
 
 static aac_object_type_t
@@ -372,7 +372,7 @@ audio_profile_guess_aac (AVCodecContext *ac)
 }
 
 static dlna_profile_t *
-probe_mpeg4 (AVFormatContext *ctx,
+probe_mpeg4 (AVFormatContext *ctx __attribute__ ((unused)),
              dlna_container_type_t st,
              av_codecs_t *codecs)
 {

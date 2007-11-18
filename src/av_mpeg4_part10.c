@@ -1116,7 +1116,7 @@ static const struct {
   { &avc_3gpp_bl_qcif15_amr, CT_3GP,
     AVC_VIDEO_PROFILE_BL_QCIF15, AUDIO_PROFILE_AMR },
   
-  { NULL }
+  { NULL, 0, 0, 0 }
 };
 
 static inline int
@@ -1125,7 +1125,7 @@ is_valid_video_profile (video_properties_t res[],
 {
   int i;
 
-  for (i = 0; i < size / sizeof (video_properties_t); i++)
+  for (i = 0; i < size / (int) sizeof (video_properties_t); i++)
     if (res[i].width == vc->width &&
         res[i].height == vc->height)
       return 1;

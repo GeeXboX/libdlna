@@ -305,7 +305,8 @@ static dlna_profile_t mpeg_es_ntsc_xac3 = {
 };
 
 static int
-is_mpeg_ps_es_audio_stream_lpcm (AVFormatContext *ctx, av_codecs_t *codecs)
+is_mpeg_ps_es_audio_stream_lpcm (AVFormatContext *ctx __attribute__((unused)),
+                                 av_codecs_t *codecs)
 {
   if (audio_profile_guess_lpcm (codecs->ac) != AUDIO_PROFILE_LPCM)
     return 0;
@@ -320,7 +321,7 @@ is_mpeg_ps_es_audio_stream_lpcm (AVFormatContext *ctx, av_codecs_t *codecs)
 }
 
 static int
-is_mpeg_ps_es_audio_stream_extended_ac3 (AVFormatContext *ctx,
+is_mpeg_ps_es_audio_stream_extended_ac3 (AVFormatContext *ctx __attribute__ ((unused)),
                                       av_codecs_t *codecs)
 {
   return (audio_profile_guess_ac3 (codecs->ac) == AUDIO_PROFILE_AC3_EXTENDED)
@@ -328,13 +329,15 @@ is_mpeg_ps_es_audio_stream_extended_ac3 (AVFormatContext *ctx,
 }
 
 static int
-is_mpeg_ps_es_audio_stream_ac3 (AVFormatContext *ctx, av_codecs_t *codecs)
+is_mpeg_ps_es_audio_stream_ac3 (AVFormatContext *ctx __attribute__ ((unused)),
+                                av_codecs_t *codecs)
 {
   return (audio_profile_guess_ac3 (codecs->ac) == AUDIO_PROFILE_AC3) ? 1 : 0;
 }
 
 static int
-is_mpeg_ps_es_audio_stream_mp2 (AVFormatContext *ctx, av_codecs_t *codecs)
+is_mpeg_ps_es_audio_stream_mp2 (AVFormatContext *ctx __attribute__ ((unused)),
+                                av_codecs_t *codecs)
 {
   if (audio_profile_guess_mp2 (codecs->ac) != AUDIO_PROFILE_MP2)
     return 0;
@@ -355,13 +358,15 @@ is_mpeg_ps_es_audio_stream_mp2 (AVFormatContext *ctx, av_codecs_t *codecs)
 }
 
 static int
-is_mpeg_ts_audio_stream_mp2 (AVFormatContext *ctx, av_codecs_t *codecs)
+is_mpeg_ts_audio_stream_mp2 (AVFormatContext *ctx __attribute__ ((unused)),
+                             av_codecs_t *codecs)
 {
   return (audio_profile_guess_mp2 (codecs->ac) == AUDIO_PROFILE_MP2) ? 1 : 0;
 }
 
 static int
-is_mpeg_ts_audio_stream_ac3 (AVFormatContext *ctx, av_codecs_t *codecs)
+is_mpeg_ts_audio_stream_ac3 (AVFormatContext *ctx __attribute__ ((unused)),
+                             av_codecs_t *codecs)
 {
   return (audio_profile_guess_ac3 (codecs->ac) == AUDIO_PROFILE_AC3) ? 1 : 0;
 }
@@ -377,8 +382,8 @@ probe_mpeg_ps_es (AVFormatContext *ctx, av_codecs_t *codecs,
   if ((codecs->vs->r_frame_rate.num == 30000 &&
        codecs->vs->r_frame_rate.den == 1001)) /* NTSC */
   {
-    for (i = 0; i < sizeof (mpeg_ps_es_valid_streams_ntsc)
-           / sizeof (mpeg_ps_es_stream_t); i++)
+    for (i = 0; i < (int) (sizeof (mpeg_ps_es_valid_streams_ntsc)
+                           / sizeof (mpeg_ps_es_stream_t)); i++)
     {
       if (mpeg_ps_es_valid_streams_ntsc[i].width == codecs->vc->width &&
           mpeg_ps_es_valid_streams_ntsc[i].height == codecs->vc->height)
@@ -400,8 +405,8 @@ probe_mpeg_ps_es (AVFormatContext *ctx, av_codecs_t *codecs,
   else if (codecs->vs->r_frame_rate.num == 25 &&
            codecs->vs->r_frame_rate.den == 1) /* PAL */
   {
-    for (i = 0; i <  sizeof (mpeg_ps_es_valid_streams_pal)
-           / sizeof (mpeg_ps_es_stream_t); i++)
+    for (i = 0; i < (int) (sizeof (mpeg_ps_es_valid_streams_pal)
+                           / sizeof (mpeg_ps_es_stream_t)); i++)
     {
       if (mpeg_ps_es_valid_streams_pal[i].width == codecs->vc->width &&
           mpeg_ps_es_valid_streams_pal[i].height == codecs->vc->height)
@@ -484,8 +489,8 @@ probe_mpeg_ts (AVFormatContext *ctx,
   if (codecs->vs->r_frame_rate.num == 25 &&
       codecs->vs->r_frame_rate.den == 1)
   {
-    for (i = 0; i <  sizeof (mpeg_ts_valid_streams_eu_sd)
-           / sizeof (mpeg_ts_stream_t); i++)
+    for (i = 0; i < (int) (sizeof (mpeg_ts_valid_streams_eu_sd)
+                           / sizeof (mpeg_ts_stream_t)); i++)
     {
       if (mpeg_ts_valid_streams_eu_sd[i].width == codecs->vc->width &&
           mpeg_ts_valid_streams_eu_sd[i].height == codecs->vc->height &&
@@ -548,8 +553,8 @@ probe_mpeg_ts (AVFormatContext *ctx,
     return NULL;
 
   /* look for compatible SD video stream */
-  for (i = 0; i <  sizeof (mpeg_ts_valid_streams_na_sd)
-         / sizeof (mpeg_ts_stream_t); i++)
+  for (i = 0; i < (int) (sizeof (mpeg_ts_valid_streams_na_sd)
+                         / sizeof (mpeg_ts_stream_t)); i++)
   {
     if (mpeg_ts_valid_streams_na_sd[i].width == codecs->vc->width &&
         mpeg_ts_valid_streams_na_sd[i].height == codecs->vc->height &&
@@ -573,8 +578,8 @@ probe_mpeg_ts (AVFormatContext *ctx,
   }
 
   /* look for compatible HD video stream */
-  for (i = 0; i <  sizeof (mpeg_ts_valid_streams_na_hd)
-         / sizeof (mpeg_ts_stream_t); i++)
+  for (i = 0; i < (int) (sizeof (mpeg_ts_valid_streams_na_hd)
+                         / sizeof (mpeg_ts_stream_t)); i++)
   {
     if (mpeg_ts_valid_streams_na_hd[i].width == codecs->vc->width &&
         mpeg_ts_valid_streams_na_hd[i].height == codecs->vc->height &&

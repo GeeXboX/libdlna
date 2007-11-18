@@ -126,7 +126,7 @@ audio_profile_guess_amr (AVCodecContext *ac)
 }
 
 static dlna_profile_t *
-probe_amr (AVFormatContext *ctx,
+probe_amr (AVFormatContext *ctx __attribute__ ((unused)),
            dlna_container_type_t st,
            av_codecs_t *codecs)
 {

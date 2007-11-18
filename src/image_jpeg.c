@@ -78,7 +78,7 @@ static const struct {
   { &jpeg_sm,       640,  480 },
   { &jpeg_med,     1024,  768 },
   { &jpeg_lrg,     4096, 4096 },
-  { NULL }
+  { NULL, 0, 0 }
 };
 
 static dlna_profile_t *

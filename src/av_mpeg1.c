@@ -34,8 +34,8 @@ static dlna_profile_t mpeg1 = {
 };
 
 static dlna_profile_t *
-probe_mpeg1 (AVFormatContext *ctx,
-             dlna_container_type_t st,
+probe_mpeg1 (AVFormatContext *ctx __attribute__ ((unused)),
+             dlna_container_type_t st __attribute__ ((unused)),
              av_codecs_t *codecs)
 {
   if (!stream_ctx_is_av (codecs))

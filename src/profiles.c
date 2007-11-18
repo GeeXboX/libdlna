@@ -197,7 +197,8 @@ static av_codecs_t *
 av_profile_get_codecs (AVFormatContext *ctx)
 {
   av_codecs_t *codecs = NULL;
-  int i, audio_stream = -1, video_stream = -1;
+  unsigned int i;
+  int audio_stream = -1, video_stream = -1;
  
   codecs = malloc (sizeof (av_codecs_t));
 
@@ -250,7 +251,7 @@ match_file_extension (const char *filename, const char *extensions)
     for (;;)
     {
       q = ext1;
-      while (*p != '\0' && *p != ',' && (q - ext1 < sizeof (ext1) - 1))
+      while (*p != '\0' && *p != ',' && (q - ext1 < (int) sizeof (ext1) - 1))
         *q++ = *p++;
       *q = '\0';
       if (!strcasecmp (ext1, ext))
