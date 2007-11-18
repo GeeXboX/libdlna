@@ -605,7 +605,7 @@ fi
 #   check for shared library build
 #################################################
 if enabled shared; then
-  case "$arch" in
+  case "$cpu" in
     x86_64|ia64|alpha|sparc*|power*) add_cflags "-fPIC" ;;
   esac
 fi
