@@ -10,7 +10,7 @@ Section: libs
 Package: libdlna-dev
 Section: libdevel
 Architecture: any
-Depends: libdlna0 (= ${binary:Version})
+Depends: libdlna0 (= ${binary:Version}), libavcodec-dev, libavformat-dev, ${shlibs:Depends}
 Description: development files for libdlna
  The reference open-source implementation of DLNA (Digital Living Network
  Alliance) standards. The primary goal is to provide DLNA support to uShare,
