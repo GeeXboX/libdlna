@@ -19,31 +19,15 @@
  * Foundation, Inc, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <stdlib.h>
-#include <string.h>
+#ifndef _DLNA_INTERNALS_H_
+#define _DLNA_INTERNALS_H_
+
+#if defined(__GNUC__)
+#    define dlna_unused __attribute__((unused))
+#else
+#    define dlna_unused
+#endif
 
 #include "dlna_internals.h"
-#include "profiles.h"
 
-audio_profile_t
-audio_profile_guess_mp2 (AVCodecContext *ac)
-{
-  if (!ac)
-    return AUDIO_PROFILE_INVALID;
-
-  if (ac->codec_id != CODEC_ID_MP2)
-    return AUDIO_PROFILE_INVALID;
-  
-  if (ac->channels > 5)
-    return AUDIO_PROFILE_INVALID;
-
-  if (ac->sample_rate != 32000 &&
-      ac->sample_rate != 44100 &&
-      ac->sample_rate != 48000)
-    return AUDIO_PROFILE_INVALID;
-  
-  if (ac->bit_rate < 32000 || ac->bit_rate > 448000)
-    return AUDIO_PROFILE_INVALID;
-  
-  return AUDIO_PROFILE_MP2;
-}
+#endif /* _DLNA_INTERNALS_H_ */

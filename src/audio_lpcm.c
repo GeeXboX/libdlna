@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dlna.h"
+#include "dlna_internals.h"
 #include "profiles.h"
 
 /* Profile for audio media class content */
@@ -55,8 +55,8 @@ audio_profile_guess_lpcm (AVCodecContext *ac)
 }
 
 static dlna_profile_t *
-probe_lpcm (AVFormatContext *ctx __attribute__ ((unused)),
-            dlna_container_type_t st __attribute__ ((unused)),
+probe_lpcm (AVFormatContext *ctx dlna_unused,
+            dlna_container_type_t st dlna_unused,
             av_codecs_t *codecs)
 {
   static dlna_profile_t p;

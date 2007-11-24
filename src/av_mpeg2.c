@@ -26,7 +26,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "dlna.h"
+#include "dlna_internals.h"
 #include "profiles.h"
 #include "containers.h"
 
@@ -305,7 +305,7 @@ static dlna_profile_t mpeg_es_ntsc_xac3 = {
 };
 
 static int
-is_mpeg_ps_es_audio_stream_lpcm (AVFormatContext *ctx __attribute__((unused)),
+is_mpeg_ps_es_audio_stream_lpcm (AVFormatContext *ctx dlna_unused,
                                  av_codecs_t *codecs)
 {
   if (audio_profile_guess_lpcm (codecs->ac) != AUDIO_PROFILE_LPCM)
@@ -321,7 +321,7 @@ is_mpeg_ps_es_audio_stream_lpcm (AVFormatContext *ctx __attribute__((unused)),
 }
 
 static int
-is_mpeg_ps_es_audio_stream_extended_ac3 (AVFormatContext *ctx __attribute__ ((unused)),
+is_mpeg_ps_es_audio_stream_extended_ac3 (AVFormatContext *ctx dlna_unused,
                                       av_codecs_t *codecs)
 {
   return (audio_profile_guess_ac3 (codecs->ac) == AUDIO_PROFILE_AC3_EXTENDED)
@@ -329,14 +329,14 @@ is_mpeg_ps_es_audio_stream_extended_ac3 (AVFormatContext *ctx __attribute__ ((un
 }
 
 static int
-is_mpeg_ps_es_audio_stream_ac3 (AVFormatContext *ctx __attribute__ ((unused)),
+is_mpeg_ps_es_audio_stream_ac3 (AVFormatContext *ctx dlna_unused,
                                 av_codecs_t *codecs)
 {
   return (audio_profile_guess_ac3 (codecs->ac) == AUDIO_PROFILE_AC3) ? 1 : 0;
 }
 
 static int
-is_mpeg_ps_es_audio_stream_mp2 (AVFormatContext *ctx __attribute__ ((unused)),
+is_mpeg_ps_es_audio_stream_mp2 (AVFormatContext *ctx dlna_unused,
                                 av_codecs_t *codecs)
 {
   if (audio_profile_guess_mp2 (codecs->ac) != AUDIO_PROFILE_MP2)
@@ -358,14 +358,14 @@ is_mpeg_ps_es_audio_stream_mp2 (AVFormatContext *ctx __attribute__ ((unused)),
 }
 
 static int
-is_mpeg_ts_audio_stream_mp2 (AVFormatContext *ctx __attribute__ ((unused)),
+is_mpeg_ts_audio_stream_mp2 (AVFormatContext *ctx dlna_unused,
                              av_codecs_t *codecs)
 {
   return (audio_profile_guess_mp2 (codecs->ac) == AUDIO_PROFILE_MP2) ? 1 : 0;
 }
 
 static int
-is_mpeg_ts_audio_stream_ac3 (AVFormatContext *ctx __attribute__ ((unused)),
+is_mpeg_ts_audio_stream_ac3 (AVFormatContext *ctx dlna_unused,
                              av_codecs_t *codecs)
 {
   return (audio_profile_guess_ac3 (codecs->ac) == AUDIO_PROFILE_AC3) ? 1 : 0;

@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dlna.h"
+#include "dlna_internals.h"
 #include "profiles.h"
 
 audio_profile_t

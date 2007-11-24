@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dlna.h"
+#include "dlna_internals.h"
 #include "profiles.h"
 
 /* WMA content (bit rate less than 193 kbps) */
@@ -84,7 +84,7 @@ audio_profile_guess_wma (AVCodecContext *ac)
 }
 
 static dlna_profile_t *
-probe_wma (AVFormatContext *ctx __attribute__ ((unused)),
+probe_wma (AVFormatContext *ctx dlna_unused,
            dlna_container_type_t st,
            av_codecs_t *codecs)
 {

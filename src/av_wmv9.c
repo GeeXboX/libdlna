@@ -49,7 +49,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dlna.h"
+#include "dlna_internals.h"
 #include "profiles.h"
 #include "containers.h"
 
@@ -131,7 +131,7 @@ static dlna_profile_t wmvhigh_pro = {
 };
 
 /* HighMAT profile */
-static dlna_profile_t wmvhm_base __attribute__ ((unused)) = {
+static dlna_profile_t wmvhm_base dlna_unused = {
   .id = "WMVHM_BASE",
   .mime = MIME_VIDEO_WMV,
   .label = LABEL_VIDEO_SD
@@ -229,7 +229,7 @@ wmv_video_profile_get (AVStream *vs, AVCodecContext *vc)
 }
 
 static dlna_profile_t *
-probe_wmv9 (AVFormatContext *ctx __attribute__ ((unused)),
+probe_wmv9 (AVFormatContext *ctx dlna_unused,
             dlna_container_type_t st,
             av_codecs_t *codecs)
 {

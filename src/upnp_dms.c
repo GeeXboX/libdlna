@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "dlna.h"
+#include "dlna_internals.h"
 
 #define UPNP_DMS_DESCRIPTION \
 "<?xml version=\"1.0\" encoding=\"utf-8\"?>" \

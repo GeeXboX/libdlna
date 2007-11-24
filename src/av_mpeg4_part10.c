@@ -28,7 +28,7 @@
 
 #include <ffmpeg/avcodec.h>
 
-#include "dlna.h"
+#include "dlna_internals.h"
 #include "profiles.h"
 #include "containers.h"
 

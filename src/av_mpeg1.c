@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dlna.h"
+#include "dlna_internals.h"
 #include "profiles.h"
 
 /* MPEG-1 video with 2 channel MPEG-1 Layer2 audio
@@ -34,8 +34,8 @@ static dlna_profile_t mpeg1 = {
 };
 
 static dlna_profile_t *
-probe_mpeg1 (AVFormatContext *ctx __attribute__ ((unused)),
-             dlna_container_type_t st __attribute__ ((unused)),
+probe_mpeg1 (AVFormatContext *ctx dlna_unused,
+             dlna_container_type_t st dlna_unused,
              av_codecs_t *codecs)
 {
   if (!stream_ctx_is_av (codecs))

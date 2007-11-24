@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dlna.h"
+#include "dlna_internals.h"
 #include "profiles.h"
 #include "containers.h"
 
@@ -126,7 +126,7 @@ audio_profile_guess_amr (AVCodecContext *ac)
 }
 
 static dlna_profile_t *
-probe_amr (AVFormatContext *ctx __attribute__ ((unused)),
+probe_amr (AVFormatContext *ctx dlna_unused,
            dlna_container_type_t st,
            av_codecs_t *codecs)
 {
