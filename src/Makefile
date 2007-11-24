@@ -59,11 +59,35 @@ all: depend $(BUILD_RULES)
 .c.lo:
 	$(CC) -c -fPIC $(CFLAGS) $(OPTFLAGS) -o $@ $<
 
-lib_static: $(OBJS)
+lib_static_info_pre:
+	@echo 
+	@echo "#############################################"
+	@echo "#         Building static objects           #"
+	@echo "#############################################"
+
+lib_static_info_post:
+	@echo 
+	@echo "#############################################"
+	@echo "#         Linking static objects            #"
+	@echo "#############################################"
+
+lib_static: lib_static_info_pre $(OBJS) lib_static_info_post
 	$(AR) r $(LIBNAME_STATIC) $(OBJS)
 	$(RANLIB) $(LIBNAME_STATIC)
 
-lib_shared: $(LOBJS)
+lib_shared_info_pre:
+	@echo 
+	@echo "#############################################"
+	@echo "#         Building shared objects           #"
+	@echo "#############################################"
+
+lib_shared_info_post:
+	@echo 
+	@echo "#############################################"
+	@echo "#         Linking shared objects            #"
+	@echo "#############################################"
+
+lib_shared: lib_shared_info_pre $(LOBJS) lib_shared_info_post
 	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(LOBJS) $(LDFLAGS) $(EXTRALIBS) -o $(LIBNAME_VERSION)
 	$(LN) -sf $(LIBNAME_VERSION) $(LIBNAME_MAJOR)
 	$(LN) -sf $(LIBNAME_MAJOR) $(LIBNAME_SHARED)
