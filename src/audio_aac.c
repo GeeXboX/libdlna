@@ -304,19 +304,11 @@ aac_object_type_get (uint8_t *data, int len)
   return t;
 }
 
-audio_profile_t
-audio_profile_guess_aac (AVCodecContext *ac)
+static audio_profile_t
+audio_profile_guess_aac_priv (AVCodecContext *ac, aac_object_type_t type)
 {
-  aac_object_type_t type;
-  
   if (!ac)
     return AUDIO_PROFILE_INVALID;
-
-  /* check for AAC variants codec */
-  if (ac->codec_id != CODEC_ID_AAC)
-    return AUDIO_PROFILE_INVALID;
-  
-  type = aac_object_type_get (ac->extradata, ac->extradata_size);
 
   switch (type)
   {
@@ -467,6 +459,22 @@ audio_profile_guess_aac (AVCodecContext *ac)
   }
   
   return AUDIO_PROFILE_INVALID;
+}
+
+audio_profile_t
+audio_profile_guess_aac (AVCodecContext *ac)
+{
+  aac_object_type_t type;
+  
+  if (!ac)
+    return AUDIO_PROFILE_INVALID;
+
+  /* check for AAC variants codec */
+  if (ac->codec_id != CODEC_ID_AAC)
+    return AUDIO_PROFILE_INVALID;
+  
+  type = aac_object_type_get (ac->extradata, ac->extradata_size);
+  return audio_profile_guess_aac_priv (ac, type);
 }
 
 static aac_object_type_t
