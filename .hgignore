@@ -1,6 +1,7 @@
 syntax: regexp
 \.o
 \.so
+\.lo
 \.depend
 \.a
 config.log
