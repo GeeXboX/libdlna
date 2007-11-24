@@ -21,6 +21,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "dlna_internals.h"
 #include "profiles.h"
@@ -465,20 +469,45 @@ audio_profile_guess_aac (AVCodecContext *ac)
   return AUDIO_PROFILE_INVALID;
 }
 
+static aac_container_type_t
+aac_get_format (AVFormatContext *ctx)
+{
+  int fd;
+  unsigned char buf[4];
+  aac_container_type_t ct = AAC_MUXED;
+  
+  if (!ctx)
+    return ct;
+
+  fd = open (ctx->filename, O_RDONLY);
+  read (fd, buf, sizeof (buf) - 1);
+  if ((buf[0] == 0xFF) && ((buf[1] & 0xF6) == 0xF0))
+  {
+    ct = AAC_RAW;
+#ifdef HAVE_DEBUG
+    fprintf (stderr, "AAC has an ADTS header\n");
+#endif /* HAVE_DEBUG */
+  }
+  close (fd);
+
+  return ct;
+}
+
 static dlna_profile_t *
-probe_mpeg4 (AVFormatContext *ctx dlna_unused,
+probe_mpeg4 (AVFormatContext *ctx,
              dlna_container_type_t st,
              av_codecs_t *codecs)
 {
   audio_profile_t ap;
-  aac_container_type_t ct;
+  aac_container_type_t ct = AAC_MUXED;
   int i;
 
   if (!stream_ctx_is_audio (codecs))
     return NULL;
-  
-  /* check for raw AAC */
-  ct = (st == CT_UNKNOWN) ? AAC_RAW : AAC_MUXED;
+
+  /* check for ADTS */
+  if (st == CT_AAC)
+    ct = aac_get_format (ctx);
   
   /* check for AAC codec */
   ap = audio_profile_guess_aac (codecs->ac);
