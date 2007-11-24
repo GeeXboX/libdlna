@@ -310,6 +310,10 @@ audio_profile_guess_aac_priv (AVCodecContext *ac, aac_object_type_t type)
   if (!ac)
     return AUDIO_PROFILE_INVALID;
 
+  /* check for AAC variants codec */
+  if (ac->codec_id != CODEC_ID_AAC)
+    return AUDIO_PROFILE_INVALID;
+  
   switch (type)
   {
   /* AAC Low Complexity variants */
@@ -469,10 +473,6 @@ audio_profile_guess_aac (AVCodecContext *ac)
   if (!ac)
     return AUDIO_PROFILE_INVALID;
 
-  /* check for AAC variants codec */
-  if (ac->codec_id != CODEC_ID_AAC)
-    return AUDIO_PROFILE_INVALID;
-  
   type = aac_object_type_get (ac->extradata, ac->extradata_size);
   return audio_profile_guess_aac_priv (ac, type);
 }
