@@ -25,7 +25,7 @@
 #include <ffmpeg/avcodec.h>
 #include <ffmpeg/avformat.h>
 
-#include "dlna.h"
+#include "dlna_internals.h"
 #include "containers.h"
 
 /* DLNA MIME types */
