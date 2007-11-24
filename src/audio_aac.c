@@ -541,10 +541,11 @@ probe_mpeg4 (AVFormatContext *ctx,
     aac_object_type_t ot;
     ct = aac_get_format (ctx);
     ot = aac_adts_object_type_get (ctx);
+    ap = audio_profile_guess_aac_priv (codecs->ac, ot);
   }
+  else
+    ap = audio_profile_guess_aac (codecs->ac);
   
-  /* check for AAC codec */
-  ap = audio_profile_guess_aac (codecs->ac);
   if (ap == AUDIO_PROFILE_INVALID)
     return NULL;
 
