@@ -161,6 +161,54 @@ static dlna_profile_t bsac_mult5_iso = {
   .label = LABEL_AUDIO_MULTI
 };
 
+static dlna_profile_t heaac_v2_l2 = {
+  .id = "HEAACv2_L2",
+  .mime = MIME_AUDIO_MPEG_4,
+  .label = LABEL_AUDIO_2CH
+};
+
+static dlna_profile_t heaac_v2_l2_adts = {
+  .id = "HEAACv2_L2",
+  .mime = MIME_AUDIO_ADTS,
+  .label = LABEL_AUDIO_2CH
+};
+
+static dlna_profile_t heaac_v2_l2_320 = {
+  .id = "HEAACv2_L2_320",
+  .mime = MIME_AUDIO_MPEG_4,
+  .label = LABEL_AUDIO_2CH
+};
+
+static dlna_profile_t heaac_v2_l2_320_adts = {
+  .id = "HEAACv2_L2_320",
+  .mime = MIME_AUDIO_ADTS,
+  .label = LABEL_AUDIO_2CH
+};
+
+static dlna_profile_t heaac_v2_l3 = {
+  .id = "HEAACv2_L3",
+  .mime = MIME_AUDIO_MPEG_4,
+  .label = LABEL_AUDIO_2CH
+};
+
+static dlna_profile_t heaac_v2_l3_adts = {
+  .id = "HEAACv2_L3",
+  .mime = MIME_AUDIO_ADTS,
+  .label = LABEL_AUDIO_2CH
+};
+
+static dlna_profile_t heaac_v2_mult5 = {
+  .id = "HEAACv2_MULT5",
+  .mime = MIME_AUDIO_MPEG_4,
+  .label = LABEL_AUDIO_2CH
+};
+
+static dlna_profile_t heaac_v2_mult5_adts = {
+  .id = "HEAACv2_MULT5",
+  .mime = MIME_AUDIO_ADTS,
+  .label = LABEL_AUDIO_2CH
+};
+
 typedef enum {
   AAC_MUXED,          /* AAC is muxed in a container */
   AAC_RAW             /* AAC is raw (ADTS) */
@@ -221,6 +269,14 @@ static const struct {
   { &heaac_mult5_iso,   AAC_MUXED, AUDIO_PROFILE_AAC_HE_MULT5 },
   { &heaac_l2_adts_320, AAC_RAW,   AUDIO_PROFILE_AAC_HE_L2_320 },
   { &heaac_l2_iso_320,  AAC_MUXED, AUDIO_PROFILE_AAC_HE_L2_320 },
+  { &heaac_v2_l2,       AAC_MUXED, AUDIO_PROFILE_AAC_HE_V2_L2 },
+  { &heaac_v2_l2_adts,  AAC_RAW,   AUDIO_PROFILE_AAC_HE_V2_L2 },
+  { &heaac_v2_l2_320,   AAC_MUXED, AUDIO_PROFILE_AAC_HE_V2_L2_320 },
+  { &heaac_v2_l2_320_adts,AAC_RAW,  AUDIO_PROFILE_AAC_HE_V2_L2_320 },
+  { &heaac_v2_l3,       AAC_MUXED, AUDIO_PROFILE_AAC_HE_V2_L3 },
+  { &heaac_v2_l3_adts,  AAC_RAW,   AUDIO_PROFILE_AAC_HE_V2_L3 },
+  { &heaac_v2_mult5,    AAC_MUXED, AUDIO_PROFILE_AAC_HE_V2_MULT5 },
+  { &heaac_v2_mult5_adts,AAC_RAW,  AUDIO_PROFILE_AAC_HE_V2_MULT5 },
   { &bsac_iso,          AAC_MUXED, AUDIO_PROFILE_AAC_BSAC },
   { &bsac_mult5_iso,    AAC_MUXED, AUDIO_PROFILE_AAC_BSAC_MULT5 },
   { NULL, 0, 0 }
