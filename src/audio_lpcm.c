@@ -32,6 +32,12 @@ static dlna_profile_t lpcm = {
   .label = LABEL_AUDIO_2CH
 };
 
+static dlna_profile_t lpcm_low = {
+  .id = "LPCM_low",
+  .mime = NULL,
+  .label = LABEL_AUDIO_2CH
+};
+
 audio_profile_t
 audio_profile_guess_lpcm (AVCodecContext *ac)
 {
@@ -47,8 +53,8 @@ audio_profile_guess_lpcm (AVCodecContext *ac)
   if (ac->channels > 2)
     return AUDIO_PROFILE_INVALID;
 
-  /* supported sampling rate: 44.1 and 48 kHz */
-  if (ac->sample_rate != 44100 && ac->sample_rate != 48000)
+  /* supported sampling rate: 8 kHz -> 48 kHz */
+  if (ac->sample_rate < 8000 || ac->sample_rate > 48000)
     return AUDIO_PROFILE_INVALID;
   
   return AUDIO_PROFILE_LPCM;
@@ -67,8 +73,11 @@ probe_lpcm (AVFormatContext *ctx dlna_unused,
 
   if (audio_profile_guess_lpcm (codecs->ac) != AUDIO_PROFILE_LPCM)
     return NULL;
-  
-  memcpy (&p, &lpcm, sizeof (lpcm));
+
+  if (codecs->ac->sample_rate <= 32000)
+    memcpy (&p, &lpcm_low, sizeof (lpcm_low));
+  else
+    memcpy (&p, &lpcm, sizeof (lpcm));
   sprintf (mime, "%s;rate=%d;channels=%d",
            MIME_AUDIO_LPCM, codecs->ac->sample_rate, codecs->ac->channels);
   p.mime = strdup (mime);
