@@ -602,15 +602,6 @@ if enabled optimize; then
 fi
 
 #################################################
-#   check for shared library build
-#################################################
-if enabled shared; then
-  case "$cpu" in
-    x86_64|ia64|alpha|sparc*|power*) add_cflags "-fPIC" ;;
-  esac
-fi
-
-#################################################
 #   check for ffmpeg libavformat/libavcodec
 #################################################
 if [ -n "$ffmpegdir" ]; then

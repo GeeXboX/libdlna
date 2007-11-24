@@ -47,25 +47,29 @@ CFLAGS += -DHAVE_DEBUG
 endif
 
 OBJS = $(SRCS:.c=.o)
+LOBJS = $(SRCS:.c=.lo)
 
-.SUFFIXES: .c .o
+.SUFFIXES: .c .o .lo
 
 all: depend $(BUILD_RULES)
 
 .c.o:
 	$(CC) -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
 
+.c.lo:
+	$(CC) -c -fPIC $(CFLAGS) $(OPTFLAGS) -o $@ $<
+
 lib_static: $(OBJS)
 	$(AR) r $(LIBNAME_STATIC) $(OBJS)
 	$(RANLIB) $(LIBNAME_STATIC)
 
-lib_shared: $(OBJS)
-	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(OBJS) $(LDFLAGS) $(EXTRALIBS) -o $(LIBNAME_VERSION)
+lib_shared: $(LOBJS)
+	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(LOBJS) $(LDFLAGS) $(EXTRALIBS) -o $(LIBNAME_VERSION)
 	$(LN) -sf $(LIBNAME_VERSION) $(LIBNAME_MAJOR)
 	$(LN) -sf $(LIBNAME_MAJOR) $(LIBNAME_SHARED)
 
 clean:
-	-$(RM) -f *.o *.a *.so*
+	-$(RM) -f *.o *.lo *.a *.so*
 	-$(RM) -f .depend
 
 install_static: lib_static
