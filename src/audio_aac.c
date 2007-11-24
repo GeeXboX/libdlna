@@ -469,6 +469,28 @@ audio_profile_guess_aac (AVCodecContext *ac)
   return AUDIO_PROFILE_INVALID;
 }
 
+static aac_object_type_t
+aac_adts_object_type_get (AVFormatContext *ctx)
+{
+  int fd;
+  unsigned char buf[4];
+  uint8_t t = AAC_INVALID;
+
+  if (!ctx)
+    return t;
+  
+  fd = open (ctx->filename, O_RDONLY);
+  read (fd, buf, sizeof (buf) - 1);
+  t = (buf[2] & 0xC0) >> 6;
+  close (fd);
+  
+#ifdef HAVE_DEBUG
+    fprintf (stderr, "AAC Object Type: %d\n", t);
+#endif /* HAVE_DEBUG */
+  
+  return t;
+}
+
 static aac_container_type_t
 aac_get_format (AVFormatContext *ctx)
 {
@@ -507,7 +529,11 @@ probe_mpeg4 (AVFormatContext *ctx,
 
   /* check for ADTS */
   if (st == CT_AAC)
+  {
+    aac_object_type_t ot;
     ct = aac_get_format (ctx);
+    ot = aac_adts_object_type_get (ctx);
+  }
   
   /* check for AAC codec */
   ap = audio_profile_guess_aac (codecs->ac);
