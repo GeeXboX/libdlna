@@ -407,6 +407,41 @@ audio_profile_guess_aac (AVCodecContext *ac)
     break;
   }
 
+  /* AAC High efficiency v2 (with PS) variants */
+  case AAC_PARAM_ER:
+  {
+    if (ac->sample_rate < 8000)
+      break;
+
+    if (ac->sample_rate <= 24000) /* HE-AAC @ Level 2 */
+    {
+      if (ac->channels > 2)
+        break;
+
+      if (ac->bit_rate <= 320000)
+        return AUDIO_PROFILE_AAC_HE_V2_L2_320;
+
+      if (ac->bit_rate <= 576000)
+        return AUDIO_PROFILE_AAC_HE_V2_L2;
+
+      break;
+    }
+    else if (ac->sample_rate <= 48000)
+    {
+      /* HE-AAC @ Level 3 */
+      if (ac->channels <= 2 && ac->bit_rate <= 576000)
+        return AUDIO_PROFILE_AAC_HE_V2_L3;
+
+      /* HE-AAC @ Level 4/5 */
+      if (ac->channels <= 6 && ac->bit_rate <= 2880000)
+        return AUDIO_PROFILE_AAC_HE_V2_MULT5;
+
+      break;
+    }
+
+    break;
+  }
+  
   case AAC_BSAC_ER:
   {
     if (ac->sample_rate < 16000 || ac->sample_rate > 48000)
