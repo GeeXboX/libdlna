@@ -166,6 +166,9 @@ typedef enum {
   AAC_RAW             /* AAC is raw (ADTS) */
 } aac_container_type_t;
 
+/* HeAACv1 (a.k.a. AACplus v1) is AAC LC + Spectral Band Replication (SBR) */
+/* HeAACv2 (a.ka.a AACplus v2) is HeAACv1 + Parametric Stereo (PS) */
+
 typedef enum {
   AAC_INVALID   =  0, 
   AAC_MAIN      =  1, /* AAC Main */
