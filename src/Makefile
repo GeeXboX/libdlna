@@ -88,7 +88,8 @@ lib_shared_info_post:
 	@echo "#############################################"
 
 lib_shared: lib_shared_info_pre $(LOBJS) lib_shared_info_post
-	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(LOBJS) $(LDFLAGS) $(EXTRALIBS) -o $(LIBNAME_VERSION)
+	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(LOBJS) \
+	  $(LDFLAGS) $(EXTRALIBS) -o $(LIBNAME_VERSION)
 	$(LN) -sf $(LIBNAME_VERSION) $(LIBNAME_MAJOR)
 	$(LN) -sf $(LIBNAME_MAJOR) $(LIBNAME_SHARED)
 
