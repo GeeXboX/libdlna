@@ -28,6 +28,6 @@
 #    define dlna_unused
 #endif
 
-#include "dlna_internals.h"
+#include "dlna.h"
 
 #endif /* _DLNA_INTERNALS_H_ */
