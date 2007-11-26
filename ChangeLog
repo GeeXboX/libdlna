@@ -1,3 +1,10 @@
+2007-11-26  Benjamin Zores  <ben@geexbox.org>
+
+	* Release 0.2.3.
+	* FIX: one header file was missing from previous tarball release.
+	* Support for LPCM and HeAACv2 profiles introduced in DLNA 1.5.
+	* Better check of AAC ADTS frame header.
+
 2007-11-24  Benjamin Zores  <ben@geexbox.org>
 
 	* Release 0.2.2.
