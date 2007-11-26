@@ -39,6 +39,7 @@ SRCS =  profiles.c \
 	upnp_dms.c \
 
 EXTRADIST = dlna.h \
+	dlna_internals.h \
 	containers.h \
 	profiles.h \
 
