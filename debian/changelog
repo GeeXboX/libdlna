@@ -1,3 +1,9 @@
+libdlna (0.2.3-0ubuntu1) gutsy; urgency=low
+
+  * new upstream release
+
+ -- Alexis Saettler <alexis@saettler.org>  Wed, 28 Nov 2007 21:57:33 +0100
+
 libdlna (0.2.1-0ubuntu2) gutsy; urgency=low
 
   * add depends on dev package
