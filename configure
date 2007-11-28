@@ -611,8 +611,13 @@ fi
 
 echolog "Checking for libavformat ..."
 check_lib ffmpeg/avformat.h av_register_all -lavformat || die "Error, can't find libavformat !"
+add_cflags `pkg-config libavformat --cflags`
+add_extralibs `pkg-config libavformat --libs`
+
 echolog "Checking for libavcodec ..."
 check_lib ffmpeg/avcodec.h avcodec_register_all -lavcodec || die "Error, can't find libavcodec !"
+add_cflags `pkg-config libavcodec --cflags`
+add_extralibs `pkg-config libavcodec --libs`
 
 #################################################
 #   version
