@@ -268,10 +268,9 @@ version=$3
 libs=$4
 requires=$5
 cat <<EOF >$name.pc
-prefix=$PREFIX
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}/lib
-includedir=\${prefix}/include
+PREFIX=$PREFIX
+libdir=$libdir
+includedir=$includedir
 
 Name: $name
 Description: $comment
@@ -312,8 +311,8 @@ CONFIGFILE="config.mak"
 logging="yes"
 logfile="config.log"
 PREFIX="/usr/local"
-libdir='$(PREFIX)/lib'
-includedir='$(PREFIX)/include'
+libdir='${PREFIX}/lib'
+includedir='${PREFIX}/include'
 static="yes"
 shared="yes"
 cc="gcc"
