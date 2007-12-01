@@ -34,6 +34,8 @@ extern "C" {
 #endif /* 0 */
 #endif /* __cplusplus */
 
+#include <inttypes.h>
+
 #define DLNA_STRINGIFY(s)         DLNA_TOSTRING(s)
 #define DLNA_TOSTRING(s) #s
 
@@ -156,6 +158,42 @@ typedef struct dlna_profile_s {
 } dlna_profile_t;
 
 /**
+ * DLNA Media Object item metadata
+ */
+typedef struct dlna_metadata_s {
+  char     *title;                /* <dc:title> */
+  char     *author;               /* <dc:artist> */
+  char     *comment;              /* <upnp:longDescription> */
+  char     *album;                /* <upnp:album> */
+  uint32_t track;                 /* <upnp:originalTrackNumber> */
+  char     *genre;                /* <upnp:genre> */
+} dlna_metadata_t;
+
+/**
+ * DLNA Media Object item properties
+ */
+typedef struct dlna_properties_s {
+  int64_t  size;                  /* res@size */
+  char     duration[64];          /* res@duration */
+  uint32_t bitrate;               /* res@bitrate */
+  uint32_t sample_frequency;      /* res@sampleFrequency */
+  uint32_t bps;                   /* res@bitsPerSample */
+  uint32_t channels;              /* res@nrAudioChannels */
+  char     resolution[64];        /* res@resolution */
+} dlna_properties_t;
+
+/**
+ * DLNA Media Object item
+ */
+typedef struct dlna_item_s {
+  char *filename;
+  dlna_media_class_t class;
+  dlna_properties_t *properties;
+  dlna_metadata_t *metadata;
+  dlna_profile_t *profile;
+} dlna_item_t;
+ 
+/**
  * DLNA Library's controller.
  * This controls the whole library.
  */
@@ -217,6 +255,22 @@ void dlna_register_media_profile (dlna_t *dlna, dlna_media_profile_t profile);
  * @return A pointer on file's DLNA profile if compatible, NULL otherwise.
  */
 dlna_profile_t *dlna_guess_media_profile (dlna_t *dlna, const char *filename);
+
+/**
+ * Create a new DLNA media object item.
+ *
+ * @param[in] dlna     The DLNA library's controller.
+ * @param[in] filename The input file to be added.
+ * @return A new DLNA object item if compatible, NULL otherwise.
+ */
+dlna_item_t *dlna_item_new (dlna_t *dlna, const char *filename);
+
+/**
+ * Free an existing DLNA media object item.
+ *
+ * @param[in] item     The DLNA object item to be freed.
+ */
+void dlna_item_free (dlna_item_t *item);
 
 /**
  * Provides UPnP A/V ContentDirectory Object Item associated to profile.

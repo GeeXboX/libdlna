@@ -9,7 +9,8 @@ main (int argc, char **argv)
   dlna_t *dlna;
   dlna_profile_t *p;
   dlna_org_flags_t flags;
-
+  dlna_item_t *item;
+  
   if (argc < 2)
   {
     printf ("usage: %s media_filename\n", argv[0]);
@@ -26,6 +27,32 @@ main (int argc, char **argv)
   dlna = dlna_init ();
   dlna_set_verbosity (dlna, 1);
   dlna_register_all_media_profiles (dlna);
+
+  item = dlna_item_new (dlna, argv[1]);
+  if (item)
+  {
+    if (item->properties)
+    {
+      printf ("Size: %lld bytes\n", item->properties->size);
+      printf ("Duration: %s\n", item->properties->duration);
+      printf ("Bitrate: %d bytes/sec\n", item->properties->bitrate);
+      printf ("SampleFrequency: %d Hz\n", item->properties->sample_frequency);
+      printf ("BitsPerSample: %d\n", item->properties->bps);
+      printf ("Channels: %d\n", item->properties->channels);
+      printf ("Resolution: %s\n", item->properties->resolution);
+    }
+
+    if (item->metadata)
+    {
+      printf ("Title: %s\n", item->metadata->title);
+      printf ("Artist: %s\n", item->metadata->author);
+      printf ("Description: %s\n", item->metadata->comment);
+      printf ("Album: %s\n", item->metadata->album);
+      printf ("Track: %d\n", item->metadata->track);
+      printf ("Genre: %s\n", item->metadata->genre);
+    }
+    dlna_item_free (item);
+  }
   
   p = dlna_guess_media_profile (dlna, argv[1]);
   if (p)

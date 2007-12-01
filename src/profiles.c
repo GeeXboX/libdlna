@@ -339,6 +339,142 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   return profile;
 }
 
+static dlna_properties_t *
+dlna_item_get_properties (AVFormatContext *ctx)
+{
+  dlna_properties_t *prop;
+  av_codecs_t *codecs;
+  int duration, hours, min, sec;
+  
+  if (!ctx)
+    return NULL;
+
+  /* grab codecs info */
+  codecs = av_profile_get_codecs (ctx);
+  if (!codecs)
+    return NULL;
+  
+  prop = malloc (sizeof (dlna_properties_t));
+  prop->size = ctx->file_size;
+
+  duration = (int) (ctx->duration / AV_TIME_BASE);
+  hours = (int) (duration / 3600);
+  min = (int) ((duration - (hours * 3600)) / 60);
+  sec = (int) (duration - (hours * 3600) - (min * 60));
+  memset (prop->duration, '\0', 64);
+  sprintf (prop->duration, "%s:%.2d:%.2d.",
+           hours ? (char *) hours : "", min, sec);
+
+  prop->bitrate = (uint32_t) (ctx->bit_rate / 8);
+  prop->sample_frequency = codecs->ac ? codecs->ac->sample_rate : 0;
+  prop->bps = codecs->ac ? codecs->ac->bits_per_sample : 0;
+  prop->channels = codecs->ac ? codecs->ac->channels : 0;
+
+  memset (prop->resolution, '\0', 64);
+  if (codecs->vc)
+    sprintf (prop->resolution, "%dx%d",
+             codecs->vc->width, codecs->vc->height);
+
+  free (codecs);
+  return prop;
+}
+
+static dlna_metadata_t *
+dlna_item_get_metadata (AVFormatContext *ctx)
+{
+  dlna_metadata_t *meta;
+  
+  if (!ctx)
+    return NULL;
+
+  meta = malloc (sizeof (dlna_metadata_t));
+  meta->title   = strdup (ctx->title);
+  meta->author  = strdup (ctx->author);
+  meta->comment = strdup (ctx->comment);
+  meta->album   = strdup (ctx->album);
+  meta->track   = ctx->track;
+  meta->genre   = strdup (ctx->genre);
+
+  return meta;
+}
+
+static void
+dlna_metadata_free (dlna_metadata_t *meta)
+{
+  if (!meta)
+    return;
+
+  if (meta->title)
+    free (meta->title);
+  if (meta->author)
+    free (meta->author);
+  if (meta->comment)
+    free (meta->comment);
+  if (meta->album)
+    free (meta->album);
+  if (meta->genre)
+    free (meta->genre);
+  free (meta);
+}
+
+dlna_item_t *
+dlna_item_new (dlna_t *dlna, const char *filename)
+{
+  AVFormatContext *ctx;
+  dlna_item_t *item;
+
+  if (!dlna || !filename)
+    return NULL;
+  
+  if (!dlna->inited)
+    dlna = dlna_init ();
+  
+  if (av_open_input_file (&ctx, filename, NULL, 0, NULL) != 0)
+  {
+    if (dlna->verbosity)
+      fprintf (stderr, "can't open file: %s\n", filename);
+    return NULL;
+  }
+
+  if (av_find_stream_info (ctx) < 0)
+  {
+    if (dlna->verbosity)
+      fprintf (stderr, "can't find stream info\n");
+    return NULL;
+  }
+
+  item = malloc (sizeof (dlna_item_t));
+  item->profile    = dlna_guess_media_profile (dlna, filename);
+  if (!item->profile) /* not DLNA compliant */
+  {
+    free (item);
+    return NULL;
+  }
+  item->filename   = strdup (filename);
+  item->properties = dlna_item_get_properties (ctx);
+  item->metadata   = dlna_item_get_metadata (ctx);
+  item->class      = item->profile->class;
+
+  av_close_input_file (ctx);
+
+  return item;
+}
+
+void
+dlna_item_free (dlna_item_t *item)
+{
+  if (!item)
+    return;
+
+  if (item->filename)
+    free (item->filename);
+  if (item->properties)
+    free (item->properties);
+  dlna_metadata_free (item->metadata);
+  item->profile = NULL;
+  free (item);
+}
+
 /* UPnP ContentDirectory Object Item */
 #define UPNP_OBJECT_ITEM_PHOTO            "object.item.imageItem.photo"
 #define UPNP_OBJECT_ITEM_AUDIO            "object.item.audioItem.musicTrack"
