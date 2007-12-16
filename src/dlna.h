@@ -340,6 +340,70 @@ dlna_dms_description_get (const char *friendly_name,
                           const char *cds_control_url,
                           const char *cds_event_url);
 
+/**
+ * Set device UPnP friendly name.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] str   Value to be set.
+ */
+void dlna_set_device_friendly_name (dlna_t *dlna, char *str);
+
+/**
+ * Set device UPnP manufacturer name.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] str   Value to be set.
+ */
+void dlna_set_device_manufacturer (dlna_t *dlna, char *str);
+
+/**
+ * Set device UPnP manufacturer URL.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] str   Value to be set.
+ */
+void dlna_set_device_manufacturer_url (dlna_t *dlna, char *str);
+
+/**
+ * Set device UPnP model description.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] str   Value to be set.
+ */
+void dlna_set_device_model_description (dlna_t *dlna, char *str);
+
+/**
+ * Set device UPnP model name.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] str   Value to be set.
+ */
+void dlna_set_device_model_name (dlna_t *dlna, char *str);
+
+/**
+ * Set device UPnP model number.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] str   Value to be set.
+ */
+void dlna_set_device_model_number (dlna_t *dlna, char *str);
+
+/**
+ * Set device UPnP serial number.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] str   Value to be set.
+ */
+void dlna_set_device_serial_number (dlna_t *dlna, char *str);
+
+/**
+ * Set device UPnP UUID.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] str   Value to be set.
+ */
+void dlna_set_device_uuid (dlna_t *dlna, char *str);
+
 #ifdef __cplusplus
 #if 0 /* avoid EMACS indent */
 {

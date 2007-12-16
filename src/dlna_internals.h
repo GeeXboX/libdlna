@@ -43,6 +43,16 @@ struct dlna_s {
   int check_extensions;
   /* linked-list of registered DLNA profiles */
   void *first_profile;
+
+  /* UPnP Properties */
+  char *friendly_name;
+  char *manufacturer;
+  char *manufacturer_url;
+  char *model_description;
+  char *model_name;
+  char *model_number;
+  char *serial_number;
+  char *uuid;
 };
 
 #endif /* _DLNA_INTERNALS_H_ */

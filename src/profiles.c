@@ -155,6 +155,16 @@ dlna_init (void)
   dlna->inited = 1;
   dlna->verbosity = 0;
   dlna->first_profile = NULL;
+
+  /* UPnP Properties */
+  dlna->friendly_name = strdup ("libdlna");
+  dlna->manufacturer = strdup ("Benjamin Zores");
+  dlna->manufacturer_url = strdup ("http://libdlna.geexbox.org/");
+  dlna->model_description = strdup ("libdlna device");
+  dlna->model_name = strdup ("libdlna");
+  dlna->model_number = strdup ("libdlna-001");
+  dlna->serial_number = strdup ("libdlna-001");
+  dlna->uuid = strdup ("01:23:45:67:89");
   
   /* register all FFMPEG demuxers */
   av_register_all ();
@@ -172,6 +182,17 @@ dlna_uninit (dlna_t *dlna)
   if (dlna->verbosity)
     fprintf (stderr, "DLNA: uninit\n");
   dlna->first_profile = NULL;
+
+  /* UPnP Properties */
+  free (dlna->friendly_name);
+  free (dlna->manufacturer);
+  free (dlna->manufacturer_url);
+  free (dlna->model_description);
+  free (dlna->model_name);
+  free (dlna->model_number);
+  free (dlna->serial_number);
+  free (dlna->uuid);
+
   free (dlna);
 }
 
