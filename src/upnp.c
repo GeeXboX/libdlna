@@ -23,7 +23,13 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <upnp/upnp.h>
+#include <upnp/upnptools.h>
+
 #include "dlna_internals.h"
+
+#define UPNP_MAX_CONTENT_LENGTH 4096
+#define VIRTUAL_DIR "/web"
 
 void
 dlna_set_device_friendly_name (dlna_t *dlna, char *str)
@@ -92,6 +98,18 @@ dlna_set_device_model_number (dlna_t *dlna, char *str)
 }
 
 void
+dlna_set_device_model_url (dlna_t *dlna, char *str)
+{
+  if (!dlna || !str)
+    return;
+
+  if (dlna->model_url)
+    free (dlna->model_url);
+  dlna->model_url = strdup (str);
+}
+
+
+void
 dlna_set_device_serial_number (dlna_t *dlna, char *str)
 {
   if (!dlna || !str)
@@ -111,4 +129,162 @@ dlna_set_device_uuid (dlna_t *dlna, char *str)
   if (dlna->uuid)
     free (dlna->uuid);
   dlna->uuid = strdup (str);
+}
+
+static int
+device_callback_event_handler (Upnp_EventType type,
+                               void *event dlna_unused,
+                               void *cookie dlna_unused)
+{
+  switch (type)
+    {
+    case UPNP_CONTROL_ACTION_REQUEST:
+    case UPNP_CONTROL_ACTION_COMPLETE:
+    case UPNP_EVENT_SUBSCRIPTION_REQUEST:
+    case UPNP_CONTROL_GET_VAR_REQUEST:
+      break;
+    default:
+      break;
+    }
+
+  return 0;
+}
+
+int
+upnp_init (dlna_t *dlna, dlna_device_type_t type)
+{
+  char *description = NULL;
+  int res;
+
+  if (!dlna)
+    return -1;
+
+  if (type == DLNA_DEVICE_UNKNOWN)
+    return -1;
+
+  switch (type)
+  {
+  case DLNA_DEVICE_DMS:
+    description =
+      dlna_dms_description_get (dlna->friendly_name,
+                                dlna->manufacturer,
+                                dlna->manufacturer_url,
+                                dlna->model_description,
+                                dlna->model_name,
+                                dlna->model_number,
+                                dlna->model_url,
+                                dlna->serial_number,
+                                dlna->uuid,
+                                "/web/presentation.html",
+                                "/web/cms.xml",
+                                "/web/cms_control",
+                                "/web/cms_event",
+                                "/web/cds.xml",
+                                "/web/cds_control",
+                                "/web/cds_event");
+  case DLNA_DEVICE_DMP:
+  default:
+    break;
+  }
+  
+  if (!description)
+    goto upnp_init_err;
+
+  if (dlna->verbosity)
+    fprintf (stderr, "Initializing UPnP A/V subsystem ...\n");
+
+#if 0 /* not yet implemented */
+  res = UpnpInit (dlna->ip, ut->port);
+  if (res != UPNP_E_SUCCESS)
+  {
+    if (dlna->verbosity)
+      fprintf (stderr, "Cannot initialize UPnP A/V subsystem\n");
+    goto upnp_init_err;
+  }
+#endif
+
+  if (UpnpSetMaxContentLength (UPNP_MAX_CONTENT_LENGTH) != UPNP_E_SUCCESS)
+  {
+    if (dlna->verbosity)
+      fprintf (stderr, "Could not set UPnP max content length\n");
+  }
+
+  dlna->port = UpnpGetServerPort ();
+  if (dlna->verbosity)
+    fprintf (stderr, "UPnP MediaServer listening on %s:%d\n",
+             UpnpGetServerIpAddress (), dlna->port);
+
+  UpnpEnableWebserver (TRUE);
+
+#if 0 /* not yet implemented */
+  res = UpnpSetVirtualDirCallbacks (&virtual_dir_callbacks);
+  if (res != UPNP_E_SUCCESS)
+  {
+    if (dlna->verbosity)
+      fprintf (stderr, "Cannot set virtual directory callbacks\n");
+    goto upnp_init_err;
+  }
+#endif
+  
+  res = UpnpAddVirtualDir (VIRTUAL_DIR);
+  if (res != UPNP_E_SUCCESS)
+  {
+    if (dlna->verbosity)
+      fprintf (stderr, "Cannot add virtual directory for web server\n");
+    goto upnp_init_err;
+  }
+
+  res = UpnpRegisterRootDevice2 (UPNPREG_BUF_DESC, description, 0, 1,
+                                 device_callback_event_handler,
+                                 NULL, &(dlna->dev));
+  if (res != UPNP_E_SUCCESS)
+  {
+    if (dlna->verbosity)
+      fprintf (stderr, "Cannot register UPnP A/V device\n");
+    goto upnp_init_err;
+  }
+
+  res = UpnpUnRegisterRootDevice (dlna->dev);
+  if (res != UPNP_E_SUCCESS)
+  {
+    if (dlna->verbosity)
+      fprintf (stderr, "Cannot unregister UPnP device\n");
+    goto upnp_init_err;
+  }
+
+  res = UpnpRegisterRootDevice2 (UPNPREG_BUF_DESC, description, 0, 1,
+                                 device_callback_event_handler,
+                                 NULL, &(dlna->dev));
+  if (res != UPNP_E_SUCCESS)
+  {
+    if (dlna->verbosity)
+      fprintf (stderr, "Cannot register UPnP device\n");
+    goto upnp_init_err;
+  }
+
+  if (dlna->verbosity)
+    fprintf (stderr, "Sending UPnP advertisement for device ...\n");
+  UpnpSendAdvertisement (dlna->dev, 1800);
+
+  free (description);
+  return 0;
+
+ upnp_init_err:
+  if (description)
+    free (description);
+  return -1;
+}
+
+int
+upnp_uninit (dlna_t *dlna)
+{
+  if (!dlna)
+    return -1;
+
+  if (dlna->verbosity)
+    fprintf (stderr, "Stopping UPnP A/V Service ...\n");
+  UpnpUnRegisterRootDevice (dlna->dev);
+  UpnpFinish ();
+
+  return UPNP_E_SUCCESS;
 }

@@ -389,6 +389,14 @@ void dlna_set_device_model_name (dlna_t *dlna, char *str);
 void dlna_set_device_model_number (dlna_t *dlna, char *str);
 
 /**
+ * Set device UPnP model URL.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] str   Value to be set.
+ */
+void dlna_set_device_model_url (dlna_t *dlna, char *str);
+
+/**
  * Set device UPnP serial number.
  *
  * @param[in] dlna  The DLNA library's controller.

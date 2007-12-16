@@ -163,6 +163,7 @@ dlna_init (void)
   dlna->model_description = strdup ("libdlna device");
   dlna->model_name = strdup ("libdlna");
   dlna->model_number = strdup ("libdlna-001");
+  dlna->model_url = strdup ("http://libdlna.geexbox.org/");
   dlna->serial_number = strdup ("libdlna-001");
   dlna->uuid = strdup ("01:23:45:67:89");
   
@@ -190,6 +191,7 @@ dlna_uninit (dlna_t *dlna)
   free (dlna->model_description);
   free (dlna->model_name);
   free (dlna->model_number);
+  free (dlna->model_url);
   free (dlna->serial_number);
   free (dlna->uuid);
 

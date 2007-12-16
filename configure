@@ -37,6 +37,9 @@ show_help(){
   echo "  --disable-shared            do not build shared libraries [default=no]"
   echo "  --with-ffmpeg-dir=DIR       check for ffmpeg installed in DIR"
   echo ""
+  echo "Search paths:"
+  echo "  --with-libupnp-dir=DIR      check for libupnp installed in DIR"
+  echo ""
   echo "Advanced options (experts only):"
   echo "  --enable-debug              enable debugging symbols"
   echo "  --disable-debug             disable debugging symbols"
@@ -257,6 +260,12 @@ check_libconfig(){
     return $err
 }
 
+check_lib_version() {
+    check_cmd pkg-config "$1" --atleast-version="$2"
+    err=$?
+    return $err
+}
+
 append_config(){
     echo "$@" >> $CONFIGFILE
 }
@@ -404,6 +413,8 @@ for opt do
   --libdir=*) libdir="$optval"; force_libdir=yes
   ;;
   --includedir=*) includedir="$optval"
+  ;;
+  --with-libupnp-dir=*) libupnpdir="$optval";
   ;;
   --enable-static) static="yes"
   ;;
@@ -607,6 +618,28 @@ if enabled optimize; then
 fi
 
 #################################################
+#   check for libupnp and friends (mandatory)
+#################################################
+if [ -n "$libupnpdir" ]; then
+  check_cflags -I$libupnpdir
+  check_ldflags -L$libupnpdir
+fi
+
+echolog "Checking for libixml ..."
+check_lib upnp/ixml.h ixmlRelaxParser -lixml || die "Error, can't find libixml !"
+
+echolog "Checking for libthreadutil ..."
+check_lib upnp/ThreadPool.h ThreadPoolAdd "-lthreadutil -lpthread" || die "Error, can't find libthreadutil !"
+add_extralibs -lpthread
+
+libupnp_min_version="1.4.2"
+echolog "Checking for libupnp >= $libupnp_min_version ..."
+check_lib upnp/upnp.h UpnpSetMaxContentLength -lupnp || die "Error, can't find libupnp !"
+check_lib_version libupnp $libupnp_min_version || die "Error, libupnp < $libupnp_min_version !"
+add_cflags `pkg-config libupnp --cflags`
+add_extralibs `pkg-config libupnp --libs`
+
+#################################################
 #   check for ffmpeg libavformat/libavcodec
 #################################################
 if [ -n "$ffmpegdir" ]; then
@@ -645,6 +678,7 @@ restore_flags
 echolog ""
 echolog "libdlna: configure is OK"
 echolog "  version            $VERSION"
+echolog "  using libupnp      `pkg-config libupnp --modversion`"
 echolog "configuration:"
 echolog "  install prefix     $PREFIX"
 echolog "  C compiler         $cc"

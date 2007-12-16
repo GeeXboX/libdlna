@@ -30,6 +30,15 @@
 
 #include "dlna.h"
 
+#include <upnp/upnp.h>
+#include <upnp/upnptools.h>
+
+typedef enum {
+  DLNA_DEVICE_UNKNOWN,
+  DLNA_DEVICE_DMS,      /* Digital Media Server */
+  DLNA_DEVICE_DMP,      /* Digital Media Player */
+} dlna_device_type_t;
+
 /**
  * DLNA Library's controller.
  * This controls the whole library.
@@ -45,14 +54,20 @@ struct dlna_s {
   void *first_profile;
 
   /* UPnP Properties */
+  unsigned short port; /* server port */
+  UpnpDevice_Handle dev;
   char *friendly_name;
   char *manufacturer;
   char *manufacturer_url;
   char *model_description;
   char *model_name;
   char *model_number;
+  char *model_url;
   char *serial_number;
   char *uuid;
 };
+
+int upnp_init (dlna_t *dlna, dlna_device_type_t type);
+int upnp_uninit (dlna_t *dlna);
 
 #endif /* _DLNA_INTERNALS_H_ */
