@@ -22,6 +22,29 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <unistd.h>
+
+#if (defined(BSD) || defined(__FreeBSD__) || defined(__APPLE__))
+#include <sys/socket.h>
+#include <sys/sysctl.h>
+#include <net/if_dl.h>
+#endif
+
+#if (defined(__APPLE__))
+#include <net/route.h>
+#endif
+
+#include <net/if.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdbool.h>
+#include <fcntl.h>
+
+#ifdef HAVE_IFADDRS_H
+#include <ifaddrs.h>
+#endif
+
 #include "dlna_internals.h"
 #include "profiles.h"
 #include "containers.h"
@@ -218,12 +241,103 @@ dlna_set_extension_check (dlna_t *dlna, int level)
   dlna->check_extensions = level;
 }
 
+static int
+has_network_interface (char *interface)
+{
+#ifdef HAVE_IFADDRS_H
+  struct ifaddrs *itflist, *itf;
+
+  if (!interface)
+    return 0;
+
+  if (getifaddrs (&itflist) < 0)
+  {
+    perror ("getifaddrs");
+    return 0;
+  }
+
+  itf = itflist;
+  while (itf)
+  {
+    if ((itf->ifa_flags & IFF_UP)
+        && !strncmp (itf->ifa_name, interface, IFNAMSIZ))
+    {
+      freeifaddrs (itflist);
+      return 1;
+    }
+    itf = itf->ifa_next;
+  }
+
+  freeifaddrs (itflist);
+#else  
+  int sock, i, n;
+  struct ifconf ifc;
+  struct ifreq ifr;
+  char buff[8192];
+
+  if (!interface)
+    return 0;
+
+  /* determine UDN according to MAC address */
+  sock = socket (AF_INET, SOCK_STREAM, 0);
+  if (sock < 0)
+  {
+    perror ("socket");
+    return 0;
+  }
+
+  /* get list of available interfaces */
+  ifc.ifc_len = sizeof (buff);
+  ifc.ifc_buf = buff;
+
+  if (ioctl (sock, SIOCGIFCONF, &ifc) < 0)
+  {
+    perror ("ioctl");
+    close (sock);
+    return 0;
+  }
+
+  n = ifc.ifc_len / sizeof (struct ifreq);
+  for (i = n - 1 ; i >= 0 ; i--)
+  {
+    ifr = ifc.ifc_req[i];
+
+    if (strncmp (ifr.ifr_name, interface, IFNAMSIZ))
+      continue;
+
+    if (ioctl (sock, SIOCGIFFLAGS, &ifr) < 0)
+    {
+      perror ("ioctl");
+      close (sock);
+      return 0;
+    }
+
+    if (!(ifr.ifr_flags & IFF_UP))
+    {
+      close (sock);
+      return 0;
+    }
+
+    /* found right interface */
+    close (sock);
+    return 1;
+  }
+  close (sock);
+#endif
+
+  return 0;
+}
+
 void
 dlna_set_interface (dlna_t *dlna, char *itf)
 {
   if (!dlna || !itf)
     return;
 
+  /* check for valid network interface */
+  if (!has_network_interface (itf))
+    return;
+  
   if (dlna->interface)
     free (dlna->interface);
   dlna->interface = strdup (itf);
