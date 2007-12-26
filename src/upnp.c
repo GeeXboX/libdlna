@@ -259,15 +259,13 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
   if (!ip)
     goto upnp_init_err;
   
-#if 0 /* not yet implemented */
-  res = UpnpInit (dlna->ip, ut->port);
+  res = UpnpInit (ip, dlna->port);
   if (res != UPNP_E_SUCCESS)
   {
     if (dlna->verbosity)
       fprintf (stderr, "Cannot initialize UPnP A/V subsystem\n");
     goto upnp_init_err;
   }
-#endif
 
   if (UpnpSetMaxContentLength (UPNP_MAX_CONTENT_LENGTH) != UPNP_E_SUCCESS)
   {
