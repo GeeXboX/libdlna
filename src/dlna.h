@@ -154,7 +154,7 @@ typedef struct dlna_profile_s {
   /* Profile Label */
   const char *label;
   /* Profile type: IMAGE / AUDIO / AV */
-  dlna_media_class_t class;
+  dlna_media_class_t media_class;
 } dlna_profile_t;
 
 /**
@@ -187,7 +187,7 @@ typedef struct dlna_properties_s {
  */
 typedef struct dlna_item_s {
   char *filename;
-  dlna_media_class_t class;
+  dlna_media_class_t media_class;
   dlna_properties_t *properties;
   dlna_metadata_t *metadata;
   dlna_profile_t *profile;

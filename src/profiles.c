@@ -285,7 +285,7 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
     if (prof)
     {
       profile = prof;
-      profile->class = p->class;
+      profile->media_class = p->class;
       break;
     }
     p = p->next;
@@ -412,7 +412,7 @@ dlna_item_new (dlna_t *dlna, const char *filename)
   item->filename   = strdup (filename);
   item->properties = dlna_item_get_properties (ctx);
   item->metadata   = dlna_item_get_metadata (ctx);
-  item->class      = item->profile->class;
+  item->media_class= item->profile->media_class;
 
   av_close_input_file (ctx);
 
@@ -445,7 +445,7 @@ dlna_profile_upnp_object_item (dlna_profile_t *profile)
   if (!profile)
     return NULL;
 
-  switch (profile->class)
+  switch (profile->media_class)
   {
   case DLNA_CLASS_IMAGE:
     return UPNP_OBJECT_ITEM_PHOTO;

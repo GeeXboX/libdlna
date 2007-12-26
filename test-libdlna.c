@@ -62,7 +62,7 @@ main (int argc, char **argv)
     printf ("ID: %s\n", p->id);
     printf ("MIME: %s\n", p->mime);
     printf ("Label: %s\n", p->label);
-    printf ("Class: %d\n", p->class);
+    printf ("Class: %d\n", p->media_class);
     printf ("UPnP Object Item: %s\n", dlna_profile_upnp_object_item (p));
 
     protocol_info = dlna_write_protocol_info (DLNA_PROTOCOL_INFO_TYPE_HTTP,
