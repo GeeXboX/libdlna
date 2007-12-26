@@ -45,6 +45,15 @@ extern "C" {
 
 #define LIBDLNA_IDENT        "DLNA " DLNA_STRINGIFY(LIBDLNA_VERSION)
 
+/* Verbosity level: defines which kind of log can be displayed */
+typedef enum {
+  DLNA_MSG_NONE,          /* no error messages */
+  DLNA_MSG_INFO,          /* working operations */
+  DLNA_MSG_WARNING,       /* harmless failures */
+  DLNA_MSG_ERROR,         /* may result in hazardous behavior */
+  DLNA_MSG_CRITICAL,      /* prevents lib from working */
+} dlna_verbosity_level_t;
+
 typedef enum {
   DLNA_PROTOCOL_INFO_TYPE_UNKNOWN,
   DLNA_PROTOCOL_INFO_TYPE_HTTP,
