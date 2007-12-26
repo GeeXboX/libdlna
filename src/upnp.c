@@ -38,12 +38,7 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <stdbool.h>
 #include <fcntl.h>
-
-#ifdef HAVE_IFADDRS_H
-#include <ifaddrs.h>
-#endif
 
 #include <upnp/upnp.h>
 #include <upnp/upnptools.h>
