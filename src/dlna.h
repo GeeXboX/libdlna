@@ -231,6 +231,14 @@ void dlna_set_verbosity (dlna_t *dlna, int level);
 void dlna_set_extension_check (dlna_t *dlna, int level);
 
 /**
+ * Set library's network interface to use.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] itf   Name of the interface to be used.
+ */
+void dlna_set_interface (dlna_t *dlna, char *itf);
+
+/**
  * Register all known/supported DLNA profiles.
  *
  * @param[in] dlna  The DLNA library's controller.

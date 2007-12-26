@@ -54,6 +54,7 @@ struct dlna_s {
   void *first_profile;
 
   /* UPnP Properties */
+  char *interface;
   unsigned short port; /* server port */
   UpnpDevice_Handle dev;
   char *friendly_name;

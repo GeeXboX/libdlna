@@ -155,7 +155,8 @@ dlna_init (void)
   dlna->inited = 1;
   dlna->verbosity = 0;
   dlna->first_profile = NULL;
-
+  dlna->interface = strdup ("lo"); /* bind to loopback as a default */
+  
   /* UPnP Properties */
   dlna->friendly_name = strdup ("libdlna");
   dlna->manufacturer = strdup ("Benjamin Zores");
@@ -183,6 +184,7 @@ dlna_uninit (dlna_t *dlna)
   if (dlna->verbosity)
     fprintf (stderr, "DLNA: uninit\n");
   dlna->first_profile = NULL;
+  free (dlna->interface);
 
   /* UPnP Properties */
   free (dlna->friendly_name);
@@ -214,6 +216,17 @@ dlna_set_extension_check (dlna_t *dlna, int level)
     return;
 
   dlna->check_extensions = level;
+}
+
+void
+dlna_set_interface (dlna_t *dlna, char *itf)
+{
+  if (!dlna || !itf)
+    return;
+
+  if (dlna->interface)
+    free (dlna->interface);
+  dlna->interface = strdup (itf);
 }
 
 static av_codecs_t *
