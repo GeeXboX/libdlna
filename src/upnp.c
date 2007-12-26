@@ -22,6 +22,28 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+
+#if (defined(BSD) || defined(__FreeBSD__) || defined(__APPLE__))
+#include <sys/socket.h>
+#include <sys/sysctl.h>
+#include <net/if_dl.h>
+#endif
+
+#if (defined(__APPLE__))
+#include <net/route.h>
+#endif
+
+#include <net/if.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdbool.h>
+#include <fcntl.h>
+
+#ifdef HAVE_IFADDRS_H
+#include <ifaddrs.h>
+#endif
 
 #include <upnp/upnp.h>
 #include <upnp/upnptools.h>
@@ -150,10 +172,50 @@ device_callback_event_handler (Upnp_EventType type,
   return 0;
 }
 
+static char *
+get_iface_address (char *interface)
+{
+  int sock;
+  uint32_t ip;
+  struct ifreq ifr;
+  char *val;
+
+  if (!interface)
+    return NULL;
+
+  /* determine UDN according to MAC address */
+  sock = socket (AF_INET, SOCK_STREAM, 0);
+  if (sock < 0)
+  {
+    perror ("socket");
+    return NULL;
+  }
+
+  strcpy (ifr.ifr_name, interface);
+  ifr.ifr_addr.sa_family = AF_INET;
+
+  if (ioctl (sock, SIOCGIFADDR, &ifr) < 0)
+  {
+    perror ("ioctl");
+    close (sock);
+    return NULL;
+  }
+
+  val = malloc (16 * sizeof (char));
+  ip = ((struct sockaddr_in *) &ifr.ifr_addr)->sin_addr.s_addr;
+  ip = ntohl (ip);
+  sprintf (val, "%d.%d.%d.%d",
+           (ip >> 24) & 0xFF, (ip >> 16) & 0xFF, (ip >> 8) & 0xFF, ip & 0xFF);
+
+  close (sock);
+  return val;
+}
+
 int
 upnp_init (dlna_t *dlna, dlna_device_type_t type)
 {
   char *description = NULL;
+  char *ip = NULL;
   int res;
 
   if (!dlna)
@@ -193,6 +255,10 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
   if (dlna->verbosity)
     fprintf (stderr, "Initializing UPnP A/V subsystem ...\n");
 
+  ip = get_iface_address (dlna->interface);
+  if (!ip)
+    goto upnp_init_err;
+  
 #if 0 /* not yet implemented */
   res = UpnpInit (dlna->ip, ut->port);
   if (res != UPNP_E_SUCCESS)
@@ -266,10 +332,13 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
     fprintf (stderr, "Sending UPnP advertisement for device ...\n");
   UpnpSendAdvertisement (dlna->dev, 1800);
 
+  free (ip);
   free (description);
   return 0;
 
  upnp_init_err:
+  if (ip)
+    free (ip);
   if (description)
     free (description);
   return -1;
