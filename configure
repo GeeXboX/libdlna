@@ -618,6 +618,12 @@ if enabled optimize; then
 fi
 
 #################################################
+#   check for ifaddr (optional)
+#################################################
+echolog "Checking for ifaddrs ..."
+check_lib ifaddrs.h getifaddrs "" && add_cflags -DHAVE_IFADDRS_H
+
+#################################################
 #   check for libupnp and friends (mandatory)
 #################################################
 if [ -n "$libupnpdir" ]; then
