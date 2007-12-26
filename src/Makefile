@@ -36,6 +36,7 @@ SRCS =  profiles.c \
 	av_mpeg4_part2.c \
 	av_mpeg4_part10.c \
 	av_wmv9.c \
+	dlna.c \
 	upnp.c \
 	upnp_dms.c \
 
