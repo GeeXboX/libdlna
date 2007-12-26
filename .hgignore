@@ -6,5 +6,5 @@ syntax: regexp
 \.a
 config.log
 config.mak
-test-libdlna$
+dlna-profiler$
 ^libdlna.pc
