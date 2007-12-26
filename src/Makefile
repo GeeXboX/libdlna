@@ -18,7 +18,8 @@ LIBNAME_STATIC = ${LIBNAME}.a
 LIBNAME_VERSION = $(LIBNAME_SHARED).$(VERSION)
 LIBNAME_MAJOR = $(LIBNAME_SHARED).$(shell echo $(VERSION) | cut -f1 -d.)
 
-SRCS =  profiles.c \
+SRCS =  \
+	profiles.c \
 	containers.c \
 	image_jpeg.c \
 	image_png.c \
@@ -40,7 +41,8 @@ SRCS =  profiles.c \
 	upnp.c \
 	upnp_dms.c \
 
-EXTRADIST = dlna.h \
+EXTRADIST = \
+	dlna.h \
 	dlna_internals.h \
 	containers.h \
 	profiles.h \

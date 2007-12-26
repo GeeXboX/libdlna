@@ -7,14 +7,16 @@ DISTFILE = libdlna-$(VERSION).tar.bz2
 PKGCONFIG_DIR = $(libdir)/pkgconfig
 PKGCONFIG_FILE = libdlna.pc
 
-EXTRADIST = AUTHORS \
+EXTRADIST = \
+	AUTHORS \
 	ChangeLog \
 	configure \
 	COPYING \
 	README \
 
-SUBDIRS = src \
-	  utils \
+SUBDIRS = \
+	src \
+	utils \
 
 all: lib utils
 
