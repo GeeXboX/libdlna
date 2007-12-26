@@ -55,7 +55,7 @@ dlna_init (void)
 
   dlna = malloc (sizeof (dlna_t));
   dlna->inited = 1;
-  dlna->verbosity = 0;
+  dlna->verbosity = DLNA_MSG_ERROR;
   dlna->first_profile = NULL;
   dlna->interface = strdup ("lo"); /* bind to loopback as a default */
   
@@ -103,7 +103,7 @@ dlna_uninit (dlna_t *dlna)
 }
 
 void
-dlna_set_verbosity (dlna_t *dlna, int level)
+dlna_set_verbosity (dlna_t *dlna, dlna_verbosity_level_t level)
 {
   if (!dlna)
     return;

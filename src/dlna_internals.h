@@ -47,7 +47,7 @@ struct dlna_s {
   /* has the library's been inited */
   int inited;
   /* defines verbosity level */
-  int verbosity;
+  dlna_verbosity_level_t verbosity;
   /* defines flexibility on file extension's check */
   int check_extensions;
   /* linked-list of registered DLNA profiles */

@@ -227,9 +227,9 @@ void dlna_uninit (dlna_t *dlna);
  * Set library's verbosity level.
  *
  * @param[in] dlna  The DLNA library's controller.
- * @param[in] level Level of verbosity (0 to disable, 1 to enable).
+ * @param[in] level Level of verbosity
  */
-void dlna_set_verbosity (dlna_t *dlna, int level);
+void dlna_set_verbosity (dlna_t *dlna, dlna_verbosity_level_t level);
 
 /**
  * Set library's check level on files extension.
