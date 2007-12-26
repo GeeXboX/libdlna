@@ -7,9 +7,6 @@ DISTFILE = libdlna-$(VERSION).tar.bz2
 PKGCONFIG_DIR = $(libdir)/pkgconfig
 PKGCONFIG_FILE = libdlna.pc
 
-LIBTEST = test-libdlna
-SRCS = test-libdlna.c
-
 EXTRADIST = AUTHORS \
 	ChangeLog \
 	configure \
@@ -17,27 +14,19 @@ EXTRADIST = AUTHORS \
 	README \
 
 SUBDIRS = src \
+	  utils \
 
-CFLAGS += -Isrc
-LDFLAGS += -Lsrc -ldlna
-
-ifeq ($(BUILD_STATIC),yes)
-  LDFLAGS += $(EXTRALIBS)
-endif
-
-all: lib test
+all: lib utils
 
 lib:
 	$(MAKE) -C src
 
-test: $(LIBTEST)
-
-$(LIBTEST): $(SRCS)
-	$(CC) $? $(OPTFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+utils:
+	$(MAKE) -C utils
 
 clean:
 	$(MAKE) -C src clean
-	-$(RM) -f $(LIBTEST)
+	$(MAKE) -C utils clean
 
 distclean: clean
 	-$(RM) -f config.log
@@ -65,6 +54,6 @@ dist:
 	-$(RM) -rf libdlna-$(VERSION)
 
 dist-all:
-	cp $(EXTRADIST) $(SRCS) Makefile $(DIST)
+	cp $(EXTRADIST) Makefile $(DIST)
 
-.PHONY: dist dist-all
+.PHONY: dist dist-all utils
