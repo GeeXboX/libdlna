@@ -46,7 +46,7 @@
 #define UPNP_MAX_CONTENT_LENGTH 4096
 #define VIRTUAL_DIR "/web"
 
-static const upnp_service_t upnp_av_services[] = {
+static upnp_service_t upnp_av_services[] = {
   { NULL, NULL, NULL }
 };
 
