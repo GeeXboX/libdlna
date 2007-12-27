@@ -235,15 +235,13 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   
   if (av_open_input_file (&ctx, filename, NULL, 0, NULL) != 0)
   {
-    if (dlna->verbosity)
-      fprintf (stderr, "can't open file: %s\n", filename);
+    dlna_log (dlna, DLNA_MSG_CRITICAL, "can't open file: %s\n", filename);
     return NULL;
   }
 
   if (av_find_stream_info (ctx) < 0)
   {
-    if (dlna->verbosity)
-      fprintf (stderr, "can't find stream info\n");
+    dlna_log (dlna, DLNA_MSG_CRITICAL, "can't find stream info\n");
     av_close_input_file (ctx);
     return NULL;
   }
@@ -261,7 +259,7 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   }
 
   /* check for container type */
-  st = stream_get_container (ctx);
+  st = stream_get_container (dlna, ctx);
   
   p = dlna->first_profile;
   while (p)
@@ -388,15 +386,13 @@ dlna_item_new (dlna_t *dlna, const char *filename)
   
   if (av_open_input_file (&ctx, filename, NULL, 0, NULL) != 0)
   {
-    if (dlna->verbosity)
-      fprintf (stderr, "can't open file: %s\n", filename);
+    dlna_log (dlna, DLNA_MSG_CRITICAL, "can't open file: %s\n", filename);
     return NULL;
   }
 
   if (av_find_stream_info (ctx) < 0)
   {
-    if (dlna->verbosity)
-      fprintf (stderr, "can't find stream info\n");
+    dlna_log (dlna, DLNA_MSG_CRITICAL, "can't find stream info\n");
     av_close_input_file (ctx);
     return NULL;
   }

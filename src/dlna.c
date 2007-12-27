@@ -73,6 +73,8 @@ dlna_init (void)
   /* register all FFMPEG demuxers */
   av_register_all ();
 
+  dlna_log (dlna, DLNA_MSG_INFO, "DLNA: init\n");
+  
   return dlna;
 }
 
@@ -83,8 +85,7 @@ dlna_uninit (dlna_t *dlna)
     return;
 
   dlna->inited = 0;
-  if (dlna->verbosity)
-    fprintf (stderr, "DLNA: uninit\n");
+  dlna_log (dlna, DLNA_MSG_INFO, "DLNA: uninit\n");
   dlna->first_profile = NULL;
   free (dlna->interface);
 

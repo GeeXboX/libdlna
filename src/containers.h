@@ -22,6 +22,8 @@
 #ifndef _CONTAINERS_H_
 #define _CONTAINERS_H_
 
+#include "dlna_internals.h"
+
 typedef enum {
   CT_UNKNOWN,
   CT_IMAGE, /* for PNG and JPEG */
@@ -43,6 +45,7 @@ typedef enum {
   CT_MPEG_TRANSPORT_STREAM_DLNA_NO_TS,
 } dlna_container_type_t;
 
-dlna_container_type_t stream_get_container (AVFormatContext *ctx);
+dlna_container_type_t stream_get_container (dlna_t *dlna,
+                                            AVFormatContext *ctx);
 
 #endif /* _CONTAINERS_H_ */

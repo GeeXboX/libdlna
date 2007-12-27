@@ -91,13 +91,11 @@ mov_find_container_type (const char *filename)
 }
 
 dlna_container_type_t
-stream_get_container (AVFormatContext *ctx)
+stream_get_container (dlna_t *dlna, AVFormatContext *ctx)
 {
   int i;
 
-#ifdef HAVE_DEBUG
-  fprintf (stderr, "Found container: %s\n", ctx->iformat->name);
-#endif /* HAVE_DEBUG */
+  dlna_log (dlna, DLNA_MSG_INFO, "Found container: %s\n", ctx->iformat->name);
   
   for (i = 0; avf_format_mapping[i].name; i++)
     if (!strcmp (ctx->iformat->name, avf_format_mapping[i].name))

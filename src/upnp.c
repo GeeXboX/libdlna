@@ -247,8 +247,7 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
   if (!description)
     goto upnp_init_err;
 
-  if (dlna->verbosity)
-    fprintf (stderr, "Initializing UPnP A/V subsystem ...\n");
+  dlna_log (dlna, DLNA_MSG_INFO, "Initializing UPnP A/V subsystem ...\n");
 
   ip = get_iface_address (dlna->interface);
   if (!ip)
@@ -257,21 +256,17 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
   res = UpnpInit (ip, dlna->port);
   if (res != UPNP_E_SUCCESS)
   {
-    if (dlna->verbosity)
-      fprintf (stderr, "Cannot initialize UPnP A/V subsystem\n");
+    dlna_log (dlna, DLNA_MSG_CRITICAL,
+              "Cannot initialize UPnP A/V subsystem\n");
     goto upnp_init_err;
   }
 
   if (UpnpSetMaxContentLength (UPNP_MAX_CONTENT_LENGTH) != UPNP_E_SUCCESS)
-  {
-    if (dlna->verbosity)
-      fprintf (stderr, "Could not set UPnP max content length\n");
-  }
+    dlna_log (dlna, DLNA_MSG_ERROR, "Could not set UPnP max content length\n");
 
   dlna->port = UpnpGetServerPort ();
-  if (dlna->verbosity)
-    fprintf (stderr, "UPnP MediaServer listening on %s:%d\n",
-             UpnpGetServerIpAddress (), dlna->port);
+  dlna_log (dlna, DLNA_MSG_INFO, "UPnP MediaServer listening on %s:%d\n",
+            UpnpGetServerIpAddress (), dlna->port);
 
   UpnpEnableWebserver (TRUE);
 
@@ -279,8 +274,8 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
   res = UpnpSetVirtualDirCallbacks (&virtual_dir_callbacks);
   if (res != UPNP_E_SUCCESS)
   {
-    if (dlna->verbosity)
-      fprintf (stderr, "Cannot set virtual directory callbacks\n");
+    dlna_log (dlna, DLNA_MSG_CRITICAL,
+              "Cannot set virtual directory callbacks\n");
     goto upnp_init_err;
   }
 #endif
@@ -288,8 +283,8 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
   res = UpnpAddVirtualDir (VIRTUAL_DIR);
   if (res != UPNP_E_SUCCESS)
   {
-    if (dlna->verbosity)
-      fprintf (stderr, "Cannot add virtual directory for web server\n");
+    dlna_log (dlna, DLNA_MSG_CRITICAL,
+              "Cannot add virtual directory for web server\n");
     goto upnp_init_err;
   }
 
@@ -298,16 +293,14 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
                                  NULL, &(dlna->dev));
   if (res != UPNP_E_SUCCESS)
   {
-    if (dlna->verbosity)
-      fprintf (stderr, "Cannot register UPnP A/V device\n");
+    dlna_log (dlna, DLNA_MSG_CRITICAL, "Cannot register UPnP A/V device\n");
     goto upnp_init_err;
   }
 
   res = UpnpUnRegisterRootDevice (dlna->dev);
   if (res != UPNP_E_SUCCESS)
   {
-    if (dlna->verbosity)
-      fprintf (stderr, "Cannot unregister UPnP device\n");
+    dlna_log (dlna, DLNA_MSG_CRITICAL, "Cannot unregister UPnP device\n");
     goto upnp_init_err;
   }
 
@@ -316,13 +309,12 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
                                  NULL, &(dlna->dev));
   if (res != UPNP_E_SUCCESS)
   {
-    if (dlna->verbosity)
-      fprintf (stderr, "Cannot register UPnP device\n");
+    dlna_log (dlna, DLNA_MSG_CRITICAL, "Cannot register UPnP device\n");
     goto upnp_init_err;
   }
 
-  if (dlna->verbosity)
-    fprintf (stderr, "Sending UPnP advertisement for device ...\n");
+  dlna_log (dlna, DLNA_MSG_INFO,
+            "Sending UPnP advertisement for device ...\n");
   UpnpSendAdvertisement (dlna->dev, 1800);
 
   free (ip);
@@ -343,8 +335,7 @@ upnp_uninit (dlna_t *dlna)
   if (!dlna)
     return -1;
 
-  if (dlna->verbosity)
-    fprintf (stderr, "Stopping UPnP A/V Service ...\n");
+  dlna_log (dlna, DLNA_MSG_INFO, "Stopping UPnP A/V Service ...\n");
   UpnpUnRegisterRootDevice (dlna->dev);
   UpnpFinish ();
 
