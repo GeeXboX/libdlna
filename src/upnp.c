@@ -249,6 +249,7 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
                                 dlna->serial_number,
                                 dlna->uuid,
                                 "presentation.html");
+    break;
   case DLNA_DEVICE_DMP:
   default:
     break;
