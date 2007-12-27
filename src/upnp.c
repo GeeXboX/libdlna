@@ -50,6 +50,48 @@ static const upnp_service_t upnp_av_services[] = {
   { NULL, NULL, NULL }
 };
 
+static int
+upnp_find_service_action (dlna_t *dlna,
+                          upnp_service_t **service,
+                          upnp_service_action_t **action,
+                          struct Upnp_Action_Request *ar)
+{
+  int s, a;
+
+  *service = NULL;
+  *action = NULL;
+
+  if (!ar || !ar->ActionName)
+    return 0;
+
+  /* parse all registered services */
+  for (s = 0; upnp_av_services[s].id; s++)
+  {
+    /* find the resquested one */
+    if (!strcmp (upnp_av_services[s].id, ar->ServiceID))
+    {
+      dlna_log (dlna, DLNA_MSG_INFO,
+                "ActionRequest: using service %s\n", ar->ServiceID);
+      *service = &upnp_av_services[s];
+      /* parse all known actions */
+      for (a = 0; upnp_av_services[s].actions[a].name; a++)
+      {
+        /* find the requested one */
+        if (!strcmp (upnp_av_services[s].actions[a].name, ar->ActionName))
+        {
+          dlna_log (dlna, DLNA_MSG_INFO,
+                    "ActionRequest: using action %s\n", ar->ActionName);
+          *action = &upnp_av_services[s].actions[a];
+          return 1;
+        }
+      }
+      return 0;
+    }
+  }
+
+  return 0;
+}
+
 static void
 upnp_action_request_handler (dlna_t *dlna, struct Upnp_Action_Request *ar)
 {
