@@ -43,9 +43,6 @@
 #include "dlna_internals.h"
 #include "upnp_internals.h"
 
-#define UPNP_MAX_CONTENT_LENGTH 4096
-#define VIRTUAL_DIR "/web"
-
 static upnp_service_t upnp_av_services[] = {
   { NULL, NULL, NULL }
 };
