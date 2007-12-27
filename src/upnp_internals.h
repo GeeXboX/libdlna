@@ -27,6 +27,17 @@
 #define UPNP_MAX_CONTENT_LENGTH 4096
 #define VIRTUAL_DIR "/web"
 
+/* Conection Manager Service */
+#define CMS_URL              "cms.xml"
+#define CMS_CONTROL_URL      "cms_control"
+#define CMS_EVENT_URL        "cms_event"
+
+/* Content Directory Service */
+#define CDS_URL              "cms.xml"
+#define CDS_CONTROL_URL      "cms_control"
+#define CDS_EVENT_URL        "cms_event"
+
+
 typedef struct upnp_service_s         upnp_service_t;
 typedef struct upnp_action_event_s    upnp_action_event_t;
 typedef struct upnp_service_action_s  upnp_service_action_t;

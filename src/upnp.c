@@ -248,13 +248,7 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
                                 dlna->model_url,
                                 dlna->serial_number,
                                 dlna->uuid,
-                                "/web/presentation.html",
-                                "/web/cms.xml",
-                                "/web/cms_control",
-                                "/web/cms_event",
-                                "/web/cds.xml",
-                                "/web/cds_control",
-                                "/web/cds_event");
+                                "presentation.html");
   case DLNA_DEVICE_DMP:
   default:
     break;
