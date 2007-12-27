@@ -40,9 +40,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <upnp/upnp.h>
-#include <upnp/upnptools.h>
-
 #include "dlna_internals.h"
 #include "upnp_internals.h"
 
