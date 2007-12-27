@@ -24,6 +24,27 @@
 
 #include "dlna_internals.h"
 
+typedef struct upnp_service_s         upnp_service_t;
+typedef struct upnp_action_event_s    upnp_action_event_t;
+typedef struct upnp_service_action_s  upnp_service_action_t;
+
+struct upnp_action_event_s {
+  struct Upnp_Action_Request *ar;
+  int status;
+  upnp_service_t *service;
+};
+
+struct upnp_service_action_s {
+  char *name;
+  int (*cb) (dlna_t *, upnp_action_event_t *);
+};
+
+struct upnp_service_s {
+  char *id;
+  char *type;
+  upnp_service_action_t *actions;
+};
+
 struct UpnpVirtualDirCallbacks virtual_dir_callbacks;
 
 #endif /* _UPNP_INTERNALS_H_ */
