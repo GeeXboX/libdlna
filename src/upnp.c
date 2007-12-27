@@ -46,6 +46,10 @@
 #define UPNP_MAX_CONTENT_LENGTH 4096
 #define VIRTUAL_DIR "/web"
 
+static const upnp_service_t upnp_av_services[] = {
+  { NULL, NULL, NULL }
+};
+
 static void
 upnp_action_request_handler (dlna_t *dlna, struct Upnp_Action_Request *ar)
 {
