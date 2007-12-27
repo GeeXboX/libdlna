@@ -68,6 +68,10 @@ struct dlna_s {
   char *uuid;
 };
 
+void dlna_log (dlna_t *dlna,
+               dlna_verbosity_level_t level,
+               const char *format, ...);
+
 int upnp_init (dlna_t *dlna, dlna_device_type_t type);
 int upnp_uninit (dlna_t *dlna);
 

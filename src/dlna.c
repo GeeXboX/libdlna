@@ -103,6 +103,27 @@ dlna_uninit (dlna_t *dlna)
 }
 
 void
+dlna_log (dlna_t *dlna, dlna_verbosity_level_t level, const char *format, ...)
+{
+  va_list va;
+
+  if (!dlna || !format)
+    return;
+
+  /* do we really want loging ? */
+  if (dlna->verbosity == DLNA_MSG_NONE)
+    return;
+  
+  if (level < dlna->verbosity)
+    return;
+
+  va_start (va, format);
+  fprintf (stderr, "[libdlna] ");
+  vfprintf (stderr, format, va);
+  va_end (va);
+}
+
+void
 dlna_set_verbosity (dlna_t *dlna, dlna_verbosity_level_t level)
 {
   if (!dlna)
