@@ -95,10 +95,8 @@ upnp_find_service_action (dlna_t *dlna,
 static void
 upnp_action_request_handler (dlna_t *dlna, struct Upnp_Action_Request *ar)
 {
-#if 0
-  struct service_t *service;
-  struct service_action_t *action;
-#endif
+  upnp_service_t *service;
+  upnp_service_action_t *action;
   char val[256];
   uint32_t ip;
 
@@ -133,17 +131,15 @@ upnp_action_request_handler (dlna_t *dlna, struct Upnp_Action_Request *ar)
     ixmlFreeDOMString (str);
   }
 
-#if 0
-  /* not yet implemented */
-  if (find_service_action (ar, &service, &action))
+  if (upnp_find_service_action (dlna, &service, &action, ar))
   {
-    struct action_event_t event;
+    upnp_action_event_t event;
 
-    event.request = ar;
-    event.status  = true;
+    event.ar      = ar;
+    event.status  = 1;
     event.service = service;
 
-    if (action->function (&event) && event.status)
+    if (action->cb (dlna, &event) && event.status)
       ar->ErrCode = UPNP_E_SUCCESS;
 
     if (dlna->verbosity == DLNA_MSG_INFO)
@@ -163,7 +159,6 @@ upnp_action_request_handler (dlna_t *dlna, struct Upnp_Action_Request *ar)
     strcpy (ar->ErrStr, "Unknown Service Action");
   else /* Invalid Service name */
     strcpy (ar->ErrStr, "Unknown Service ID");
-#endif
   
   ar->ActionResult = NULL;
   ar->ErrCode = UPNP_SOAP_E_INVALID_ACTION;
