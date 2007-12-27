@@ -129,18 +129,18 @@ device_callback_event_handler (Upnp_EventType type,
                                void *cookie)
 {
   switch (type)
-    {
-    case UPNP_CONTROL_ACTION_REQUEST:
-      upnp_action_request_handler ((dlna_t *) cookie,
-                                   (struct Upnp_Action_Request *) event);
-      break;
-    case UPNP_CONTROL_ACTION_COMPLETE:
-    case UPNP_EVENT_SUBSCRIPTION_REQUEST:
-    case UPNP_CONTROL_GET_VAR_REQUEST:
-      break;
-    default:
-      break;
-    }
+  {
+  case UPNP_CONTROL_ACTION_REQUEST:
+    upnp_action_request_handler ((dlna_t *) cookie,
+                                 (struct Upnp_Action_Request *) event);
+    break;
+  case UPNP_CONTROL_ACTION_COMPLETE:
+  case UPNP_EVENT_SUBSCRIPTION_REQUEST:
+  case UPNP_CONTROL_GET_VAR_REQUEST:
+    break;
+  default:
+    break;
+  }
 
   return 0;
 }
