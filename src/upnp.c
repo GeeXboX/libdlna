@@ -44,6 +44,7 @@
 #include <upnp/upnptools.h>
 
 #include "dlna_internals.h"
+#include "upnp_internals.h"
 
 #define UPNP_MAX_CONTENT_LENGTH 4096
 #define VIRTUAL_DIR "/web"
@@ -270,7 +271,6 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
 
   UpnpEnableWebserver (TRUE);
 
-#if 0 /* not yet implemented */
   res = UpnpSetVirtualDirCallbacks (&virtual_dir_callbacks);
   if (res != UPNP_E_SUCCESS)
   {
@@ -278,7 +278,6 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
               "Cannot set virtual directory callbacks\n");
     goto upnp_init_err;
   }
-#endif
   
   res = UpnpAddVirtualDir (VIRTUAL_DIR);
   if (res != UPNP_E_SUCCESS)
