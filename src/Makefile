@@ -39,11 +39,13 @@ SRCS =  \
 	av_wmv9.c \
 	dlna.c \
 	upnp.c \
+	http.c \
 	upnp_dms.c \
 
 EXTRADIST = \
 	dlna.h \
 	dlna_internals.h \
+	upnp_internals.h \
 	containers.h \
 	profiles.h \
 
