@@ -4,6 +4,7 @@ endif
 include ../config.mak
 
 include ixml/ixml.mak
+include threadutil/threadutil.mak
 
 ifeq ($(BUILD_STATIC),yes)
   BUILD_RULES   += lib_static
@@ -58,8 +59,10 @@ EXTRADIST = \
 ifeq ($(DEBUG),yes)
 CFLAGS += -DHAVE_DEBUG
 CFLAGS += -DDEBUG # for ixml library
+CFLAGS += -DSTATS # for threadutil library
 else
 CFLAGS += -DNDEBUG # for ixml library
+CFLAGS += -DNO_DEBUG # for threadutil library
 endif
 
 OBJS = $(SRCS:.c=.o)
@@ -87,8 +90,8 @@ lib_static_info_post:
 	@echo "#         Linking static objects            #"
 	@echo "#############################################"
 
-lib_static: lib_static_info_pre $(OBJS) $(IXML_OBJS) lib_static_info_post
-	$(AR) r $(LIBNAME_STATIC) $(OBJS) $(IXML_OBJS)
+lib_static: lib_static_info_pre $(OBJS) $(IXML_OBJS) $(THREADUTIL_OBJS) lib_static_info_post
+	$(AR) r $(LIBNAME_STATIC) $(OBJS) $(IXML_OBJS) $(THREADUTIL_OBJS)
 	$(RANLIB) $(LIBNAME_STATIC)
 
 lib_shared_info_pre:
@@ -103,8 +106,8 @@ lib_shared_info_post:
 	@echo "#         Linking shared objects            #"
 	@echo "#############################################"
 
-lib_shared: lib_shared_info_pre $(LOBJS) $(IXML_LOBJS) lib_shared_info_post
-	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(LOBJS) $(IXML_LOBJS) \
+lib_shared: lib_shared_info_pre $(LOBJS) $(IXML_LOBJS) $(THREADUTIL_LOBJS) lib_shared_info_post
+	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(LOBJS) $(IXML_LOBJS) $(THREADUTIL_LOBJS) \
 	  $(LDFLAGS) $(EXTRALIBS) -o $(LIBNAME_VERSION)
 	$(LN) -sf $(LIBNAME_VERSION) $(LIBNAME_MAJOR)
 	$(LN) -sf $(LIBNAME_MAJOR) $(LIBNAME_SHARED)
@@ -112,6 +115,7 @@ lib_shared: lib_shared_info_pre $(LOBJS) $(IXML_LOBJS) lib_shared_info_post
 clean:
 	-$(RM) -f *.o *.lo *.a *.so*
 	-$(RM) -f ixml/*.o ixml/*.lo
+	-$(RM) -f threadutil/*.o threadutil/*.lo
 	-$(RM) -f .depend
 
 install_static: lib_static
@@ -129,11 +133,11 @@ install: $(INSTALL_RULES)
 	$(INSTALL) -m 644 dlna.h $(includedir)
 
 depend:
-	$(CC) -MM $(CFLAGS) $(SRCS) $(IXML_SRCS) 1>.depend
+	$(CC) -MM $(CFLAGS) $(SRCS) $(IXML_SRCS) $(THREADUTIL_SRCS) 1>.depend
 
 .PHONY: clean depend
 
-dist-all: ixml-dist-all
+dist-all: ixml-dist-all threadutil-dist-all
 	cp $(EXTRADIST) $(IXML_EXTRADIST) $(SRCS) $(IXML_SRCS) Makefile $(DIST)
 
 .PHONY: dist-all
