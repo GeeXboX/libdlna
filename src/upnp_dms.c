@@ -118,10 +118,10 @@ int
 dlna_dms_init (dlna_t *dlna)
 {
   if (!dlna)
-    return 0;
+    return DLNA_ST_ERROR;
 
   if (!dlna->inited)
-    return 0;
+    return DLNA_ST_ERROR;
 
   return upnp_init (dlna, DLNA_DEVICE_DMS);
 }
@@ -130,10 +130,10 @@ int
 dlna_dms_uninit (dlna_t *dlna)
 {
   if (!dlna)
-    return -1;
+    return DLNA_ST_ERROR;
 
   if (!dlna->inited)
-    return -1;
+    return DLNA_ST_ERROR;
 
   return upnp_uninit (dlna);
 }

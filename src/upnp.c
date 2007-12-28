@@ -59,7 +59,7 @@ upnp_find_service_action (dlna_t *dlna,
   *action = NULL;
 
   if (!ar || !ar->ActionName)
-    return 0;
+    return DLNA_ST_ERROR;
 
   /* parse all registered services */
   for (s = 0; upnp_av_services[s].id; s++)
@@ -79,14 +79,14 @@ upnp_find_service_action (dlna_t *dlna,
           dlna_log (dlna, DLNA_MSG_INFO,
                     "ActionRequest: using action %s\n", ar->ActionName);
           *action = &upnp_av_services[s].actions[a];
-          return 1;
+          return DLNA_ST_OK;
         }
       }
-      return 0;
+      return DLNA_ST_ERROR;
     }
   }
 
-  return 0;
+  return DLNA_ST_ERROR;
 }
 
 static void
@@ -128,7 +128,7 @@ upnp_action_request_handler (dlna_t *dlna, struct Upnp_Action_Request *ar)
     ixmlFreeDOMString (str);
   }
 
-  if (upnp_find_service_action (dlna, &service, &action, ar))
+  if (upnp_find_service_action (dlna, &service, &action, ar) == DLNA_ST_OK)
   {
     upnp_action_event_t event;
 
@@ -230,10 +230,10 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
   int res;
 
   if (!dlna)
-    return -1;
+    return DLNA_ST_ERROR;
 
   if (type == DLNA_DEVICE_UNKNOWN)
-    return -1;
+    return DLNA_ST_ERROR;
 
   switch (type)
   {
@@ -328,25 +328,25 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
 
   free (ip);
   free (description);
-  return 0;
+  return DLNA_ST_OK;
 
  upnp_init_err:
   if (ip)
     free (ip);
   if (description)
     free (description);
-  return -1;
+  return DLNA_ST_ERROR;
 }
 
 int
 upnp_uninit (dlna_t *dlna)
 {
   if (!dlna)
-    return -1;
+    return DLNA_ST_ERROR;
 
   dlna_log (dlna, DLNA_MSG_INFO, "Stopping UPnP A/V Service ...\n");
   UpnpUnRegisterRootDevice (dlna->dev);
   UpnpFinish ();
 
-  return UPNP_E_SUCCESS;
+  return DLNA_ST_OK;
 }
