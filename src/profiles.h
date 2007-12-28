@@ -19,8 +19,8 @@
  * Foundation, Inc, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _PROFILES_H_
-#define _PROFILES_H_
+#ifndef PROFILES_H
+#define PROFILES_H
 
 #include <ffmpeg/avcodec.h>
 #include <ffmpeg/avformat.h>
@@ -148,4 +148,4 @@ int stream_ctx_is_image (AVFormatContext *ctx,
 int stream_ctx_is_audio (av_codecs_t *codecs);
 int stream_ctx_is_av (av_codecs_t *codecs);
 
-#endif /* _PROFILES_H_ */
+#endif /* PROFILES_H */

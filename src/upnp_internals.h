@@ -19,8 +19,8 @@
  * Foundation, Inc, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _UPNP_INTERNALS_H_
-#define _UPNP_INTERNALS_H_
+#ifndef UPNP_INTERNALS_H
+#define UPNP_INTERNALS_H
 
 #include "dlna_internals.h"
 
@@ -64,4 +64,4 @@ struct UpnpVirtualDirCallbacks virtual_dir_callbacks;
 int upnp_init (dlna_t *dlna, dlna_device_type_t type);
 int upnp_uninit (dlna_t *dlna);
 
-#endif /* _UPNP_INTERNALS_H_ */
+#endif /* UPNP_INTERNALS_H */

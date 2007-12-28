@@ -19,8 +19,8 @@
  * Foundation, Inc, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _CONTAINERS_H_
-#define _CONTAINERS_H_
+#ifndef CONTAINERS_H
+#define CONTAINERS_H
 
 #include "dlna_internals.h"
 
@@ -48,4 +48,4 @@ typedef enum {
 dlna_container_type_t stream_get_container (dlna_t *dlna,
                                             AVFormatContext *ctx);
 
-#endif /* _CONTAINERS_H_ */
+#endif /* CONTAINERS_H */

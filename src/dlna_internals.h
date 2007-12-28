@@ -19,8 +19,8 @@
  * Foundation, Inc, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _DLNA_INTERNALS_H_
-#define _DLNA_INTERNALS_H_
+#ifndef DLNA_INTERNALS_H
+#define DLNA_INTERNALS_H
 
 #if defined(__GNUC__)
 #    define dlna_unused __attribute__((unused))
@@ -72,4 +72,4 @@ void dlna_log (dlna_t *dlna,
                dlna_verbosity_level_t level,
                const char *format, ...);
 
-#endif /* _DLNA_INTERNALS_H_ */
+#endif /* DLNA_INTERNALS_H */

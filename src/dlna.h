@@ -19,8 +19,8 @@
  * Foundation, Inc, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef _DLNA_H_
-#define _DLNA_H_
+#ifndef DLNA_H
+#define DLNA_H
 
 /**
  * @file dlna.h
@@ -442,4 +442,4 @@ void dlna_set_device_uuid (dlna_t *dlna, char *str);
 }
 #endif /* __cplusplus */
 
-#endif /* _DLNA_H_ */
+#endif /* DLNA_H */
