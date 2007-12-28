@@ -283,7 +283,7 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
     dlna_log (dlna, DLNA_MSG_ERROR, "Could not set UPnP max content length\n");
 
   dlna->port = UpnpGetServerPort ();
-  dlna_log (dlna, DLNA_MSG_INFO, "UPnP MediaServer listening on %s:%d\n",
+  dlna_log (dlna, DLNA_MSG_INFO, "UPnP device listening on %s:%d\n",
             UpnpGetServerIpAddress (), dlna->port);
 
   UpnpEnableWebserver (TRUE);
