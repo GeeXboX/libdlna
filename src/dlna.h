@@ -437,7 +437,7 @@ void dlna_set_device_serial_number (dlna_t *dlna, char *str);
  * Set device UPnP UUID.
  *
  * @param[in] dlna  The DLNA library's controller.
- * @param[in] str   Value to be set.
+ * @param[in] str   Value to be set ("uuid:" is automatically preprended).
  */
 void dlna_set_device_uuid (dlna_t *dlna, char *str);
 
