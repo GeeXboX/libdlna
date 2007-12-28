@@ -44,7 +44,7 @@
 "    <serialNumber>%s</serialNumber>" \
 "    <UDN>uuid:%s</UDN>" \
 "    <presentationURL>%s/%s</presentationURL>" \
-"    <dlna:X_DLNADOC>DMS-1.00</dlna:X_DLNADOC>" \
+"    <dlna:X_DLNADOC xmlns:dlna=\"urn:schemas-dlna-org:device-1-0\">DMS-1.00</dlna:X_DLNADOC>" \
 "    <serviceList>" \
 "      <service>" \
 "        <serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType>" \
