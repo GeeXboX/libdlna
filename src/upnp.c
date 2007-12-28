@@ -43,7 +43,15 @@
 #include "dlna_internals.h"
 #include "upnp_internals.h"
 
+extern upnp_service_action_t cms_service_actions[];
+
 static upnp_service_t upnp_av_services[] = {
+  /* Connection Manager Service (CMS) */
+  {
+    CMS_SERVICE_ID,
+    CMS_SERVICE_TYPE,
+    cms_service_actions
+  },
   { NULL, NULL, NULL }
 };
 

@@ -39,6 +39,7 @@ SRCS =  \
 	av_wmv9.c \
 	dlna.c \
 	upnp.c \
+	cms.c \
 	http.c \
 	upnp_dms.c \
 
@@ -48,6 +49,7 @@ EXTRADIST = \
 	upnp_internals.h \
 	containers.h \
 	profiles.h \
+	cms.h \
 
 ifeq ($(DEBUG),yes)
 CFLAGS += -DHAVE_DEBUG

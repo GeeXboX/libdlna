@@ -23,6 +23,7 @@
 #define UPNP_INTERNALS_H
 
 #include "dlna_internals.h"
+#include "cms.h"
 
 #define UPNP_MAX_CONTENT_LENGTH 4096
 #define VIRTUAL_DIR "/web"
