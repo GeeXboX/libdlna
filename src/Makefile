@@ -138,7 +138,7 @@ depend:
 .PHONY: clean depend
 
 dist-all: ixml-dist-all threadutil-dist-all
-	cp $(EXTRADIST) $(IXML_EXTRADIST) $(SRCS) $(IXML_SRCS) Makefile $(DIST)
+	cp $(EXTRADIST) $(SRCS) Makefile $(DIST)
 
 .PHONY: dist-all
 
