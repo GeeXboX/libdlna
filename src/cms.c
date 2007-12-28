@@ -19,6 +19,12 @@
  * Foundation, Inc, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/*
+ * ConnectionManager service specifications can be found at:
+ * http://upnp.org/standardizeddcps/documents/ConnectionManager1.0.pdf
+ * http://upnp.org/specs/av/UPnP-av-ConnectionManager-v2-Service-20060531.pdf
+ */
+
 #include "upnp_internals.h"
 
 /* CMS Action Names */

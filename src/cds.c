@@ -19,6 +19,12 @@
  * Foundation, Inc, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/*
+ * ContentDirectory service specifications can be found at:
+ * http://upnp.org/standardizeddcps/documents/ContentDirectory1.0.pdf
+ * http://upnp.org/specs/av/UPnP-av-ContentDirectory-v2-Service-20060531.pdf
+ */
+
 #include "upnp_internals.h"
 
 /* CDS Action Names */
