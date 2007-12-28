@@ -113,3 +113,27 @@ dlna_dms_description_get (const char *friendly_name,
 
   return desc;
 }
+
+int
+dlna_dms_init (dlna_t *dlna)
+{
+  if (!dlna)
+    return 0;
+
+  if (!dlna->inited)
+    return 0;
+
+  return upnp_init (dlna, DLNA_DEVICE_DMS);
+}
+
+int
+dlna_dms_uninit (dlna_t *dlna)
+{
+  if (!dlna)
+    return -1;
+
+  if (!dlna->inited)
+    return -1;
+
+  return upnp_uninit (dlna);
+}

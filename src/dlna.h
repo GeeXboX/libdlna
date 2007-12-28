@@ -346,6 +346,24 @@ dlna_dms_description_get (const char *friendly_name,
                           const char *presentation_url);
 
 /**
+ * Initialize a DLNA Digital Media Server compliant device.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ *
+  * @return   0 in case of success, -1 otherwise.
+ */
+int dlna_dms_init (dlna_t *dlna);
+
+/**
+ * Uninitialize a DLNA Digital Media Server compliant device.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ *
+  * @return   0 in case of success, -1 otherwise.
+ */
+int dlna_dms_uninit (dlna_t *dlna);
+
+/**
  * Set device UPnP friendly name.
  *
  * @param[in] dlna  The DLNA library's controller.
