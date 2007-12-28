@@ -43,6 +43,7 @@
 #include "upnp_internals.h"
 
 extern upnp_service_action_t cms_service_actions[];
+extern upnp_service_action_t cds_service_actions[];
 
 static upnp_service_t upnp_av_services[] = {
   /* Connection Manager Service (CMS) */
@@ -50,6 +51,12 @@ static upnp_service_t upnp_av_services[] = {
     CMS_SERVICE_ID,
     CMS_SERVICE_TYPE,
     cms_service_actions
+  },
+  /* Content Directory Service (CDS) */
+  {
+    CDS_SERVICE_ID,
+    CDS_SERVICE_TYPE,
+    cds_service_actions
   },
   { NULL, NULL, NULL }
 };
