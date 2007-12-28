@@ -45,6 +45,12 @@ extern "C" {
 
 #define LIBDLNA_IDENT        "DLNA " DLNA_STRINGIFY(LIBDLNA_VERSION)
 
+/* Status code for DLNA related functions */
+typedef enum {
+  DLNA_ST_OK,
+  DLNA_ST_ERROR
+} dlna_status_code_t;
+
 /* Verbosity level: defines which kind of log can be displayed */
 typedef enum {
   DLNA_MSG_NONE,          /* no error messages */
