@@ -163,4 +163,8 @@
 #define CMS_SERVICE_ID   "urn:upnp-org:serviceId:ConnectionManager"
 #define CMS_SERVICE_TYPE "urn:schemas-upnp-org:service:ConnectionManager:1"
 
+#define CMS_URL              "cms.xml"
+#define CMS_CONTROL_URL      "cms_control"
+#define CMS_EVENT_URL        "cms_event"
+
 #endif /* CMS_H */

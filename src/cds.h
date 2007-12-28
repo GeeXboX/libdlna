@@ -94,4 +94,8 @@
 #define CDS_SERVICE_ID   "urn:upnp-org:serviceId:ContentDirectory"
 #define CDS_SERVICE_TYPE "urn:schemas-upnp-org:service:ContentDirectory:1"
 
+#define CDS_URL              "cms.xml"
+#define CDS_CONTROL_URL      "cms_control"
+#define CDS_EVENT_URL        "cms_event"
+
 #endif /* CDS_H */
