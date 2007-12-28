@@ -3,6 +3,8 @@ $(error "../config.mak is not present, run configure !")
 endif
 include ../config.mak
 
+include ixml/ixml.mak
+
 ifeq ($(BUILD_STATIC),yes)
   BUILD_RULES   += lib_static
   INSTALL_RULES += install_static
@@ -55,6 +57,9 @@ EXTRADIST = \
 
 ifeq ($(DEBUG),yes)
 CFLAGS += -DHAVE_DEBUG
+CFLAGS += -DDEBUG # for ixml library
+else
+CFLAGS += -DNDEBUG # for ixml library
 endif
 
 OBJS = $(SRCS:.c=.o)
@@ -82,8 +87,8 @@ lib_static_info_post:
 	@echo "#         Linking static objects            #"
 	@echo "#############################################"
 
-lib_static: lib_static_info_pre $(OBJS) lib_static_info_post
-	$(AR) r $(LIBNAME_STATIC) $(OBJS)
+lib_static: lib_static_info_pre $(OBJS) $(IXML_OBJS) lib_static_info_post
+	$(AR) r $(LIBNAME_STATIC) $(OBJS) $(IXML_OBJS)
 	$(RANLIB) $(LIBNAME_STATIC)
 
 lib_shared_info_pre:
@@ -98,14 +103,15 @@ lib_shared_info_post:
 	@echo "#         Linking shared objects            #"
 	@echo "#############################################"
 
-lib_shared: lib_shared_info_pre $(LOBJS) lib_shared_info_post
-	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(LOBJS) \
+lib_shared: lib_shared_info_pre $(LOBJS) $(IXML_LOBJS) lib_shared_info_post
+	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(LOBJS) $(IXML_LOBJS) \
 	  $(LDFLAGS) $(EXTRALIBS) -o $(LIBNAME_VERSION)
 	$(LN) -sf $(LIBNAME_VERSION) $(LIBNAME_MAJOR)
 	$(LN) -sf $(LIBNAME_MAJOR) $(LIBNAME_SHARED)
 
 clean:
 	-$(RM) -f *.o *.lo *.a *.so*
+	-$(RM) -f ixml/*.o ixml/*.lo
 	-$(RM) -f .depend
 
 install_static: lib_static
@@ -123,12 +129,12 @@ install: $(INSTALL_RULES)
 	$(INSTALL) -m 644 dlna.h $(includedir)
 
 depend:
-	$(CC) -MM $(CFLAGS) $(SRCS) 1>.depend
+	$(CC) -MM $(CFLAGS) $(SRCS) $(IXML_SRCS) 1>.depend
 
 .PHONY: clean depend
 
-dist-all:
-	cp $(EXTRADIST) $(SRCS) Makefile $(DIST)
+dist-all: ixml-dist-all
+	cp $(EXTRADIST) $(IXML_EXTRADIST) $(SRCS) $(IXML_SRCS) Makefile $(DIST)
 
 .PHONY: dist-all
 
