@@ -30,10 +30,16 @@
 /* Represent the CMS GetCurrentConnectionIDs action. */
 #define SERVICE_CMS_ACTION_CON_ID "GetCurrentConnectionIDs"
 
+#define SERVICE_CMS_ACTION_PREPARE "PrepareForConnection"
+#define SERVICE_CMS_ACTION_CON_COMPLETE "ConnectionComplete"
+
+
 /* List of UPnP ConnectionManager Service actions */
 upnp_service_action_t cms_service_actions[] = {
   { SERVICE_CMS_ACTION_CON_INFO,  NULL },
   { SERVICE_CMS_ACTION_PROT_INFO, NULL },
   { SERVICE_CMS_ACTION_CON_ID,    NULL },
+  { SERVICE_CMS_ACTION_PREPARE,    NULL },
+  { SERVICE_CMS_ACTION_CON_COMPLETE, NULL },
   { NULL,                         NULL }
 };
