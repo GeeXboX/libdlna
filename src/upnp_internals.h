@@ -61,4 +61,7 @@ struct upnp_service_s {
 
 struct UpnpVirtualDirCallbacks virtual_dir_callbacks;
 
+int upnp_init (dlna_t *dlna, dlna_device_type_t type);
+int upnp_uninit (dlna_t *dlna);
+
 #endif /* _UPNP_INTERNALS_H_ */
