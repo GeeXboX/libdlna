@@ -7,4 +7,5 @@ syntax: regexp
 config.log
 config.mak
 dlna-profiler$
+dlna-dms$
 ^libdlna.pc
