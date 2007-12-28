@@ -356,7 +356,7 @@ dlna_dms_description_get (const char *friendly_name,
  *
  * @param[in] dlna  The DLNA library's controller.
  *
-  * @return   0 in case of success, -1 otherwise.
+  * @return   DLNA_ST_OK in case of success, DLNA_ST_ERROR otherwise.
  */
 int dlna_dms_init (dlna_t *dlna);
 
@@ -365,7 +365,7 @@ int dlna_dms_init (dlna_t *dlna);
  *
  * @param[in] dlna  The DLNA library's controller.
  *
-  * @return   0 in case of success, -1 otherwise.
+  * @return   DLNA_ST_OK in case of success, DLNA_ST_ERROR otherwise.
  */
 int dlna_dms_uninit (dlna_t *dlna);
 
