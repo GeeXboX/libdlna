@@ -40,7 +40,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "dlna_internals.h"
 #include "upnp_internals.h"
 
 extern upnp_service_action_t cms_service_actions[];
