@@ -265,7 +265,7 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
   if (!description)
     goto upnp_init_err;
 
-  dlna_log (dlna, DLNA_MSG_INFO, "Initializing UPnP A/V subsystem ...\n");
+  dlna_log (dlna, DLNA_MSG_INFO, "Initializing UPnP subsystem ...\n");
 
   ip = get_iface_address (dlna->interface);
   if (!ip)
@@ -275,7 +275,7 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
   if (res != UPNP_E_SUCCESS)
   {
     dlna_log (dlna, DLNA_MSG_CRITICAL,
-              "Cannot initialize UPnP A/V subsystem\n");
+              "Cannot initialize UPnP subsystem\n");
     goto upnp_init_err;
   }
 
@@ -309,7 +309,7 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
                                  dlna, &(dlna->dev));
   if (res != UPNP_E_SUCCESS)
   {
-    dlna_log (dlna, DLNA_MSG_CRITICAL, "Cannot register UPnP A/V device\n");
+    dlna_log (dlna, DLNA_MSG_CRITICAL, "Cannot register UPnP device\n");
     goto upnp_init_err;
   }
 
