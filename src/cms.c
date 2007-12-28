@@ -21,25 +21,19 @@
 
 #include "upnp_internals.h"
 
-/* Represent the CMS GetCurrentConnectionInfo action. */
-#define SERVICE_CMS_ACTION_CON_INFO "GetCurrentConnectionInfo"
-
-/* Represent the CMS GetProtocolInfo action. */
-#define SERVICE_CMS_ACTION_PROT_INFO "GetProtocolInfo"
-
-/* Represent the CMS GetCurrentConnectionIDs action. */
-#define SERVICE_CMS_ACTION_CON_ID "GetCurrentConnectionIDs"
-
-#define SERVICE_CMS_ACTION_PREPARE "PrepareForConnection"
-#define SERVICE_CMS_ACTION_CON_COMPLETE "ConnectionComplete"
-
+/* CMS Action Names */
+#define SERVICE_CMS_ACTION_PROT_INFO          "GetProtocolInfo"
+#define SERVICE_CMS_ACTION_PREPARE            "PrepareForConnection"
+#define SERVICE_CMS_ACTION_CON_COMPLETE       "ConnectionComplete"
+#define SERVICE_CMS_ACTION_CON_ID             "GetCurrentConnectionIDs"
+#define SERVICE_CMS_ACTION_CON_INFO           "GetCurrentConnectionInfo"
 
 /* List of UPnP ConnectionManager Service actions */
 upnp_service_action_t cms_service_actions[] = {
-  { SERVICE_CMS_ACTION_CON_INFO,  NULL },
-  { SERVICE_CMS_ACTION_PROT_INFO, NULL },
-  { SERVICE_CMS_ACTION_CON_ID,    NULL },
-  { SERVICE_CMS_ACTION_PREPARE,    NULL },
-  { SERVICE_CMS_ACTION_CON_COMPLETE, NULL },
-  { NULL,                         NULL }
+  { SERVICE_CMS_ACTION_PROT_INFO,     NULL },
+  { SERVICE_CMS_ACTION_PREPARE,       NULL },
+  { SERVICE_CMS_ACTION_CON_COMPLETE,  NULL },
+  { SERVICE_CMS_ACTION_CON_ID,        NULL },
+  { SERVICE_CMS_ACTION_CON_INFO,      NULL },
+  { NULL,                             NULL }
 };
