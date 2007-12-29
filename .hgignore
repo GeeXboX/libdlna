@@ -6,6 +6,8 @@ syntax: regexp
 \.a
 config.log
 config.mak
+TAGS
+tags
 dlna-profiler$
 dlna-dms$
 ^libdlna.pc

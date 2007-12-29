@@ -75,7 +75,7 @@ LOBJS = $(SRCS:.c=.lo)
 
 .SUFFIXES: .c .o .lo
 
-all: depend $(BUILD_RULES)
+all: depend $(BUILD_RULES) TAGS tags
 
 .c.o:
 	$(CC) -c $(CFLAGS) $(OPTFLAGS) -o $@ $<
@@ -119,12 +119,21 @@ lib_shared: lib_shared_info_pre $(LOBJS) $(IXML_LOBJS) $(THREADUTIL_LOBJS) $(UPN
 	$(LN) -sf $(LIBNAME_VERSION) $(LIBNAME_MAJOR)
 	$(LN) -sf $(LIBNAME_MAJOR) $(LIBNAME_SHARED)
 
+TAGS:
+	@rm -f $@; \
+	 ( find -name '*.[chS]' -print ) | xargs etags -a
+
+tags:
+	@rm -f $@; \
+	 ( find -name '*.[chS]' -print ) | xargs ctags -a;
+
 clean:
 	-$(RM) -f *.o *.lo *.a *.so*
 	-$(RM) -f ixml/*.o ixml/*.lo
 	-$(RM) -f threadutil/*.o threadutil/*.lo
 	-$(RM) -f upnp/*.o upnp/*.lo
 	-$(RM) -f .depend
+	-$(RM) -f tags TAGS
 
 install_static: lib_static
 	$(INSTALL) -d $(libdir)
