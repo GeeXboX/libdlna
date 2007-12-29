@@ -35,6 +35,7 @@
 
 #include "upnp.h"
 #include "upnpconfig.h"
+#include "config.h"
 
 #include <stdio.h>
 
