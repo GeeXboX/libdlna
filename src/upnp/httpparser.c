@@ -2161,7 +2161,7 @@ parser_get_entity_read_method( INOUT http_parser_t * parser )
     // * use content length
     if( httpmsg_find_hdr( hmsg, HDR_CONTENT_LENGTH, &hdr_value ) ) {
         parser->content_length = raw_to_int( &hdr_value, 10 );
-        if( parser->content_length < 0 ) {
+        if( parser->content_length == 0 ) {
             // bad content-length
             return PARSE_FAILURE;
         }

@@ -843,8 +843,7 @@ http_WriteHttpPost( IN void *Handle,
     int freeTempbuf = 0;
     int numWritten = 0;
 
-    if( ( !handle ) || ( !size ) || ( ( ( *size ) > 0 ) && !buf )
-        || ( ( *size ) < 0 ) ) {
+    if( ( !handle ) || ( !size ) || ( ( ( *size ) > 0 ) && !buf ) ) {
         if(size) ( *size ) = 0;
         return UPNP_E_INVALID_PARAM;
     }
@@ -1290,8 +1289,7 @@ http_ReadHttpGet( IN void *Handle,
 
     int ret_code = 0;
 
-    if( ( !handle ) || ( !size ) || ( ( ( *size ) > 0 ) && !buf )
-        || ( ( *size ) < 0 ) ) {
+    if( ( !handle ) || ( !size ) || ( ( ( *size ) > 0 ) && !buf ) ) {
         if(size) ( *size ) = 0;
         return UPNP_E_INVALID_PARAM;
     }
