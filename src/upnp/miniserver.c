@@ -390,7 +390,7 @@ RunMiniServer( MiniServerSockArray * miniSock )
 
     fd_set expSet;
     fd_set rdSet;
-    unsigned int maxMiniSock;
+    int maxMiniSock;
     int byteReceived;
     char requestBuf[256];
 

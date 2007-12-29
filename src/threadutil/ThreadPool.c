@@ -311,7 +311,7 @@ static void BumpPriority( ThreadPool *tp )
 {
     int done = 0;
     struct timeval now;
-    unsigned long diffTime = 0;
+    long diffTime = 0;
     ThreadPoolJob *tempJob = NULL;
 
     assert( tp != NULL );

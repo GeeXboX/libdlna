@@ -1211,7 +1211,7 @@ create_url_list( IN memptr * url_list,
                  OUT URL_list * out )
 {
     int URLcount = 0;
-    int i;
+    unsigned int i;
     int return_code = 0;
     uri_type temp;
     token urls;

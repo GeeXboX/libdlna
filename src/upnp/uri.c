@@ -164,8 +164,8 @@ replace_escaped( char *in,
 {
     int tempInt = 0;
     char tempChar = 0;
-    int i = 0;
-    int j = 0;
+    unsigned int i = 0;
+    unsigned int j = 0;
 
     if( ( in[index] == '%' ) && ( isxdigit( in[index + 1] ) )
         && isxdigit( in[index + 2] ) ) {
@@ -428,7 +428,7 @@ int token_string_casecmp(
     token * in1,
     char *in2 )
 {
-    int in2_length = strlen( in2 );
+    unsigned int in2_length = strlen( in2 );
 
     if( in1->size != in2_length )
         return 1;
@@ -456,7 +456,7 @@ int
 token_string_cmp( token * in1,
                   char *in2 )
 {
-    int in2_length = strlen( in2 );
+    unsigned int in2_length = strlen( in2 );
 
     if( in1->size != in2_length )
         return 1;
@@ -781,7 +781,7 @@ int
 remove_escaped_chars( INOUT char *in,
                       INOUT size_t *size )
 {
-    int i = 0;
+    unsigned int i = 0;
 
     for( i = 0; i < *size; i++ ) {
         replace_escaped( in, i, size );
@@ -913,7 +913,7 @@ resolve_rel_url( char *base_url,
     uri_type rel;
     char temp_path = '/';
 
-    int i = 0;
+    unsigned int i = 0;
     char *finger = NULL;
 
     char *last_slash = NULL;
