@@ -977,7 +977,7 @@ ixmlNode_cloneElement( IN IXML_Element * nodeptr )
 *
 *=================================================================*/
 IXML_Document *
-ixmlNode_cloneDoc( IN IXML_Document * nodeptr )
+ixmlNode_cloneDoc( IN IXML_Document * nodeptr ixml_unused )
 {
     IXML_Document *newDoc;
     IXML_Node *docNode;

@@ -34,6 +34,11 @@
 
 #include "autoconfig.h"
 
+#if defined(__GNUC__)
+#    define upnp_unused __attribute__((unused))
+#else
+#    define upnp_unused
+#endif
 
 /** @name Compile time configuration options
  *  The Linux SDK for UPnP Devices contains some compile-time parameters 

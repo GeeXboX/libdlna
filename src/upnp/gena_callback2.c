@@ -86,7 +86,7 @@ error_respond( IN SOCKINFO * info,
 *	UPNP_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 void
-genaCallback( IN http_parser_t * parser,
+genaCallback( IN http_parser_t * parser upnp_unused,
               IN http_message_t * request,
               INOUT SOCKINFO * info )
 {

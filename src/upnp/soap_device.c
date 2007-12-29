@@ -1020,7 +1020,7 @@ handle_invoke_action( IN SOCKINFO * info,
 *	Note :
 ****************************************************************************/
 void
-soap_device_callback( IN http_parser_t * parser,
+soap_device_callback( IN http_parser_t * parser upnp_unused,
                       IN http_message_t * request,
                       INOUT SOCKINFO * info )
 {

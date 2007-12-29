@@ -1902,7 +1902,7 @@ Parser_processSTag( IN Parser * xmlParser,
 *===============================================================================*/
 static BOOL
 Parser_hasDefaultNamespace( IN Parser * xmlParser,
-                            IN IXML_Node * newNode,
+                            IN IXML_Node * newNode ixml_unused,
                             IN char **nsURI )
 {
     IXML_ElementStack *pCur = xmlParser->pCurElement;
@@ -2305,7 +2305,7 @@ Parser_free( IN Parser * xmlParser )
 *
 *===============================================================================*/
 static int
-Parser_parseReference( IN char *pStr )
+Parser_parseReference( IN char *pStr ixml_unused )
 {                               // place holder for future implementation
     return IXML_SUCCESS;
 }

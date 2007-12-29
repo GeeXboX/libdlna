@@ -271,9 +271,9 @@ void printService(
 	Dbg_Module module);
 #else
 static UPNP_INLINE void printService(
-	service_info *service,
-	Upnp_LogLevel level,
-	Dbg_Module module) {}
+	service_info *service upnp_unused,
+	Upnp_LogLevel level upnp_unused,
+	Dbg_Module module upnp_unused) {}
 #endif
 
 /************************************************************************
@@ -298,9 +298,9 @@ void printServiceList(
 	Dbg_Module module);
 #else
 static UPNP_INLINE void printServiceList(
-	service_info *service,
-	Upnp_LogLevel level,
-	Dbg_Module module) {}
+	service_info *service upnp_unused,
+	Upnp_LogLevel level upnp_unused,
+	Dbg_Module module upnp_unused) {}
 #endif
 
 /************************************************************************
@@ -326,9 +326,9 @@ void printServiceTable(
 	Dbg_Module module);
 #else
 static UPNP_INLINE void printServiceTable(
-	service_table *table,
-	Upnp_LogLevel level,
-	Dbg_Module module) {}
+	service_table *table upnp_unused,
+	Upnp_LogLevel level upnp_unused,
+	Dbg_Module module upnp_unused) {}
 #endif
 
 /************************************************************************

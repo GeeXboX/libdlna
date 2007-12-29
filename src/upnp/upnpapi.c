@@ -362,10 +362,10 @@ PrintThreadPoolStats(
 #else /* DEBUG */
 static UPNP_INLINE void 
 PrintThreadPoolStats(
-	ThreadPool *tp, 
-	const char *DbgFileName,
-	int DbgLineNo,
-	const char *msg)
+	ThreadPool *tp upnp_unused, 
+	const char *DbgFileName upnp_unused,
+	int DbgLineNo upnp_unused,
+	const char *msg upnp_unused)
 {
 }
 #endif /* DEBUG */
@@ -954,7 +954,7 @@ get_server_addr( OUT struct sockaddr_in *serverAddr )
 static int
 GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
                        IN char *description,
-                       IN unsigned int bufferLen,
+                       IN unsigned int bufferLen upnp_unused,
                        IN int config_baseURL,
                        OUT IXML_Document ** xmlDoc,
                        OUT char descURL[LINE_SIZE] )

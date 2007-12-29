@@ -1911,6 +1911,12 @@ ixmlFreeDOMString(DOMString buf
 		    /** The {\bf DOMString} to free. */
                  );
 
+#if defined(__GNUC__)
+#    define ixml_unused __attribute__((unused))
+#else
+#    define ixml_unused
+#endif
+  
 #ifdef __cplusplus
 }
 #endif

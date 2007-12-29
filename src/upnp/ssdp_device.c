@@ -753,7 +753,7 @@ int
 DeviceShutdown( IN char *DevType,
                 IN int RootDev,
                 IN char *Udn,
-                IN char *_Server,
+                IN char *_Server upnp_unused,
                 IN char *Location,
                 IN int Duration )
 {
