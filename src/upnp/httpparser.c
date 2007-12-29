@@ -381,31 +381,6 @@ scanner_get_str( IN scanner_t * scanner )
     return scanner->msg->buf + scanner->cursor;
 }
 
-/************************************************************************
-* Function :	scanner_pushback
-*
-* Parameters :
-*	INOUT scanner_t* scanner ;	Scanner Object
-*	IN size_t pushback_bytes ;	Bytes to be moved back
-*
-* Description :	Move back by a certain number of bytes.				
-*	This is used to put back one or more tokens back into the input		
-*
-* Return : void ;
-*
-* Note :
-************************************************************************/
-#warning The only use of the function 'scanner_pushback()' in the code is commented out.
-#warning 'scanner_pushback()' is a candidate for removal.
-static UPNP_INLINE void
-scanner_pushback( INOUT scanner_t * scanner,
-                  IN size_t pushback_bytes )
-{
-    scanner->cursor -= pushback_bytes;
-}
-
-/***********************************************************************/
-
 /*************                end of scanner              **************/
 
 /***********************************************************************/
@@ -632,7 +607,6 @@ skip_blank_lines( INOUT scanner_t * scanner )
     if( status == PARSE_OK ) {
         // pushback a non-whitespace token
         scanner->cursor -= token.length;
-        //scanner_pushback( scanner, token.length );
     }
 
     return status;
@@ -949,31 +923,6 @@ read_until_crlf( INOUT scanner_t * scanner,
         str->length = scanner->cursor - start_pos;
     }
 
-    return status;
-}
-
-/************************************************************************
-* Function: skip_to_end_of_header
-*
-* Parameters:
-*	INOUT scanner_t* scanner ; Scanner Object
-*
-* Description: Skip to end of header
-*
-* Returns:
-*   PARSE_OK
-*   PARSE_FAILURE
-*   PARSE_INCOMPLETE
-************************************************************************/
-#warning There are currently no uses of the function 'skip_to_end_of_header()' in the code.
-#warning 'skip_to_end_of_header()' is a candidate for removal.
-static UPNP_INLINE int
-skip_to_end_of_header( INOUT scanner_t * scanner )
-{
-    memptr dummy_raw_value;
-    parse_status_t status;
-
-    status = match_raw_value( scanner, &dummy_raw_value );
     return status;
 }
 

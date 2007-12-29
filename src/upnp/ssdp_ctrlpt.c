@@ -350,46 +350,6 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
 }
 
 /************************************************************************
-* Function : process_reply
-*
-* Parameters:
-*	IN char* request_buf: the response came from the device
-*	IN int buf_len: The length of the response buffer
-*	IN struct sockaddr_in* dest_addr: The address of the device
-*	IN void *cookie : cookie passed by the control point application
-*		at the time of sending search message
-*
-* Description:
-*	This function processes reply recevied from a search
-*
-* Returns: void
-*
-***************************************************************************/
-#warning There are currently no uses of the function 'process_reply()' in the code.
-#warning 'process_reply()' is a candidate for removal.
-static UPNP_INLINE void
-process_reply( IN char *request_buf,
-               IN int buf_len,
-               IN struct sockaddr_in *dest_addr,
-               IN void *cookie )
-{
-    http_parser_t parser;
-
-    parser_response_init( &parser, HTTPMETHOD_MSEARCH );
-
-    // parse
-    if( parser_append( &parser, request_buf, buf_len ) != PARSE_SUCCESS ) {
-        httpmsg_destroy( &parser.msg );
-        return;
-    }
-    // handle reply
-    ssdp_handle_ctrlpt_msg( &parser.msg, dest_addr, FALSE, cookie );
-
-    // done
-    httpmsg_destroy( &parser.msg );
-}
-
-/************************************************************************
 * Function : CreateClientRequestPacket
 *
 * Parameters:
