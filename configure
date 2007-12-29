@@ -9,9 +9,9 @@
 unset foo
 (: ${foo%%bar}) 2>/dev/null && ! (: ${foo?}) 2>/dev/null
 if test "$?" != 0; then
-    if test "x$OMC_CONFIGURE_EXEC" = x; then
-        OMC_CONFIGURE_EXEC=1
-        export OMC_CONFIGURE_EXEC
+    if test "x$LIBDLNA_CONFIGURE_EXEC" = x; then
+        LIBDLNA_CONFIGURE_EXEC=1
+        export LIBDLNA_CONFIGURE_EXEC
         exec bash "$0" "$@"
         exec ksh "$0" "$@"
         exec /usr/xpg4/bin/sh "$0" "$@"
