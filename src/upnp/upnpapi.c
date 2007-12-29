@@ -4169,7 +4169,7 @@ UpnpIsWebserverEnabled()
  *	UPNP_E_SUCCESS on success, or UPNP_E_INVALID_PARAM
  ***************************************************************************/
 int
-UpnpSetVirtualDirCallbacks( IN struct UpnpVirtualDirCallbacks *callbacks )
+UpnpSetVirtualDirCallbacks( IN struct UpnpVirtualDirCallbacks *callbacks, IN void *cookie )
 {
     struct UpnpVirtualDirCallbacks *pCallback;
 
@@ -4183,6 +4183,7 @@ UpnpSetVirtualDirCallbacks( IN struct UpnpVirtualDirCallbacks *callbacks )
     if( callbacks == NULL )
         return UPNP_E_INVALID_PARAM;
 
+    pCallback->cookie = cookie;
     pCallback->get_info = callbacks->get_info;
     pCallback->open = callbacks->open;
     pCallback->close = callbacks->close;

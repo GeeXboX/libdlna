@@ -945,9 +945,12 @@ typedef void *UpnpWebFileHandle;
  */
 struct UpnpVirtualDirCallbacks
 {
+  void *cookie;
+  
   /** Called by the web server to query information on a file.  The callback
    *  should return 0 on success or -1 on an error. */
   int (*get_info) (
+    IN void *cookie,
     IN  const char *filename,     /** The name of the file to query. */
     OUT struct File_Info *info    /** Pointer to a structure to store the 
                                       information on the file. */
@@ -957,6 +960,7 @@ struct UpnpVirtualDirCallbacks
    *  a valid handle if the file can be opened.  Otherwise, it should return
    *  {\tt NULL} to signify an error. */
   UpnpWebFileHandle (*open)(
+    IN void *cookie,
     IN const char *filename,       /** The name of the file to open. */ 
     IN enum UpnpOpenFileMode Mode  /** The mode in which to open the file. 
                                        Valid values are {\tt UPNP_READ} or 
@@ -975,6 +979,7 @@ struct UpnpVirtualDirCallbacks
    *    \end{itemzie}
    */
    int (*read) (
+     IN void *cookie,
      IN UpnpWebFileHandle fileHnd,  /** The handle of the file to read. */
      OUT char *buf,                 /** The buffer in which to place the 
 				        data. */
@@ -988,6 +993,7 @@ struct UpnpVirtualDirCallbacks
    *  which might be less than {\bf buflen} in the case of a write error.
    */
    int (*write) (
+     IN void *cookie,
      IN UpnpWebFileHandle fileHnd, /** The handle of the file to write. */
      IN char *buf,                 /** The buffer with the bytes to write. */
      IN size_t buflen              /** The number of bytes to write. */
@@ -1005,6 +1011,7 @@ struct UpnpVirtualDirCallbacks
    *  should return 0 on a successful seek or a non-zero value on an error.
    */
    int (*seek) (
+     IN void *cookie,
      IN UpnpWebFileHandle fileHnd,  /** The handle of the file to move the 
                                         file pointer. */
      IN off_t offset,                /** The number of bytes to move in the 
@@ -1026,6 +1033,7 @@ struct UpnpVirtualDirCallbacks
     *  error.
     */
    int (*close) (
+     IN void *cookie,
      IN UpnpWebFileHandle fileHnd   /** The handle of the file to close. */
      );
 
@@ -2659,11 +2667,11 @@ EXPORT_SPEC int UpnpSetWebServerRootDir(
  */
 
 EXPORT_SPEC int UpnpSetVirtualDirCallbacks(
-    IN struct UpnpVirtualDirCallbacks *callbacks /** Pointer to a structure 
+    IN struct UpnpVirtualDirCallbacks *callbacks, /** Pointer to a structure 
                                                      containing points to the 
                                                      virtual interface 
                                                      functions. */
-    );
+    IN void *cookie);
 
 /** {\bf UpnpEnableWebServer} enables or disables the webserver.  A value of
  *  {\tt TRUE} enables the webserver, {\tt FALSE} disables it.

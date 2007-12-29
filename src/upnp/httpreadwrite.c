@@ -354,7 +354,7 @@ http_SendMessage( IN SOCKINFO * info,
             // file name
             filename = va_arg(argp, char *);
             if( Instr && Instr->IsVirtualFile ) {
-                Fp = (virtualDirCallback.open)( filename, UPNP_READ );
+                Fp = (virtualDirCallback.open)(virtualDirCallback.cookie, filename, UPNP_READ );
             } else  {
                 Fp = fopen( filename, "rb" );
             }
@@ -364,7 +364,7 @@ http_SendMessage( IN SOCKINFO * info,
             }
 
             if( Instr && Instr->IsRangeActive && Instr->IsVirtualFile ) {
-                if( virtualDirCallback.seek( Fp, Instr->RangeOffset,
+                if( virtualDirCallback.seek(virtualDirCallback.cookie, Fp, Instr->RangeOffset,
                                              SEEK_CUR ) != 0 ) {
                     free( ChunkBuf );
                     return UPNP_E_FILE_READ_ERROR;
@@ -381,7 +381,7 @@ http_SendMessage( IN SOCKINFO * info,
                     int n = (amount_to_be_read >= Data_Buf_Size) ?
                         Data_Buf_Size : amount_to_be_read;
                     if( Instr->IsVirtualFile ) {
-                        num_read = virtualDirCallback.read( Fp, file_buf, n );
+                        num_read = virtualDirCallback.read(virtualDirCallback.cookie, Fp, file_buf, n );
                     } else {
                         num_read = fread( file_buf, 1, n, Fp );
                     }
@@ -446,7 +446,7 @@ http_SendMessage( IN SOCKINFO * info,
 Cleanup_File:
             va_end( argp );
             if( Instr && Instr->IsVirtualFile ) {
-                virtualDirCallback.close( Fp );
+                virtualDirCallback.close(virtualDirCallback.cookie, Fp );
 	    } else {
                 fclose( Fp );
 	    }

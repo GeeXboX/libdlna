@@ -1282,7 +1282,7 @@ process_request( IN http_message_t * req,
         if( req->method != HTTPMETHOD_POST ) {
             // get file info
             pVirtualDirCallback = &virtualDirCallback;
-            if( pVirtualDirCallback->get_info( filename->buf, &finfo ) !=
+            if( pVirtualDirCallback->get_info(virtualDirCallback.cookie, filename->buf, &finfo ) !=
                 0 ) {
                 err_code = HTTP_NOT_FOUND;
                 goto error_handler;
@@ -1299,7 +1299,7 @@ process_request( IN http_message_t * req,
                 }
                 // get info
                 if( ( pVirtualDirCallback->
-                      get_info( filename->buf, &finfo ) != UPNP_E_SUCCESS )
+                      get_info(virtualDirCallback.cookie, filename->buf, &finfo ) != UPNP_E_SUCCESS )
                     || finfo.is_directory ) {
                     err_code = HTTP_NOT_FOUND;
                     goto error_handler;
@@ -1531,7 +1531,7 @@ http_RecvPostMessage( http_parser_t * parser,
 
     if( Instr && Instr->IsVirtualFile ) {
 
-        Fp = (virtualDirCallback.open)( filename, UPNP_WRITE );
+        Fp = (virtualDirCallback.open)(virtualDirCallback.cookie, filename, UPNP_WRITE );
         if( Fp == NULL ) {
             return HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -1611,9 +1611,9 @@ http_RecvPostMessage( http_parser_t * parser,
         entity_offset += Data_Buf_Size;
 
         if( Instr->IsVirtualFile ) {
-            Num_Write = virtualDirCallback.write( Fp, Buf, Data_Buf_Size );
+            Num_Write = virtualDirCallback.write(virtualDirCallback.cookie, Fp, Buf, Data_Buf_Size );
             if( Num_Write < 0 ) {
-                virtualDirCallback.close( Fp );
+                virtualDirCallback.close(virtualDirCallback.cookie, Fp );
                 return HTTP_INTERNAL_SERVER_ERROR;
             }
         } else {
@@ -1628,7 +1628,7 @@ http_RecvPostMessage( http_parser_t * parser,
              || ( entity_offset != parser->msg.entity.length ) );
 
     if( Instr->IsVirtualFile ) {
-        virtualDirCallback.close( Fp );
+        virtualDirCallback.close(virtualDirCallback.cookie, Fp );
     } else {
         fclose( Fp );
     }

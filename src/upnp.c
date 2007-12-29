@@ -295,7 +295,7 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
 
   UpnpEnableWebserver (TRUE);
 
-  res = UpnpSetVirtualDirCallbacks (&virtual_dir_callbacks);
+  res = UpnpSetVirtualDirCallbacks (&virtual_dir_callbacks, dlna);
   if (res != UPNP_E_SUCCESS)
   {
     dlna_log (dlna, DLNA_MSG_CRITICAL,

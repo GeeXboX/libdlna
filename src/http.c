@@ -31,21 +31,24 @@
 #include "upnp_internals.h"
 
 static int
-upnp_http_get_info (const char *filename dlna_unused,
+upnp_http_get_info (void *cookie dlna_unused,
+                    const char *filename dlna_unused,
                     struct File_Info *info dlna_unused)
 {
   return 0;
 }
 
 static UpnpWebFileHandle
-upnp_http_open (const char *filename dlna_unused,
+upnp_http_open (void *cookie dlna_unused,
+                const char *filename dlna_unused,
                 enum UpnpOpenFileMode mode dlna_unused)
 {
   return NULL;
 }
 
 static int
-upnp_http_read (UpnpWebFileHandle fh dlna_unused,
+upnp_http_read (void *cookie dlna_unused,
+                UpnpWebFileHandle fh dlna_unused,
                 char *buf dlna_unused,
                 size_t buflen dlna_unused)
 {
@@ -53,7 +56,8 @@ upnp_http_read (UpnpWebFileHandle fh dlna_unused,
 }
 
 static int
-upnp_http_write (UpnpWebFileHandle fh dlna_unused,
+upnp_http_write (void *cookie dlna_unused,
+                 UpnpWebFileHandle fh dlna_unused,
                  char *buf dlna_unused,
                  size_t buflen dlna_unused)
 {
@@ -61,7 +65,8 @@ upnp_http_write (UpnpWebFileHandle fh dlna_unused,
 }
 
 static int
-upnp_http_seek (UpnpWebFileHandle fh dlna_unused,
+upnp_http_seek (void *cookie dlna_unused,
+                UpnpWebFileHandle fh dlna_unused,
                 off_t offset dlna_unused,
                 int origin dlna_unused)
 {
@@ -69,12 +74,14 @@ upnp_http_seek (UpnpWebFileHandle fh dlna_unused,
 }
 
 static int
-upnp_http_close (UpnpWebFileHandle fh dlna_unused)
+upnp_http_close (void *cookie dlna_unused,
+                 UpnpWebFileHandle fh dlna_unused)
 {
   return 0;
 }
 
 struct UpnpVirtualDirCallbacks virtual_dir_callbacks = {
+  NULL,
   upnp_http_get_info,
   upnp_http_open,
   upnp_http_read,
