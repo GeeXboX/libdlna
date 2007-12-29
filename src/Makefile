@@ -96,7 +96,8 @@ lib_static_info_post:
 	@echo "#############################################"
 
 lib_static: lib_static_info_pre $(OBJS) $(IXML_OBJS) $(THREADUTIL_OBJS) $(UPNP_OBJS) lib_static_info_post
-	$(AR) r $(LIBNAME_STATIC) $(OBJS) $(IXML_OBJS) $(THREADUTIL_OBJS) $(UPNP_OBJS)
+	$(AR) r $(LIBNAME_STATIC) $(OBJS) \
+	  $(IXML_OBJS) $(THREADUTIL_OBJS) $(UPNP_OBJS)
 	$(RANLIB) $(LIBNAME_STATIC)
 
 lib_shared_info_pre:
@@ -112,7 +113,8 @@ lib_shared_info_post:
 	@echo "#############################################"
 
 lib_shared: lib_shared_info_pre $(LOBJS) $(IXML_LOBJS) $(THREADUTIL_LOBJS) $(UPNP_LOBJS) lib_shared_info_post
-	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(LOBJS) $(IXML_LOBJS) $(THREADUTIL_LOBJS) $(UPNP_LOBJS) \
+	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(LOBJS) \
+	  $(IXML_LOBJS) $(THREADUTIL_LOBJS) $(UPNP_LOBJS) \
 	  $(LDFLAGS) $(EXTRALIBS) -o $(LIBNAME_VERSION)
 	$(LN) -sf $(LIBNAME_VERSION) $(LIBNAME_MAJOR)
 	$(LN) -sf $(LIBNAME_MAJOR) $(LIBNAME_SHARED)
@@ -139,7 +141,8 @@ install: $(INSTALL_RULES)
 	$(INSTALL) -m 644 dlna.h $(includedir)
 
 depend:
-	$(CC) -MM $(CFLAGS) $(SRCS) $(IXML_SRCS) $(THREADUTIL_SRCS) $(UPNP_SRCS) 1>.depend
+	$(CC) -MM $(CFLAGS) $(SRCS) \
+	  $(IXML_SRCS) $(THREADUTIL_SRCS) $(UPNP_SRCS) 1>.depend
 
 .PHONY: clean depend
 
