@@ -30,8 +30,8 @@
 
 #include "dlna.h"
 
-#include <upnp/upnp.h>
-#include <upnp/upnptools.h>
+#include "upnp/upnp.h"
+#include "upnp/upnptools.h"
 
 typedef enum {
   DLNA_DEVICE_UNKNOWN,
