@@ -27,17 +27,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
-#include <limits.h>
+
+#include <ffmpeg/common.h>
 
 #include "upnp_internals.h"
-
-#ifndef MAX
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
 
 typedef enum {
   HTTP_ERROR = -1,
@@ -199,7 +192,7 @@ upnp_http_read (void *cookie,
     break; /* not yet implemented */
   case HTTP_FILE_MEMORY:
     dlna_log (dlna, DLNA_MSG_INFO, "Read file from memory.\n");
-    len = (ssize_t) MIN (buflen, hdl->detail.memory.len - hdl->pos);
+    len = (ssize_t) FFMIN (buflen, hdl->detail.memory.len - hdl->pos);
     memcpy (buf, hdl->detail.memory.content + hdl->pos, (ssize_t) len);
     break;
   default:
