@@ -25,6 +25,7 @@
 #include "dlna_internals.h"
 #include "cms.h"
 #include "cds.h"
+#include "avts.h"
 
 #define UPNP_MAX_CONTENT_LENGTH 4096
 #define VIRTUAL_DIR "/web"

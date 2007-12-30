@@ -45,6 +45,7 @@ SRCS =  \
 	upnp.c \
 	cms.c \
 	cds.c \
+	avts.c \
 	http.c \
 	upnp_dms.c \
 
@@ -56,6 +57,7 @@ EXTRADIST = \
 	profiles.h \
 	cms.h \
 	cds.h \
+	avts.h \
 
 ifeq ($(DEBUG),yes)
 CFLAGS += -DHAVE_DEBUG

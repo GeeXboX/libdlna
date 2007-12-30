@@ -44,6 +44,7 @@
 
 extern upnp_service_action_t cms_service_actions[];
 extern upnp_service_action_t cds_service_actions[];
+extern upnp_service_action_t avts_service_actions[];
 
 static upnp_service_t upnp_av_services[] = {
   /* Connection Manager Service (CMS) */
@@ -57,6 +58,12 @@ static upnp_service_t upnp_av_services[] = {
     CDS_SERVICE_ID,
     CDS_SERVICE_TYPE,
     cds_service_actions
+  },
+  /* AVTransport Service (AVTS) */
+  {
+    AVTS_SERVICE_ID,
+    AVTS_SERVICE_TYPE,
+    avts_service_actions
   },
   { NULL, NULL, NULL }
 };
