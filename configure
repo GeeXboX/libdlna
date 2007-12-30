@@ -644,12 +644,12 @@ check_ld <<EOF
 #include <stdio.h>
 #include <dlna.h>
 int main(){
-  printf(DLNA_STRINGIFY(LIBDLNA_VERSION));
+  printf("LIBDLNA_VERSION:"DLNA_STRINGIFY(LIBDLNA_VERSION));
   printf("\n");
   return 0;
 }
 EOF
-VERSION=`$TMPE`
+VERSION=`strings $TMPE | sed -n -e 's,LIBDLNA_VERSION:,,p'`
 restore_flags
 
 
