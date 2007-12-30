@@ -27,6 +27,7 @@
 #include "cds.h"
 #include "avts.h"
 
+#define SERVICE_CONTENT_TYPE "text/xml"
 #define UPNP_MAX_CONTENT_LENGTH 4096
 #define VIRTUAL_DIR "/web"
 
