@@ -96,16 +96,16 @@ dlna_dms_description_get (const char *friendly_name,
     + strlen (model_description) + strlen (model_name)
     + strlen (model_number) + strlen (model_url) + strlen (serial_number)
     + strlen (uuid) +
-    + strlen (VIRTUAL_DIR) + strlen (presentation_url) +
-    + strlen (VIRTUAL_DIR) + strlen (CMS_URL) +
-    + strlen (VIRTUAL_DIR) + strlen (CMS_CONTROL_URL) +
-    + strlen (VIRTUAL_DIR) + strlen (CMS_EVENT_URL) +
-    + strlen (VIRTUAL_DIR) + strlen (CDS_URL) +
-    + strlen (VIRTUAL_DIR) + strlen (CDS_CONTROL_URL) +
-    + strlen (VIRTUAL_DIR) + strlen (CDS_EVENT_URL) +
-    + strlen (VIRTUAL_DIR) + strlen (AVTS_URL) +
-    + strlen (VIRTUAL_DIR) + strlen (AVTS_CONTROL_URL) +
-    + strlen (VIRTUAL_DIR) + strlen (AVTS_EVENT_URL) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (presentation_url) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (CMS_URL) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (CMS_CONTROL_URL) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (CMS_EVENT_URL) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (CDS_URL) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (CDS_CONTROL_URL) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (CDS_EVENT_URL) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (AVTS_URL) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (AVTS_CONTROL_URL) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (AVTS_EVENT_URL) +
     1;
 
   desc = malloc (len);
@@ -113,16 +113,16 @@ dlna_dms_description_get (const char *friendly_name,
   sprintf (desc, UPNP_DMS_DESCRIPTION, friendly_name,
            manufacturer, manufacturer_url, model_description,
            model_name, model_number, model_url, serial_number, uuid,
-           VIRTUAL_DIR, presentation_url,
-           VIRTUAL_DIR, CMS_URL,
-           VIRTUAL_DIR, CMS_CONTROL_URL,
-           VIRTUAL_DIR, CMS_EVENT_URL,
-           VIRTUAL_DIR, CDS_URL,
-           VIRTUAL_DIR, CDS_CONTROL_URL,
-           VIRTUAL_DIR, CDS_EVENT_URL,
-           VIRTUAL_DIR, AVTS_URL,
-           VIRTUAL_DIR, AVTS_CONTROL_URL,
-           VIRTUAL_DIR, AVTS_EVENT_URL);
+           SERVICES_VIRTUAL_DIR, presentation_url,
+           SERVICES_VIRTUAL_DIR, CMS_URL,
+           SERVICES_VIRTUAL_DIR, CMS_CONTROL_URL,
+           SERVICES_VIRTUAL_DIR, CMS_EVENT_URL,
+           SERVICES_VIRTUAL_DIR, CDS_URL,
+           SERVICES_VIRTUAL_DIR, CDS_CONTROL_URL,
+           SERVICES_VIRTUAL_DIR, CDS_EVENT_URL,
+           SERVICES_VIRTUAL_DIR, AVTS_URL,
+           SERVICES_VIRTUAL_DIR, AVTS_CONTROL_URL,
+           SERVICES_VIRTUAL_DIR, AVTS_EVENT_URL);
 
   return desc;
 }

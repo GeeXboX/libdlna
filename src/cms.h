@@ -88,7 +88,7 @@
 
 #define CMS_DESCRIPTION_LEN strlen (CMS_DESCRIPTION)
 
-#define CMS_LOCATION "/web/cms.xml"
+#define CMS_LOCATION "/services/cms.xml"
 
 #define CMS_SERVICE_ID   "urn:upnp-org:serviceId:ConnectionManager"
 #define CMS_SERVICE_TYPE "urn:schemas-upnp-org:service:ConnectionManager:1"

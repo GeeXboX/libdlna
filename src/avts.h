@@ -157,7 +157,7 @@
 
 #define AVTS_DESCRIPTION_LEN strlen (AVTS_DESCRIPTION)
 
-#define AVTS_LOCATION "/web/avts.xml"
+#define AVTS_LOCATION "/services/avts.xml"
 
 #define AVTS_SERVICE_ID   "urn:upnp-org:serviceId:ContentDirectory"
 #define AVTS_SERVICE_TYPE "urn:schemas-upnp-org:service:ContentDirectory:1"

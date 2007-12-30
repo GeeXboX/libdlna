@@ -89,7 +89,7 @@
 
 #define CDS_DESCRIPTION_LEN strlen (CDS_DESCRIPTION)
 
-#define CDS_LOCATION "/web/cds.xml"
+#define CDS_LOCATION "/services/cds.xml"
 
 #define CDS_SERVICE_ID   "urn:upnp-org:serviceId:ContentDirectory"
 #define CDS_SERVICE_TYPE "urn:schemas-upnp-org:service:ContentDirectory:1"
