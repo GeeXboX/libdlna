@@ -780,7 +780,7 @@ is_valid_video_profile (video_properties_t res[], int size,
   {
     if (res[i].width == vc->width &&
         res[i].height == vc->height &&
-        (vs->r_frame_rate.num / vs->r_frame_rate.num)
+        (vs->r_frame_rate.num / vs->r_frame_rate.den)
         <= (res[i].fps_num / res[i].fps_den))
       return 1;
   }
