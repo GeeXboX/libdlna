@@ -29,6 +29,7 @@ utils:
 clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C utils clean
+	-$(RM) -f IUpnpErrFile.txt IUpnpInfoFile.txt
 
 distclean: clean
 	-$(RM) -f config.log
