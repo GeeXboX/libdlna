@@ -35,6 +35,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 #include <inttypes.h>
+#include <sys/types.h>
 
 #define DLNA_STRINGIFY(s)         DLNA_TOSTRING(s)
 #define DLNA_TOSTRING(s) #s
@@ -294,6 +295,32 @@ dlna_item_t *dlna_item_new (dlna_t *dlna, const char *filename);
  * @param[in] item     The DLNA object item to be freed.
  */
 void dlna_item_free (dlna_item_t *item);
+
+/**
+ * Add a new container to the VFS layer.
+ *
+ * @param[in] dlna         The DLNA library's controller.
+ * @param[in] name         Displayed name of the container.
+ * @param[in] id           Expected UPnP object ID.
+ * @param[in] container_id UPnP object ID of its parent.
+ * @return The attrbiuted UPnP object ID if successfull, 0 otherwise.
+ */
+uint32_t dlna_vfs_add_container (dlna_t *dlna, char *name,
+                                 uint32_t id, uint32_t container_id);
+
+/**
+ * Add a new resource to the VFS layer.
+ *
+ * @param[in] dlna         The DLNA library's controller.
+ * @param[in] name         Displayed name of the resource.
+ * @param[in] fullname     Full path to the specified resource.
+ * @param[in] size         Resource file size (in bytes).
+ * @param[in] container_id UPnP object ID of its parent.
+ * @return The attrbiuted UPnP object ID if successfull, 0 otherwise.
+ */
+uint32_t dlna_vfs_add_resource (dlna_t *dlna, char *name,
+                                char *fullpath, off_t size,
+                                uint32_t container_id);
 
 /**
  * Provides UPnP A/V ContentDirectory Object Item associated to profile.

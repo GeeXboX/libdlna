@@ -21,16 +21,70 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <libgen.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <string.h>
 
 #include "dlna.h"
+
+static void
+add_dir (dlna_t *dlna, char *dir, uint32_t id)
+{
+  struct dirent **namelist;
+  int n, i;
+
+  n = scandir (dir, &namelist, 0, alphasort);
+  if (n < 0)
+  {
+    perror ("scandir");
+    return;
+  }
+
+  for (i = 0; i < n; i++)
+  {
+    struct stat st;
+    char *fullpath = NULL;
+
+    if (namelist[i]->d_name[0] == '.')
+    {
+      free (namelist[i]);
+      continue;
+    }
+
+    fullpath = malloc (strlen (dir) + strlen (namelist[i]->d_name) + 2);
+    sprintf (fullpath, "%s/%s", dir, namelist[i]->d_name);
+
+    if (stat (fullpath, &st) < 0)
+    {
+      free (namelist[i]);
+      free (fullpath);
+      continue;
+    }
+
+    if (S_ISDIR (st.st_mode))
+    {
+      uint32_t cid;
+      cid = dlna_vfs_add_container (dlna, fullpath, 0, id);
+      add_dir (dlna, fullpath, cid);
+    }
+    else
+      dlna_vfs_add_resource (dlna, basename (fullpath),
+                             fullpath, st.st_size, id);
+    
+    free (namelist[i]);
+    free (fullpath);
+  }
+  free (namelist);
+}
 
 int
 main (int argc, char **argv)
 {
   dlna_t *dlna;
   int c;
-  argc = 0;
-  argv = NULL;
   
   printf ("libdlna Digital Media Server (DMS) API example\n");
   printf ("Using %s\n", LIBDLNA_IDENT);
@@ -56,6 +110,26 @@ main (int argc, char **argv)
     return -1;
   }
 
+  if (argc > 1)
+  {
+    int i;
+
+    for (i = 1; i < argc; i++)
+    {
+      struct stat st;
+
+      if (stat (argv[i], &st) < 0)
+        continue;
+      
+      printf ("Trying to share '%s'\n", argv[i]);
+      if (S_ISDIR (st.st_mode))
+        add_dir (dlna, argv[i], 0);
+      else
+        dlna_vfs_add_resource (dlna, basename (argv[i]),
+                               argv[i], st.st_size, 0);
+    }
+  }
+  
   printf ("Hit 'q' or 'Q' + Enter to shutdown\n");
   while (1)
   {

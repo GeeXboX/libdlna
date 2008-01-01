@@ -39,6 +39,35 @@ typedef enum {
   DLNA_DEVICE_DMP,      /* Digital Media Player */
 } dlna_device_type_t;
 
+typedef struct vfs_item_s {
+  uint32_t id;
+  char *title;
+
+  enum {
+    DLNA_RESOURCE,
+    DLNA_CONTAINER
+  } type;
+
+  union {
+    struct {
+      dlna_item_t *item;
+      dlna_org_conversion_t cnv;
+      char *fullpath;
+      char *url;
+      off_t size;
+      int fd;
+    } resource;
+    struct {
+      struct vfs_item_s **children;
+      uint32_t children_count;
+    } container;
+  } u;
+
+  struct vfs_item_s *parent;
+} vfs_item_t;
+
+void vfs_item_free (vfs_item_t *item);
+
 /**
  * DLNA Library's controller.
  * This controls the whole library.
@@ -53,6 +82,10 @@ struct dlna_s {
   /* linked-list of registered DLNA profiles */
   void *first_profile;
 
+  /* VFS for Content Directory */
+  vfs_item_t *vfs_root;
+  uint32_t vfs_items;
+  
   /* UPnP Properties */
   char *interface;
   unsigned short port; /* server port */

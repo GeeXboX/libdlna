@@ -57,6 +57,11 @@ dlna_init (void)
   dlna->inited = 1;
   dlna->verbosity = DLNA_MSG_ERROR;
   dlna->first_profile = NULL;
+
+  dlna->vfs_root = NULL;
+  dlna->vfs_items = 0;
+  dlna_vfs_add_container (dlna, "root", 0, 0);
+  
   dlna->interface = strdup ("lo"); /* bind to loopback as a default */
   
   /* UPnP Properties */
@@ -87,6 +92,7 @@ dlna_uninit (dlna_t *dlna)
   dlna->inited = 0;
   dlna_log (dlna, DLNA_MSG_INFO, "DLNA: uninit\n");
   dlna->first_profile = NULL;
+  vfs_item_free (dlna->vfs_root);
   free (dlna->interface);
 
   /* UPnP Properties */

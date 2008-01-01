@@ -43,6 +43,7 @@ SRCS =  \
 	av_wmv9.c \
 	dlna.c \
 	upnp.c \
+	vfs.c \
 	cms.c \
 	cds.c \
 	avts.c \
