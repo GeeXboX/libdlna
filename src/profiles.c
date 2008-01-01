@@ -1,6 +1,6 @@
 /*
  * libdlna: reference DLNA standards implementation.
- * Copyright (C) 2007 Benjamin Zores <ben@geexbox.org>
+ * Copyright (C) 2007-2008 Benjamin Zores <ben@geexbox.org>
  *
  * This file is part of libdlna.
  *

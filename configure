@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# libdlna configure script - (c) 2007 Benjamin Zores
+# libdlna configure script - (c) 2007-2008 Benjamin Zores
 #
 #  (fully inspirated from ffmpeg configure script, thanks to Fabrice Bellard)
 #
