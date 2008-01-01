@@ -8,6 +8,8 @@ config.log
 config.mak
 TAGS
 tags
+IUpnpErrFile.txt
+IUpnpInfoFile.txt
 dlna-profiler$
 dlna-dms$
 ^libdlna.pc
