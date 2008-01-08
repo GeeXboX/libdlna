@@ -317,8 +317,10 @@ dlna_item_get_properties (AVFormatContext *ctx)
   min = (int) ((duration - (hours * 3600)) / 60);
   sec = (int) (duration - (hours * 3600) - (min * 60));
   memset (prop->duration, '\0', 64);
-  sprintf (prop->duration, "%s:%.2d:%.2d.",
-           hours ? (char *) hours : "", min, sec);
+  if (hours)
+    sprintf (prop->duration, "%d:%.2d:%.2d.", hours, min, sec);
+  else
+    sprintf (prop->duration, ":%.2d:%.2d.", min, sec);
 
   prop->bitrate = (uint32_t) (ctx->bit_rate / 8);
   prop->sample_frequency = codecs->ac ? codecs->ac->sample_rate : 0;
