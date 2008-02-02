@@ -23,7 +23,7 @@ all: lib utils
 lib:
 	$(MAKE) -C src
 
-utils:
+utils: lib
 	$(MAKE) -C utils
 
 clean:
