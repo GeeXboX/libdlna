@@ -1,32 +1,20 @@
 #!/usr/bin/make -f
 
 include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/makefile.mk
 
-DEB_DH_INSTALL_SOURCEDIR:=debian/tmp
+DEB_DH_INSTALL_SOURCEDIR := debian/tmp
+DEB_INSTALL_CHANGELOGS_ALL := ChangeLog
 
-common-configure-arch common-configure-indep:: debian/stamp-autotools-files
-debian/stamp-autotools-files:
-	./configure --enable-debug --prefix=/usr
-	touch $@
+# make targets
+DEB_MAKE_CLEAN_TARGET    := distclean
+DEB_MAKE_BUILD_TARGET    := -C src
+DEB_MAKE_INSTALL_TARGET  := install DESTDIR=$(DEB_DESTDIR)
 
-common-build-arch common-build-indep:: debian/stamp-makefile-build
-debian/stamp-makefile-build:
-	$(MAKE) -C src
-	touch $@
+# configure options
+DEB_CONFIGURE_NORMAL_ARGS += --enable-debug
+DEB_CONFIGURE_NORMAL_ARGS += --enable-static
+DEB_CONFIGURE_PREFIXS     += --prefix=/usr
 
-common-install-arch common-install-indep:: common-install-impl
-common-install-impl::
-	$(MAKE) install DESTDIR=$(DEB_DESTDIR)
-
-clean::
-	[ ! -f config.mak ] || $(MAKE) distclean
-	-$(RM) -f debian/stamp-autotools-files
-	-$(RM) -f debian/stamp-makefile-build
-
-
-# used to build a debian package
-#  run 'debian/rules dpkg-buildpackage'
-dpkg-buildpackage:
-	dpkg-buildpackage -rfakeroot -i"\.hg|.*\.kdevelop.*"
-
-.PHONY: dpkg-buildpackage
+configure/libdlna0 configure/libdlna-dev::
+	[ -f config.mak ] || ./configure $(DEB_CONFIGURE_NORMAL_ARGS) $(DEB_CONFIGURE_PREFIXS)

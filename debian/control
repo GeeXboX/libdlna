@@ -1,11 +1,12 @@
 Source: libdlna
-Priority: extra
+Section: libs
+Priority: optional
 Maintainer: Ubuntu MOTU Developers <ubuntu-motu@lists.ubuntu.com>
 Uploaders: Alexis Saettler <alexis@saettler.org>
 XSBC-Original-Maintainer: Alexis Saettler <alexis@saettler.org>
+Homepage: http://libdlna.geexbox.org
 Build-Depends: debhelper (>= 5), cdbs (>= 0.4.23-1.1), libavcodec-dev, libavformat-dev
-Standards-Version: 3.7.2
-Section: libs
+Standards-Version: 3.7.3
 
 Package: libdlna-dev
 Section: libdevel
@@ -22,8 +23,6 @@ Description: development files for libdlna
  .
  The libdlna-dev package contains the header files, and
  debug versions of library.
- .
- More informations on http://libdlna.geexbox.org
 
 Package: libdlna0
 Section: libs
@@ -40,5 +39,3 @@ Description: DLNA codec library
  to handle and demux A/V streams.
  .
  The libdlna0 package contains the runtime libraries for uPnP.
- .
- More informations on http://libdlna.geexbox.org
