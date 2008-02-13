@@ -349,7 +349,7 @@ void UpnpDisplayBanner(
 {
 	int leftMarginLength = starLength / 2 + 1;
 	int rightMarginLength = starLength / 2 + 1;
-	int i = 0;
+	unsigned int i = 0;
 	int LineSize = 0;
 	int starLengthMinus2 = starLength - 2;
 

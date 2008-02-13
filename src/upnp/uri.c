@@ -397,7 +397,7 @@ void print_uri( uri_type *in )
 #ifdef DEBUG
 void print_token(token * in)
 {
-    int i = 0;
+    unsigned int i = 0;
     printf( "Token Size : %"PRIzu"\n\'", in->size );
     for( i = 0; i < in->size; i++ ) {
         putchar( in->buff[i] );
