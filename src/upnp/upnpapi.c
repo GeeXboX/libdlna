@@ -264,6 +264,8 @@ int UpnpInit( IN const char *HostIP,
         return UPNP_E_INIT_FAILED;
     }
 
+    TPAttrSetMinThreads( &attr, 4 );
+    
     if( ThreadPoolInit( &gMiniServerThreadPool, &attr ) != UPNP_E_SUCCESS ) {
         UpnpSdkInit = 0;
         UpnpFinish();
