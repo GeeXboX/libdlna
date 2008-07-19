@@ -99,6 +99,7 @@ main (int argc, char **argv)
   dlna = dlna_init ();
   dlna_set_org_flags (dlna, flags);
   dlna_set_verbosity (dlna, DLNA_MSG_INFO);
+  dlna_set_capability_mode (dlna, DLNA_CAPABILITY_UPNP_AV);
   dlna_set_extension_check (dlna, 1);
   dlna_register_all_media_profiles (dlna);
 

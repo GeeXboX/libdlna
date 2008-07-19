@@ -61,6 +61,13 @@ typedef enum {
   DLNA_MSG_CRITICAL,      /* prevents lib from working */
 } dlna_verbosity_level_t;
 
+/* DLNA Capability/Compatibility mode settings */
+typedef enum {
+  DLNA_CAPABILITY_DLNA,          /* comply with DLNA specifications */
+  DLNA_CAPABILITY_UPNP_AV,       /* comply with UPnP A/V specifications */
+  DLNA_CAPABILITY_UPNP_AV_XBOX,  /* UPnP A/V with XboX 360 hacks */
+} dlna_capability_mode_t;
+
 typedef enum {
   DLNA_PROTOCOL_INFO_TYPE_UNKNOWN,
   DLNA_PROTOCOL_INFO_TYPE_HTTP,
@@ -237,6 +244,18 @@ void dlna_uninit (dlna_t *dlna);
  * @param[in] level Level of verbosity
  */
 void dlna_set_verbosity (dlna_t *dlna, dlna_verbosity_level_t level);
+
+/**
+ * Set library's capability/compatibility mode.
+ *  N.B. Very few devices actualyl support DLNA specifications.
+ *       If you have any problem having your device regonized,
+ *       just downgrade to UPnP A/V compatibility mode which is just
+ *       a non-restricted mode of DLNA specifications.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] mode  Capability mode
+ */
+void dlna_set_capability_mode (dlna_t *dlna, dlna_capability_mode_t mode);
 
 /**
  * Set library's mask of flags.

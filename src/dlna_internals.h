@@ -78,6 +78,8 @@ struct dlna_s {
   int inited;
   /* defines verbosity level */
   dlna_verbosity_level_t verbosity;
+  /* defines capability mode */
+  dlna_capability_mode_t mode;
   /* defines flexibility on file extension's check */
   int check_extensions;
   /* linked-list of registered DLNA profiles */

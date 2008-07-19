@@ -56,6 +56,7 @@ dlna_init (void)
   dlna = malloc (sizeof (dlna_t));
   dlna->inited = 1;
   dlna->verbosity = DLNA_MSG_ERROR;
+  dlna->mode = DLNA_CAPABILITY_DLNA;
   dlna->first_profile = NULL;
   dlna->flags = 0;
 
@@ -138,6 +139,15 @@ dlna_set_verbosity (dlna_t *dlna, dlna_verbosity_level_t level)
     return;
 
   dlna->verbosity = level;
+}
+
+void
+dlna_set_capability_mode (dlna_t *dlna, dlna_capability_mode_t mode)
+{
+  if (!dlna)
+    return;
+
+  dlna->mode = mode;
 }
 
 void
