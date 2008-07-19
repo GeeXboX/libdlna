@@ -57,6 +57,7 @@ dlna_init (void)
   dlna->inited = 1;
   dlna->verbosity = DLNA_MSG_ERROR;
   dlna->mode = DLNA_CAPABILITY_DLNA;
+  dlna->check_extensions = 1;
   dlna->first_profile = NULL;
   dlna->flags = 0;
 
