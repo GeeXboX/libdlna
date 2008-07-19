@@ -102,7 +102,7 @@ vfs_provide_next_id (dlna_t *dlna)
   return 0;
 }
 
-static vfs_item_t *
+vfs_item_t *
 vfs_get_item_by_id (vfs_item_t *item, uint32_t id)
 {
   vfs_item_t **children;

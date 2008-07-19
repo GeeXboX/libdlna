@@ -66,6 +66,7 @@ typedef struct vfs_item_s {
   struct vfs_item_s *parent;
 } vfs_item_t;
 
+vfs_item_t *vfs_get_item_by_id (vfs_item_t *item, uint32_t id);
 void vfs_item_free (vfs_item_t *item);
 
 /**
