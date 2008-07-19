@@ -43,12 +43,56 @@
 #define SERVICE_CDS_ACTION_DELETE_RES         "DeleteResource"
 #define SERVICE_CDS_ACTION_CREATE_REF         "CreateReference"
 
+static int
+cds_get_search_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
+{
+  if (!dlna || !ev)
+    return 0;
+
+  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
+
+  return ev->status;
+}
+
+static int
+cds_get_sort_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
+{
+  if (!dlna || !ev)
+    return 0;
+
+  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
+
+  return ev->status;
+}
+
+static int
+cds_get_system_update_id (dlna_t *dlna, upnp_action_event_t *ev)
+{
+  if (!dlna || !ev)
+    return 0;
+
+  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
+
+  return ev->status;
+}
+
+static int
+cds_browse (dlna_t *dlna, upnp_action_event_t *ev)
+{
+  if (!dlna || !ev)
+    return 0;
+
+  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
+
+  return ev->status;
+}
+
 /* List of UPnP ContentDirectory Service actions */
 upnp_service_action_t cds_service_actions[] = {
-  { SERVICE_CDS_ACTION_SEARCH_CAPS,    NULL },
-  { SERVICE_CDS_ACTION_SORT_CAPS,      NULL },
-  { SERVICE_CDS_ACTION_UPDATE_ID,      NULL },
-  { SERVICE_CDS_ACTION_BROWSE,         NULL },
+  { SERVICE_CDS_ACTION_SEARCH_CAPS,    cds_get_search_capabilities },
+  { SERVICE_CDS_ACTION_SORT_CAPS,      cds_get_sort_capabilities },
+  { SERVICE_CDS_ACTION_UPDATE_ID,      cds_get_system_update_id },
+  { SERVICE_CDS_ACTION_BROWSE,         cds_browse },
   { SERVICE_CDS_ACTION_SEARCH,         NULL },
   { SERVICE_CDS_ACTION_CREATE_OBJ,     NULL },
   { SERVICE_CDS_ACTION_DESTROY_OBJ,    NULL },
