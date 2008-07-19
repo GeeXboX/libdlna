@@ -94,7 +94,7 @@ struct ErrorString ErrorMessages[] = { {UPNP_E_SUCCESS, "UPNP_E_SUCCESS"},
 const char *
 UpnpGetErrorMessage( IN int rc )
 {
-    int i;
+    unsigned int i;
 
     for( i = 0; i < sizeof( ErrorMessages ) / sizeof( ErrorMessages[0] );
          i++ ) {
