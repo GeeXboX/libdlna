@@ -82,6 +82,8 @@ struct dlna_s {
   int check_extensions;
   /* linked-list of registered DLNA profiles */
   void *first_profile;
+  /* DLNA flags*/
+  int flags;
 
   /* VFS for Content Directory */
   vfs_item_t *vfs_root;

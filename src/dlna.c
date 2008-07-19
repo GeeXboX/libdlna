@@ -57,6 +57,7 @@ dlna_init (void)
   dlna->inited = 1;
   dlna->verbosity = DLNA_MSG_ERROR;
   dlna->first_profile = NULL;
+  dlna->flags = 0;
 
   dlna->vfs_root = NULL;
   dlna->vfs_items = 0;
@@ -137,6 +138,15 @@ dlna_set_verbosity (dlna_t *dlna, dlna_verbosity_level_t level)
     return;
 
   dlna->verbosity = level;
+}
+
+void
+dlna_set_org_flags (dlna_t *dlna, dlna_org_flags_t flags)
+{
+  if (!dlna)
+    return;
+
+  dlna->flags = flags;
 }
 
 void

@@ -239,6 +239,14 @@ void dlna_uninit (dlna_t *dlna);
 void dlna_set_verbosity (dlna_t *dlna, dlna_verbosity_level_t level);
 
 /**
+ * Set library's mask of flags.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] flags Mask of flags to be set
+ */
+void dlna_set_org_flags (dlna_t *dlna, dlna_org_flags_t flags);
+
+/**
  * Set library's check level on files extension.
  *
  * @param[in] dlna  The DLNA library's controller.

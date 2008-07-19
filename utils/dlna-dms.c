@@ -84,13 +84,20 @@ int
 main (int argc, char **argv)
 {
   dlna_t *dlna;
+  dlna_org_flags_t flags;
   int c;
   
   printf ("libdlna Digital Media Server (DMS) API example\n");
   printf ("Using %s\n", LIBDLNA_IDENT);
 
+  flags = DLNA_ORG_FLAG_STREAMING_TRANSFER_MODE |
+    DLNA_ORG_FLAG_BACKGROUND_TRANSFERT_MODE |
+    DLNA_ORG_FLAG_CONNECTION_STALL |
+    DLNA_ORG_FLAG_DLNA_V15;
+  
   /* init DLNA stack */
   dlna = dlna_init ();
+  dlna_set_org_flags (dlna, flags);
   dlna_set_verbosity (dlna, DLNA_MSG_INFO);
   dlna_set_extension_check (dlna, 1);
   dlna_register_all_media_profiles (dlna);
