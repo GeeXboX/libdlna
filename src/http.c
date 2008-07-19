@@ -27,10 +27,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <string.h>
 
 #include <ffmpeg/common.h>
 
 #include "upnp_internals.h"
+
+#define PROTOCOL_TYPE_PRE_SZ  11   /* for the str length of "http-get:*:" */
+#define PROTOCOL_TYPE_SUFF_SZ 2    /* for the str length of ":*" */
 
 typedef enum {
   HTTP_ERROR = -1,
@@ -47,6 +51,7 @@ typedef struct http_file_handler_s {
   union {
     struct {
       int fd;
+      vfs_item_t *item;
     } local;
     struct {
       char *content;
@@ -73,7 +78,12 @@ upnp_http_get_info (void *cookie,
                     struct File_Info *info)
 {
   dlna_t *dlna;
-
+  uint32_t id;
+  vfs_item_t *item;
+  char *content_type;
+  char *protocol_info;
+  struct stat st;
+  
   if (!cookie || !filename || !info)
     return HTTP_ERROR;
 
@@ -104,7 +114,53 @@ upnp_http_get_info (void *cookie,
   }
 
   /* ask for anything else ... */
-  return HTTP_ERROR; /* not yet implemented so just bails out right now */
+  id = atoi (strrchr (filename, '/') + 1);
+  item = vfs_get_item_by_id (dlna->vfs_root, id);
+  if (!item)
+    return HTTP_ERROR;
+
+  if (item->type != DLNA_RESOURCE)
+    return HTTP_ERROR;
+
+  if (!item->u.resource.fullpath)
+    return HTTP_ERROR;
+
+  if (stat (item->u.resource.fullpath, &st) < 0)
+    return HTTP_ERROR;
+
+  info->is_readable = 1;
+  if (access (item->u.resource.fullpath, R_OK) < 0)
+  {
+    if (errno != EACCES)
+      return HTTP_ERROR;
+    info->is_readable = 0;
+  }
+
+  /* file exist and can be read */
+  info->file_length = st.st_size;
+  info->last_modified = st.st_mtime;
+  info->is_directory = S_ISDIR (st.st_mode);
+
+  protocol_info = 
+    dlna_write_protocol_info (DLNA_PROTOCOL_INFO_TYPE_HTTP,
+                              DLNA_ORG_PLAY_SPEED_NORMAL,
+                              DLNA_ORG_CONVERSION_NONE,
+                              DLNA_ORG_OPERATION_RANGE,
+                              dlna->flags, item->u.resource.item->profile);
+
+  content_type =
+    strndup ((protocol_info + PROTOCOL_TYPE_PRE_SZ),
+             strlen (protocol_info + PROTOCOL_TYPE_PRE_SZ)
+             - PROTOCOL_TYPE_SUFF_SZ);
+  free (protocol_info);
+
+  if (content_type)
+  {
+    info->content_type = ixmlCloneDOMString (content_type);
+    free (content_type);
+  }
+  else
+    info->content_type = ixmlCloneDOMString ("");
   
   return HTTP_OK;
 }
@@ -130,12 +186,41 @@ http_get_file_from_memory (const char *fullpath,
 }
 
 static UpnpWebFileHandle
+http_get_file_local (vfs_item_t *item)
+{
+  http_file_handler_t *hdl;
+  int fd;
+  
+  if (!item)
+    return NULL;
+
+  if (!item->u.resource.fullpath)
+    return NULL;
+  
+  fd = open (item->u.resource.fullpath,
+             O_RDONLY | O_NONBLOCK | O_SYNC | O_NDELAY);
+  if (fd < 0)
+    return NULL;
+  
+  hdl                        = malloc (sizeof (http_file_handler_t));
+  hdl->fullpath              = strdup (item->u.resource.fullpath);
+  hdl->pos                   = 0;
+  hdl->type                  = HTTP_FILE_LOCAL;
+  hdl->detail.local.fd       = fd;
+  hdl->detail.local.item     = item;
+
+  return ((UpnpWebFileHandle) hdl);
+}
+
+static UpnpWebFileHandle
 upnp_http_open (void *cookie,
                 const char *filename,
                 enum UpnpOpenFileMode mode)
 {
   dlna_t *dlna;
-
+  uint32_t id;
+  vfs_item_t *item;
+  
   if (!cookie || !filename)
     return NULL;
 
@@ -163,9 +248,12 @@ upnp_http_open (void *cookie,
                                       AVTS_DESCRIPTION, AVTS_DESCRIPTION_LEN);
   
   /* ask for anything else ... */
-  /* not yet implemented so just bails out right now */
-  
-  return NULL;
+  id = atoi (strrchr (filename, '/') + 1);
+  item = vfs_get_item_by_id (dlna->vfs_root, id);
+  if (!item)
+    return NULL;
+
+  return http_get_file_local (item);
 }
 
 static int
@@ -189,7 +277,9 @@ upnp_http_read (void *cookie,
   switch (hdl->type)
   {
   case HTTP_FILE_LOCAL:
-    break; /* not yet implemented */
+    dlna_log (dlna, DLNA_MSG_INFO, "Read local file.\n");
+    len = read (hdl->detail.local.fd, buf, buflen);
+    break;
   case HTTP_FILE_MEMORY:
     dlna_log (dlna, DLNA_MSG_INFO, "Read file from memory.\n");
     len = (ssize_t) FFMIN (buflen, hdl->detail.memory.len - hdl->pos);
@@ -256,8 +346,14 @@ upnp_http_seek (void *cookie,
 
     if (hdl->type == HTTP_FILE_LOCAL)
     {
-      /* not yet implemented */
-      return HTTP_ERROR;
+      struct stat sb;
+      if (stat (hdl->fullpath, &sb) < 0)
+      {
+        dlna_log (dlna, DLNA_MSG_ERROR,
+                  "%s: cannot stat: %s\n", hdl->fullpath, strerror (errno));
+        return HTTP_ERROR;
+      }
+      newpos = sb.st_size + offset;
     }
     else if (hdl->type == HTTP_FILE_MEMORY)
       newpos = hdl->detail.memory.len + offset;
@@ -267,8 +363,23 @@ upnp_http_seek (void *cookie,
   switch (hdl->type)
   {
   case HTTP_FILE_LOCAL:
-    /* not yet implemented */
-    return HTTP_ERROR;
+    /* Just make sure we cannot seek before start of file. */
+    if (newpos < 0)
+    {
+      dlna_log (dlna, DLNA_MSG_ERROR,
+                "%s: cannot seek: %s\n", hdl->fullpath, strerror (EINVAL));
+      return HTTP_ERROR;
+    }
+
+    /* Don't seek with origin as specified above, as file may have
+       changed in size since our last stat. */
+    if (lseek (hdl->detail.local.fd, newpos, SEEK_SET) == -1)
+    {
+      dlna_log (dlna, DLNA_MSG_ERROR,
+                "%s: cannot seek: %s\n", hdl->fullpath, strerror (errno));
+      return HTTP_ERROR;
+    }
+    break;
   case HTTP_FILE_MEMORY:
     if (newpos < 0 || newpos > hdl->detail.memory.len)
     {
@@ -302,7 +413,7 @@ upnp_http_close (void *cookie,
   switch (hdl->type)
   {
   case HTTP_FILE_LOCAL:
-    /* not yet implemented */
+    close (hdl->detail.local.fd);
     break;
   case HTTP_FILE_MEMORY:
     /* no close operation is needed, just free file content */
