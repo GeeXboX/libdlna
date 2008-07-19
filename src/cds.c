@@ -242,8 +242,9 @@ didl_add_item (dlna_t *dlna, buffer_t *out, vfs_item_t *item,
     if (filter_has_val (filter, "@"DIDL_RES_SIZE))
       didl_add_value (out, DIDL_RES_SIZE, item->u.resource.size);
     buffer_append (out, ">");
-    if (item->u.resource.url)
-      buffer_append (out, item->u.resource.url);
+    buffer_appendf (out, "http://%s:%d%s/%d",
+                    UpnpGetServerIpAddress (),
+                    dlna->port, VIRTUAL_DIR, item->id);
     buffer_appendf (out, "</%s>", DIDL_RES);
   }
   buffer_appendf (out, "</%s>", DIDL_ITEM);
