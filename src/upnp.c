@@ -344,7 +344,7 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
 
   res = UpnpRegisterRootDevice2 (UPNPREG_BUF_DESC, description, 0, 1,
                                  device_callback_event_handler,
-                                 NULL, &(dlna->dev));
+                                 dlna, &(dlna->dev));
   if (res != UPNP_E_SUCCESS)
   {
     dlna_log (dlna, DLNA_MSG_CRITICAL, "Cannot register UPnP device\n");
