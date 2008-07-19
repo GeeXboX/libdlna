@@ -43,6 +43,14 @@
 #define SERVICE_CDS_ACTION_DELETE_RES         "DeleteResource"
 #define SERVICE_CDS_ACTION_CREATE_REF         "CreateReference"
 
+/* CDS Arguments */
+#define SERVICE_CDS_ARG_SEARCH_CAPS           "SearchCaps"
+#define SERVICE_CDS_ARG_SORT_CAPS             "SortCaps"
+#define SERVICE_CDS_ARG_UPDATE_ID             "Id"
+
+/* CDS Argument Values */
+#define SERVICE_CDS_ROOT_OBJECT_ID            "0"
+
 static int
 cds_get_search_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
 {
@@ -50,7 +58,8 @@ cds_get_search_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
     return 0;
 
   dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
-
+  upnp_add_response (ev, SERVICE_CDS_ARG_SEARCH_CAPS, "");
+  
   return ev->status;
 }
 
@@ -61,7 +70,8 @@ cds_get_sort_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
     return 0;
 
   dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
-
+  upnp_add_response (ev, SERVICE_CDS_ARG_SORT_CAPS, "");
+  
   return ev->status;
 }
 
@@ -72,7 +82,9 @@ cds_get_system_update_id (dlna_t *dlna, upnp_action_event_t *ev)
     return 0;
 
   dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
-
+  upnp_add_response (ev, SERVICE_CDS_ARG_UPDATE_ID,
+                     SERVICE_CDS_ROOT_OBJECT_ID);
+  
   return ev->status;
 }
 
