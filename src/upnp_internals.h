@@ -23,6 +23,7 @@
 #define UPNP_INTERNALS_H
 
 #include "dlna_internals.h"
+#include "buffer.h"
 #include "cms.h"
 #include "cds.h"
 #include "avts.h"
