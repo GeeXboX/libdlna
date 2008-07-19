@@ -361,6 +361,9 @@ dlna_write_protocol_info (dlna_protocol_info_type_t type,
   char protocol[512];
   char dlna_info[448];
 
+  if (!p)
+    return strdup ("");
+  
   if (type == DLNA_PROTOCOL_INFO_TYPE_HTTP)
     sprintf (protocol, "http-get:*:");
 
