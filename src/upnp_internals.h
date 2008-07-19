@@ -58,4 +58,8 @@ struct UpnpVirtualDirCallbacks virtual_dir_callbacks;
 int upnp_init (dlna_t *dlna, dlna_device_type_t type);
 int upnp_uninit (dlna_t *dlna);
 
+int upnp_add_response (upnp_action_event_t *ev, char *key, const char *value);
+char *upnp_get_string (struct Upnp_Action_Request *ar, const char *key);
+int upnp_get_ui4 (struct Upnp_Action_Request *ar, const char *key);
+
 #endif /* UPNP_INTERNALS_H */

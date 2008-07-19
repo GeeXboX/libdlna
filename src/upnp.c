@@ -379,3 +379,80 @@ upnp_uninit (dlna_t *dlna)
 
   return DLNA_ST_OK;
 }
+
+int
+upnp_add_response (upnp_action_event_t *ev, char *key, const char *value)
+{
+  char *val;
+  int res;
+
+  if (!ev || !ev->status || !key || !value)
+    return 0;
+
+  val = strdup (value);
+  res = UpnpAddToActionResponse (&ev->ar->ActionResult,
+                                 ev->ar->ActionName,
+                                 ev->service->type, key, val);
+
+  if (res != UPNP_E_SUCCESS)
+  {
+    free (val);
+    return 0;
+  }
+
+  free (val);
+  return 1;
+}
+
+char *
+upnp_get_string (struct Upnp_Action_Request *ar, const char *key)
+{
+  IXML_Node *node = NULL;
+
+  if (!ar || !ar->ActionRequest || !key)
+    return NULL;
+
+  node = (IXML_Node *) ar->ActionRequest;
+  if (!node)
+    return NULL;
+
+  node = ixmlNode_getFirstChild (node);
+  if (!node)
+    return NULL;
+
+  node = ixmlNode_getFirstChild (node);
+  for (; node; node = ixmlNode_getNextSibling (node))
+    if (ixmlNode_getNodeName (node) &&
+        !strcmp (ixmlNode_getNodeName (node), key))
+    {
+      node = ixmlNode_getFirstChild (node);
+      if (!node)
+        return strdup ("");
+      return ixmlNode_getNodeValue (node) ?
+        strdup (ixmlNode_getNodeValue (node)) : strdup ("");
+    }
+
+  return NULL;
+}
+
+int
+upnp_get_ui4 (struct Upnp_Action_Request *ar, const char *key)
+{
+  char *value;
+  int val;
+
+  if (!ar || !key)
+    return 0;
+
+  value = upnp_get_string (ar, key);
+  if (!value && !strcmp (key, "ObjectID"))
+    value = upnp_get_string (ar, "ContainerID");
+
+  if (!value)
+    return 0;
+
+  val = atoi (value);
+  free (value);
+
+  return val;
+}
