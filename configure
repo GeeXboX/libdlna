@@ -595,6 +595,7 @@ check_cflags -Wall
 check_cflags -D_LARGEFILE_SOURCE
 check_cflags -D_FILE_OFFSET_BITS=64
 check_cflags -D_REENTRANT
+check_cflags -D_GNU_SOURCE
 
 #################################################
 #   check for debug symbols
