@@ -67,7 +67,7 @@ add_dir (dlna_t *dlna, char *dir, uint32_t id)
     if (S_ISDIR (st.st_mode))
     {
       uint32_t cid;
-      cid = dlna_vfs_add_container (dlna, fullpath, 0, id);
+      cid = dlna_vfs_add_container (dlna, basename (fullpath), 0, id);
       add_dir (dlna, fullpath, cid);
     }
     else
