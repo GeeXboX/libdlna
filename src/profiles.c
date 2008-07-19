@@ -26,6 +26,93 @@
 #include "profiles.h"
 #include "containers.h"
 
+typedef struct mime_type_s {
+  const char *extension;
+  const char *mime;
+} mime_type_t;
+
+static const mime_type_t mime_type_list[] = {
+  /* Video files */
+  { "asf",   "video/x-ms-asf"},
+  { "avc",   "video/avi"},
+  { "avi",   "video/avi"},
+  { "dv",    "video/x-dv"},
+  { "divx",  "video/avi"},
+  { "wmv",   "video/x-ms-wmv"},
+  { "mjpg",  "video/x-motion-jpeg"},
+  { "mjpeg", "video/x-motion-jpeg"},
+  { "mpeg",  "video/mpeg"},
+  { "mpg",   "video/mpeg"},
+  { "mpe",   "video/mpeg"},
+  { "mp2p",  "video/mp2p"},
+  { "vob",   "video/mp2p"},
+  { "mp2t",  "video/mp2t"},
+  { "m1v",   "video/mpeg"},
+  { "m2v",   "video/mpeg2"},
+  { "mpg2",  "video/mpeg2"},
+  { "mpeg2", "video/mpeg2"},
+  { "m4v",   "video/mp4"},
+  { "m4p",   "video/mp4"},
+  { "mp4",   "video/mp4"},
+  { "mp4ps", "video/x-nerodigital-ps"},
+  { "ts",    "video/mpeg2"},
+  { "ogm",   "video/mpeg"},
+  { "mkv",   "video/mpeg"},
+  { "rmvb",  "video/mpeg"},
+  { "mov",   "video/quicktime"},
+  { "hdmov", "video/quicktime"},
+  { "qt",    "video/quicktime"},
+  { "bin",   "video/mpeg2"},
+  { "iso",   "video/mpeg2"},
+
+  /* Audio files */
+  { "3gp",  "audio/3gpp"},
+  { "aac",  "audio/x-aac"},
+  { "ac3",  "audio/x-ac3"},
+  { "aif",  "audio/aiff"},
+  { "aiff", "audio/aiff"},
+  { "at3p", "audio/x-atrac3"},
+  { "au",   "audio/basic"},
+  { "snd",  "audio/basic"},
+  { "dts",  "audio/x-dts"},
+  { "rmi",  "audio/midi"},
+  { "mid",  "audio/midi"},
+  { "mp1",  "audio/mp1"},
+  { "mp2",  "audio/mp2"},
+  { "mp3",  "audio/mpeg"},
+  { "m4a",  "audio/mp4"},
+  { "ogg",  "audio/x-ogg"},
+  { "wav",  "audio/wav"},
+  { "pcm",  "audio/l16"},
+  { "lpcm", "audio/l16"},
+  { "l16",  "audio/l16"},
+  { "wma",  "audio/x-ms-wma"},
+  { "mka",  "audio/mpeg"},
+  { "ra",   "audio/x-pn-realaudio"},
+  { "rm",   "audio/x-pn-realaudio"},
+  { "ram",  "audio/x-pn-realaudio"},
+  { "flac", "audio/x-flac"},
+
+  /* Images files */
+  { "bmp",  "image/bmp"},
+  { "ico",  "image/x-icon"},
+  { "gif",  "image/gif"},
+  { "jpeg", "image/jpeg"},
+  { "jpg",  "image/jpeg"},
+  { "jpe",  "image/jpeg"},
+  { "pcd",  "image/x-ms-bmp"},
+  { "png",  "image/png"},
+  { "pnm",  "image/x-portable-anymap"},
+  { "ppm",  "image/x-portable-pixmap"},
+  { "qti",  "image/x-quicktime"},
+  { "qtf",  "image/x-quicktime"},
+  { "qtif", "image/x-quicktime"},
+  { "tif",  "image/tiff"},
+  { "tiff", "image/tiff"},
+
+  { NULL,   NULL}
+};
+
 extern dlna_registered_profile_t dlna_profile_image_jpeg;
 extern dlna_registered_profile_t dlna_profile_image_png;
 extern dlna_registered_profile_t dlna_profile_audio_ac3;
@@ -294,6 +381,49 @@ dlna_guess_media_profile (dlna_t *dlna, const char *filename)
   return profile;
 }
 
+static dlna_profile_t *
+upnp_guess_media_profile (dlna_t *dlna,
+                          const char *filename, AVFormatContext *ctx)
+{
+  dlna_profile_t *profile = NULL;
+  av_codecs_t *codecs;
+  char *extension;
+  int i;
+  
+  if (!dlna || !ctx)
+    return NULL;
+
+  extension = get_file_extension (filename);
+  if (!extension)
+    return NULL;
+  
+  /* grab codecs info */
+  codecs = av_profile_get_codecs (ctx);
+  if (!codecs)
+    return NULL;
+  
+  profile = malloc (sizeof (dlna_profile_t));
+  profile->id = NULL; /* obviously not DLNA compliant */
+  profile->label = NULL;
+  
+  profile->mime = "";
+  for (i = 0; mime_type_list[i].extension; i++)
+    if (!strcmp (extension, mime_type_list[i].extension))
+      profile->mime = mime_type_list[i].mime;
+
+  profile->media_class = DLNA_CLASS_UNKNOWN;
+  if (stream_ctx_is_av (codecs))
+    profile->media_class = DLNA_CLASS_AV;
+  else if (stream_ctx_is_audio (codecs))
+    profile->media_class = DLNA_CLASS_AUDIO;
+  else if (ctx->nb_streams > 1 && codecs->vc && !codecs->ac)
+    profile->media_class = DLNA_CLASS_IMAGE;
+  
+  free (codecs);
+  
+  return profile;
+}
+
 static dlna_properties_t *
 dlna_item_get_properties (AVFormatContext *ctx)
 {
@@ -400,7 +530,10 @@ dlna_item_new (dlna_t *dlna, const char *filename)
   }
 
   item = malloc (sizeof (dlna_item_t));
-  item->profile    = dlna_guess_media_profile (dlna, filename);
+  if (dlna->mode == DLNA_CAPABILITY_DLNA)
+    item->profile    = dlna_guess_media_profile (dlna, filename);
+  else
+    item->profile    = upnp_guess_media_profile (dlna, filename, ctx);
   if (!item->profile) /* not DLNA compliant */
   {
     free (item);

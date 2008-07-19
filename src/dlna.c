@@ -387,21 +387,23 @@ dlna_write_protocol_info (dlna_protocol_info_type_t type,
 {
   char protocol[512];
   char dlna_info[448];
-
-  if (!p)
-    return strdup ("");
-  
+ 
   if (type == DLNA_PROTOCOL_INFO_TYPE_HTTP)
     sprintf (protocol, "http-get:*:");
 
   strcat (protocol, p->mime);
   strcat (protocol, ":");
-  
-  sprintf (dlna_info, "%s=%d;%s=%d;%s=%.2x;%s=%s;%s=%.8x%.24x",
-           "DLNA.ORG_PS", speed, "DLNA.ORG_CI", ci,
-           "DLNA.ORG_OP", op, "DLNA.ORG_PN", p->id,
-           "DLNA.ORG_FLAGS", flags, 0);
-  strcat (protocol, dlna_info);
+
+  if (p->id)
+  {
+    sprintf (dlna_info, "%s=%d;%s=%d;%s=%.2x;%s=%s;%s=%.8x%.24x",
+             "DLNA.ORG_PS", speed, "DLNA.ORG_CI", ci,
+             "DLNA.ORG_OP", op, "DLNA.ORG_PN", p->id,
+             "DLNA.ORG_FLAGS", flags, 0);
+    strcat (protocol, dlna_info);
+  }
+  else
+    strcat (protocol, "*");
 
   return strdup (protocol);
 }
