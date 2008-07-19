@@ -22,17 +22,17 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
-struct buffer_t {
+typedef struct buffer_s {
   char *buf;
   size_t len;
   size_t capacity;
-};
+} buffer_t;
 
-struct buffer_t *buffer_new (void) __attribute__ ((malloc));
-void buffer_free (struct buffer_t *buffer);
+buffer_t *buffer_new (void) __attribute__ ((malloc));
+void buffer_free (buffer_t *buffer);
 
-void buffer_append (struct buffer_t *buffer, const char *str);
-void buffer_appendf (struct buffer_t *buffer, const char *format, ...)
+void buffer_append (buffer_t *buffer, const char *str);
+void buffer_appendf (buffer_t *buffer, const char *format, ...)
     __attribute__ ((format (printf , 2, 3)));
 
 #endif /* BUFFER_H */

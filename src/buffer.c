@@ -29,12 +29,12 @@
 
 #define BUFFER_DEFAULT_CAPACITY 32768
 
-struct buffer_t *
+buffer_t *
 buffer_new (void)
 {
-  struct buffer_t *buffer = NULL;
+  buffer_t *buffer = NULL;
 
-  buffer = malloc (sizeof (struct buffer_t));
+  buffer = malloc (sizeof (buffer_t));
   buffer->buf = NULL;
   buffer->len = 0;
   buffer->capacity = 0;
@@ -43,7 +43,7 @@ buffer_new (void)
 }
 
 void
-buffer_append (struct buffer_t *buffer, const char *str)
+buffer_append (buffer_t *buffer, const char *str)
 {
   size_t len;
 
@@ -69,7 +69,7 @@ buffer_append (struct buffer_t *buffer, const char *str)
 }
 
 void
-buffer_appendf (struct buffer_t *buffer, const char *format, ...)
+buffer_appendf (buffer_t *buffer, const char *format, ...)
 {
   char str[BUFFER_DEFAULT_CAPACITY];
   int size;
@@ -93,7 +93,7 @@ buffer_appendf (struct buffer_t *buffer, const char *format, ...)
 }
 
 void
-buffer_free (struct buffer_t *buffer)
+buffer_free (buffer_t *buffer)
 {
   if (!buffer)
     return;
