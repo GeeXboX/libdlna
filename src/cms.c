@@ -34,12 +34,45 @@
 #define SERVICE_CMS_ACTION_CON_ID             "GetCurrentConnectionIDs"
 #define SERVICE_CMS_ACTION_CON_INFO           "GetCurrentConnectionInfo"
 
+static int
+cms_get_protocol_info (dlna_t *dlna, upnp_action_event_t *ev)
+{
+  if (!dlna || !ev)
+    return 0;
+
+  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
+
+  return ev->status;
+}
+
+static int
+cms_get_current_connection_ids (dlna_t *dlna, upnp_action_event_t *ev)
+{
+  if (!dlna || !ev)
+    return 0;
+
+  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
+
+  return ev->status;
+}
+
+static int
+cms_get_current_connection_info (dlna_t *dlna, upnp_action_event_t *ev)
+{
+  if (!dlna || !ev)
+    return 0;
+
+  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
+
+  return ev->status;
+}
+
 /* List of UPnP ConnectionManager Service actions */
 upnp_service_action_t cms_service_actions[] = {
-  { SERVICE_CMS_ACTION_PROT_INFO,     NULL },
+  { SERVICE_CMS_ACTION_PROT_INFO,     cms_get_protocol_info },
   { SERVICE_CMS_ACTION_PREPARE,       NULL },
   { SERVICE_CMS_ACTION_CON_COMPLETE,  NULL },
-  { SERVICE_CMS_ACTION_CON_ID,        NULL },
-  { SERVICE_CMS_ACTION_CON_INFO,      NULL },
+  { SERVICE_CMS_ACTION_CON_ID,        cms_get_current_connection_ids },
+  { SERVICE_CMS_ACTION_CON_INFO,      cms_get_current_connection_info },
   { NULL,                             NULL }
 };
