@@ -169,6 +169,9 @@ dlna_set_extension_check (dlna_t *dlna, int level)
   if (!dlna)
     return;
 
+  if (dlna->mode != DLNA_CAPABILITY_DLNA)
+    return;
+  
   dlna->check_extensions = level;
 }
 
