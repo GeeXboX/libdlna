@@ -149,6 +149,9 @@ dlna_set_capability_mode (dlna_t *dlna, dlna_capability_mode_t mode)
     return;
 
   dlna->mode = mode;
+
+  if (dlna->mode != DLNA_CAPABILITY_DLNA)
+    dlna->check_extensions = 1;
 }
 
 void
