@@ -35,9 +35,7 @@ UPNP_SRCS += \
 
 # API
 UPNP_SRCS += upnp/upnpapi.c
-ifeq ($(ENABLE_TOOLS),yes)
 UPNP_SRCS += upnp/upnptools.c
-endif
 ifeq ($(DEBUG),yes)
 UPNP_SRCS += upnp/upnpdebug.c 
 endif
