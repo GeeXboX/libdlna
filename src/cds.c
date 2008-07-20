@@ -283,19 +283,19 @@ didl_add_item (dlna_t *dlna, buffer_t *out, vfs_item_t *item,
 
   if (item->u.resource.item->metadata)
   {
-    if (item->u.resource.item->metadata->author)
+    if (strlen (item->u.resource.item->metadata->author) > 1)
       didl_add_tag (out, DIDL_ITEM_ARTIST,
                     item->u.resource.item->metadata->author);
-    if (item->u.resource.item->metadata->comment)
+    if (strlen (item->u.resource.item->metadata->comment) > 1)
       didl_add_tag (out, DIDL_ITEM_DESCRIPTION,
                     item->u.resource.item->metadata->comment);
-    if (item->u.resource.item->metadata->album)
+    if (strlen (item->u.resource.item->metadata->album) > 1)
       didl_add_tag (out, DIDL_ITEM_ALBUM,
                     item->u.resource.item->metadata->album);
     if (item->u.resource.item->metadata->track)
       didl_add_value (out, DIDL_ITEM_TRACK,
                       item->u.resource.item->metadata->track);
-    if (item->u.resource.item->metadata->genre)
+    if (strlen (item->u.resource.item->metadata->genre) > 1)
       didl_add_tag (out, DIDL_ITEM_GENRE,
                     item->u.resource.item->metadata->genre);
   }
