@@ -260,10 +260,9 @@ didl_add_item (dlna_t *dlna, buffer_t *out, vfs_item_t *item,
   buffer_append (out, ">");
 
   class = dlna_profile_upnp_object_item (item->u.resource.item->profile);
+  didl_add_tag (out, DIDL_ITEM_TITLE, item->title);
   didl_add_tag (out, DIDL_ITEM_CLASS, class);
   
-  didl_add_tag (out, DIDL_ITEM_TITLE, item->title);
-
   if (filter_has_val (filter, DIDL_RES))
   {
     char *protocol_info;
