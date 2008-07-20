@@ -94,6 +94,11 @@
 #define DIDL_CONTAINER_CLASS                  "upnp:class"
 #define DIDL_CONTAINER_TITLE                  "dc:title"
 
+/*
+ * GetSearchCapabilities:
+ *   This action returns the searching capabilities that
+ *   are supported by the device.
+ */
 static int
 cds_get_search_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
 {
@@ -106,6 +111,10 @@ cds_get_search_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
   return ev->status;
 }
 
+/*
+ * GetSortCapabilities:
+ *   Returns the CSV list of meta-data tags that can be used in sortCriteria.
+ */
 static int
 cds_get_sort_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
 {
@@ -118,6 +127,12 @@ cds_get_sort_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
   return ev->status;
 }
 
+/*
+ * GetSystemUpdateID:
+ *   This action returns the current value of state variable SystemUpdateID.
+ *   It can be used by clients that want to poll for any changes in
+ *   the Content Directory (as opposed to subscribing to events).
+ */
 static int
 cds_get_system_update_id (dlna_t *dlna, upnp_action_event_t *ev)
 {
@@ -365,6 +380,13 @@ cds_browse_directchildren (dlna_t *dlna, upnp_action_event_t *ev,
   return result_count;
 }
 
+/*
+ * Browse:
+ *   This action allows the caller to incrementally browse the native
+ *   hierarchy of the Content Directory objects exposed by the Content
+ *   Directory Service, including information listing the classes of objects
+ *   available in any particular object container.
+ */
 static int
 cds_browse (dlna_t *dlna, upnp_action_event_t *ev)
 {
