@@ -94,6 +94,31 @@
 #define DIDL_CONTAINER_CLASS                  "upnp:class"
 #define DIDL_CONTAINER_TITLE                  "dc:title"
 
+/* CDS Error Codes */
+#define CDS_ERR_INVALID_ACTION                401
+#define CDS_ERR_INVALID_ARGS                  402
+#define CDS_ERR_INVALID_VAR                   404
+#define CDS_ERR_ACTION_FAILED                 501
+#define CDS_ERR_INVALID_OBJECT_ID             701
+#define CDS_ERR_INVALID_CURRENT_TAG_VALUE     702
+#define CDS_ERR_INVALID_NEW_TAG_VALUE         703
+#define CDS_ERR_REQUIRED_TAG                  704
+#define CDS_ERR_READ_ONLY_TAG                 705
+#define CDS_ERR_PARAMETER_MISMATCH            706
+#define CDS_ERR_INVALID_SEARCH_CRITERIA       708
+#define CDS_ERR_INVALID_SORT_CRITERIA         709
+#define CDS_ERR_INVALID_CONTAINER             710
+#define CDS_ERR_RESTRICTED_OBJECT             711
+#define CDS_ERR_BAD_METADATA                  712
+#define CDS_ERR_RESTRICTED_PARENT             713
+#define CDS_ERR_INVALID_SOURCE                714
+#define CDS_ERR_ACCESS_DENIED_SOURCE          715
+#define CDS_ERR_TRANSFER_BUSY                 716
+#define CDS_ERR_INVALID_TRANSFER_ID           717
+#define CDS_ERR_INVALID_DESTINATION           718
+#define CDS_ERR_ACESS_DENIED_DESTINATION      719
+#define CDS_ERR_PROCESS_REQUEST               720
+
 /*
  * GetSearchCapabilities:
  *   This action returns the searching capabilities that
