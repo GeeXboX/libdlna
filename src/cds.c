@@ -448,10 +448,13 @@ cds_browse (dlna_t *dlna, upnp_action_event_t *ev)
 
 /* List of UPnP ContentDirectory Service actions */
 upnp_service_action_t cds_service_actions[] = {
+  /* CDS Required Actions */
   { SERVICE_CDS_ACTION_SEARCH_CAPS,    cds_get_search_capabilities },
   { SERVICE_CDS_ACTION_SORT_CAPS,      cds_get_sort_capabilities },
   { SERVICE_CDS_ACTION_UPDATE_ID,      cds_get_system_update_id },
   { SERVICE_CDS_ACTION_BROWSE,         cds_browse },
+
+  /* CDS Optional Actions */
   { SERVICE_CDS_ACTION_SEARCH,         NULL },
   { SERVICE_CDS_ACTION_CREATE_OBJ,     NULL },
   { SERVICE_CDS_ACTION_DESTROY_OBJ,    NULL },
@@ -462,5 +465,7 @@ upnp_service_action_t cds_service_actions[] = {
   { SERVICE_CDS_ACTION_GET_PROGRESS,   NULL },
   { SERVICE_CDS_ACTION_DELETE_RES,     NULL },
   { SERVICE_CDS_ACTION_CREATE_REF,     NULL },
+
+  /* CDS Vendor-specific Actions */ 
   { NULL,                              NULL }
 };
