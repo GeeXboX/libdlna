@@ -82,6 +82,11 @@
 #define DIDL_ITEM_RESTRICTED                  "restricted"
 #define DIDL_ITEM_CLASS                       "upnp:class"
 #define DIDL_ITEM_TITLE                       "dc:title"
+#define DIDL_ITEM_ARTIST                      "dc:artist"
+#define DIDL_ITEM_DESCRIPTION                 "dc:description"
+#define DIDL_ITEM_ALBUM                       "upnp:album"
+#define DIDL_ITEM_TRACK                       "upnp:originalTrackNumber"
+#define DIDL_ITEM_GENRE                       "upnp:genre"
 #define DIDL_RES                              "res"
 #define DIDL_RES_INFO                         "protocolInfo"
 #define DIDL_RES_SIZE                         "size"
@@ -268,6 +273,25 @@ didl_add_item (dlna_t *dlna, buffer_t *out, vfs_item_t *item,
   class = dlna_profile_upnp_object_item (item->u.resource.item->profile);
   didl_add_tag (out, DIDL_ITEM_TITLE, item->title);
   didl_add_tag (out, DIDL_ITEM_CLASS, class);
+
+  if (item->u.resource.item->metadata)
+  {
+    if (item->u.resource.item->metadata->author)
+      didl_add_tag (out, DIDL_ITEM_ARTIST,
+                    item->u.resource.item->metadata->author);
+    if (item->u.resource.item->metadata->comment)
+      didl_add_tag (out, DIDL_ITEM_DESCRIPTION,
+                    item->u.resource.item->metadata->comment);
+    if (item->u.resource.item->metadata->album)
+      didl_add_tag (out, DIDL_ITEM_ALBUM,
+                    item->u.resource.item->metadata->album);
+    if (item->u.resource.item->metadata->track)
+      didl_add_value (out, DIDL_ITEM_TRACK,
+                      item->u.resource.item->metadata->track);
+    if (item->u.resource.item->metadata->genre)
+      didl_add_tag (out, DIDL_ITEM_GENRE,
+                    item->u.resource.item->metadata->genre);
+  }
   
   if (filter_has_val (filter, DIDL_RES))
   {
