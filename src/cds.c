@@ -326,8 +326,9 @@ didl_add_item (dlna_t *dlna, buffer_t *out, vfs_item_t *item,
                     item->u.resource.item->properties->bps);
     didl_add_value (out, DIDL_RES_AUDIO_CHANNELS,
                     item->u.resource.item->properties->channels);
-    didl_add_param (out, DIDL_RES_RESOLUTION,
-                    item->u.resource.item->properties->resolution);
+    if (strlen (item->u.resource.item->properties->resolution) > 1)
+      didl_add_param (out, DIDL_RES_RESOLUTION,
+                      item->u.resource.item->properties->resolution);
 
     buffer_append (out, ">");
     buffer_appendf (out, "http://%s:%d%s/%d",
