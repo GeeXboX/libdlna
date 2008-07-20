@@ -475,11 +475,17 @@ cds_browse (dlna_t *dlna, upnp_action_event_t *ev)
   int meta;
   
   if (!dlna || !ev)
+  {
+    ev->ar->ErrCode = CDS_ERR_ACTION_FAILED;
     return 0;
+  }
 
   /* Check for status */
   if (!ev->status)
+  {
+    ev->ar->ErrCode = CDS_ERR_ACTION_FAILED;
     return 0;
+  }
   
   dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
 
@@ -492,19 +498,28 @@ cds_browse (dlna_t *dlna, upnp_action_event_t *ev)
   sort   = upnp_get_ui4    (ev->ar, SERVICE_CDS_ARG_SORT_CRIT);
 
   if (!flag || !filter)
+  {
+    ev->ar->ErrCode = CDS_ERR_INVALID_ARGS;
     goto browse_err;
+  }
  
   /* check for arguments validity */
   if (!strcmp (flag, SERVICE_CDS_BROWSE_METADATA))
   {
     if (index)
+    {
+      ev->ar->ErrCode = CDS_ERR_PROCESS_REQUEST;
       goto browse_err;
+    }
     meta = 1;
     }
   else if (!strcmp (flag, SERVICE_CDS_BROWSE_CHILDREN))
     meta = 0;
   else
+  {
+    ev->ar->ErrCode = CDS_ERR_PROCESS_REQUEST;
     goto browse_err;
+  }
   free (flag);
 
   /* find requested item in VFS */
@@ -513,7 +528,10 @@ cds_browse (dlna_t *dlna, upnp_action_event_t *ev)
     item = vfs_get_item_by_id (dlna->vfs_root, 0);
 
   if (!item)
+  {
+    ev->ar->ErrCode = CDS_ERR_INVALID_OBJECT_ID;
     goto browse_err;
+  }
 
   out = buffer_new ();
   result_count = meta ?
@@ -523,7 +541,10 @@ cds_browse (dlna_t *dlna, upnp_action_event_t *ev)
   free (filter);
 
   if (result_count < 0)
+  {
+    ev->ar->ErrCode = CDS_ERR_ACTION_FAILED;
     goto browse_err;
+  }
 
   buffer_free (out);
   upnp_add_response (ev, SERVICE_CDS_DIDL_UPDATE_ID,
