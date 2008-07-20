@@ -88,7 +88,7 @@
 #define DIDL_CONTAINER                        "container"
 #define DIDL_CONTAINER_ID                     "id"
 #define DIDL_CONTAINER_PARENT_ID              "parentID"
-#define DIDL_CONTAINER_CHILDS                 "childCount"
+#define DIDL_CONTAINER_CHILD_COUNT            "childCount"
 #define DIDL_CONTAINER_RESTRICTED             "restricted"
 #define DIDL_CONTAINER_SEARCH                 "searchable"
 #define DIDL_CONTAINER_CLASS                  "upnp:class"
@@ -300,7 +300,7 @@ didl_add_container (buffer_t *out, vfs_item_t *item,
   didl_add_value (out, DIDL_CONTAINER_PARENT_ID,
                   item->parent ? item->parent->id : 0);
   
-  didl_add_value (out, DIDL_CONTAINER_CHILDS,
+  didl_add_value (out, DIDL_CONTAINER_CHILD_COUNT,
                   item->u.container.children_count);
   
   didl_add_param (out, DIDL_CONTAINER_RESTRICTED, restricted);
