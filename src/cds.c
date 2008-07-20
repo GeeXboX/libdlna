@@ -139,7 +139,10 @@ static int
 cds_get_search_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
 {
   if (!dlna || !ev)
+  {
+    ev->ar->ErrCode = CDS_ERR_ACTION_FAILED;
     return 0;
+  }
 
   dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
   upnp_add_response (ev, SERVICE_CDS_ARG_SEARCH_CAPS, "");
@@ -155,7 +158,10 @@ static int
 cds_get_sort_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
 {
   if (!dlna || !ev)
+  {
+    ev->ar->ErrCode = CDS_ERR_ACTION_FAILED;
     return 0;
+  }
 
   dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
   upnp_add_response (ev, SERVICE_CDS_ARG_SORT_CAPS, "");
@@ -173,7 +179,10 @@ static int
 cds_get_system_update_id (dlna_t *dlna, upnp_action_event_t *ev)
 {
   if (!dlna || !ev)
+  {
+    ev->ar->ErrCode = CDS_ERR_ACTION_FAILED;
     return 0;
+  }
 
   dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
   upnp_add_response (ev, SERVICE_CDS_ARG_UPDATE_ID,
