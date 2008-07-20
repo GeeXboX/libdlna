@@ -85,6 +85,12 @@
 #define DIDL_RES                              "res"
 #define DIDL_RES_INFO                         "protocolInfo"
 #define DIDL_RES_SIZE                         "size"
+#define DIDL_RES_DURATION                     "duration"
+#define DIDL_RES_BITRATE                      "bitrate"
+#define DIDL_RES_SAMPLE_FREQUENCY             "sampleFrequency"
+#define DIDL_RES_BPS                          "bitsPerSample"
+#define DIDL_RES_AUDIO_CHANNELS               "nrAudioChannels"
+#define DIDL_RES_RESOLUTION                   "resolution"
 #define DIDL_CONTAINER                        "container"
 #define DIDL_CONTAINER_ID                     "id"
 #define DIDL_CONTAINER_PARENT_ID              "parentID"
@@ -280,6 +286,18 @@ didl_add_item (dlna_t *dlna, buffer_t *out, vfs_item_t *item,
     
     if (filter_has_val (filter, "@"DIDL_RES_SIZE))
       didl_add_value (out, DIDL_RES_SIZE, item->u.resource.size);
+    
+    didl_add_param (out, DIDL_RES_DURATION,
+                    item->u.resource.item->properties->duration);
+    didl_add_value (out, DIDL_RES_BITRATE,
+                    item->u.resource.item->properties->bitrate);
+    didl_add_value (out, DIDL_RES_BPS,
+                    item->u.resource.item->properties->bps);
+    didl_add_value (out, DIDL_RES_AUDIO_CHANNELS,
+                    item->u.resource.item->properties->channels);
+    didl_add_param (out, DIDL_RES_RESOLUTION,
+                    item->u.resource.item->properties->resolution);
+
     buffer_append (out, ">");
     buffer_appendf (out, "http://%s:%d%s/%d",
                     UpnpGetServerIpAddress (),
