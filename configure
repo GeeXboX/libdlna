@@ -601,12 +601,10 @@ check_cflags -D_GNU_SOURCE
 #   check for debug symbols
 #################################################
 if enabled debug; then
-  add_cflags -g3
+  add_cflags -g3 -O0
   add_cflags -DHAVE_DEBUG
   dostrip=no
-fi
-
-if enabled optimize; then
+elif enabled optimize; then
   if test -n "`$cc -v 2>&1 | grep xlc`"; then
     add_cflags  "-O5"
     add_ldflags "-O5"
