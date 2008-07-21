@@ -233,6 +233,145 @@ dlna_register_media_profile (dlna_t *dlna, dlna_media_profile_t profile)
   }
 }
 
+static int
+dlna_is_profile_registered (dlna_t *dlna, dlna_media_profile_t profile)
+{
+  void **p;
+
+  return 1;
+  
+  if (!dlna)
+    return 0;
+
+  p = &dlna->first_profile;
+  while (*p)
+  {
+    if (((dlna_registered_profile_t *) *p)->id == profile)
+      return 1;
+    p = (void *) &((dlna_registered_profile_t *) *p)->next;
+  }
+
+  return 0;
+}
+
+static int
+dlna_list_length (void *list)
+{
+  void **l = list;
+  int n = 0;
+  while (*l++)
+    n++;
+
+  return n;
+}
+
+static void *
+dlna_list_add (char **list, char *element)
+{
+  char **l = list;
+  int n = dlna_list_length (list) + 1;
+  int i;
+
+  for (i = 0; i < n; i++)
+    if (l[i] && element && !strcmp (l[i], element))
+      return l;
+  
+  l = realloc (l, (n + 1) * sizeof (char *));
+  l[n] = NULL;
+  l[n - 1] = element;
+  
+  return l;
+}
+
+char **
+dlna_get_supported_mime_types (dlna_t *dlna)
+{
+  char **mimes;
+  int i = 0;
+  
+  if (!dlna)
+    return NULL;
+
+  mimes = malloc (sizeof (char *));
+  *mimes = NULL;
+
+  switch (dlna->mode)
+  {
+  case DLNA_CAPABILITY_DLNA:
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_IMAGE_JPEG))
+      mimes = dlna_list_add (mimes, MIME_IMAGE_JPEG);
+
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_IMAGE_PNG))
+      mimes = dlna_list_add (mimes, MIME_IMAGE_PNG);
+    
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_AUDIO_AC3))
+      mimes = dlna_list_add (mimes, MIME_AUDIO_DOLBY_DIGITAL);
+    
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_AUDIO_AMR))
+    {
+      mimes = dlna_list_add (mimes, MIME_AUDIO_MPEG_4);
+      mimes = dlna_list_add (mimes, MIME_AUDIO_3GP);
+    }
+    
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_AUDIO_ATRAC3))
+      mimes = dlna_list_add (mimes, MIME_AUDIO_ATRAC);
+    
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_AUDIO_LPCM))
+      mimes = dlna_list_add (mimes, MIME_AUDIO_LPCM);
+    
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_AUDIO_MP3))
+      mimes = dlna_list_add (mimes, MIME_AUDIO_MPEG);
+    
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_AUDIO_MPEG4))
+    {
+      mimes = dlna_list_add (mimes, MIME_AUDIO_ADTS);
+      mimes = dlna_list_add (mimes, MIME_AUDIO_MPEG_4);
+    }
+    
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_AUDIO_WMA))
+      mimes = dlna_list_add (mimes, MIME_AUDIO_WMA);
+    
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_AV_MPEG1))
+      mimes = dlna_list_add (mimes, MIME_VIDEO_MPEG);
+    
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_AV_MPEG2))
+    {
+      mimes = dlna_list_add (mimes, MIME_VIDEO_MPEG);
+      mimes = dlna_list_add (mimes, MIME_VIDEO_MPEG_TS);
+    }
+    
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_AV_MPEG4_PART2))
+    {
+      mimes = dlna_list_add (mimes, MIME_VIDEO_MPEG);
+      mimes = dlna_list_add (mimes, MIME_VIDEO_MPEG_4);
+      mimes = dlna_list_add (mimes, MIME_VIDEO_MPEG_TS);
+    }
+    
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_AV_MPEG4_PART10))
+    {
+      mimes = dlna_list_add (mimes, MIME_VIDEO_MPEG);
+      mimes = dlna_list_add (mimes, MIME_VIDEO_MPEG_4);
+      mimes = dlna_list_add (mimes, MIME_VIDEO_MPEG_TS);
+    }
+    
+    if (dlna_is_profile_registered (dlna, DLNA_PROFILE_AV_WMV9))
+      mimes = dlna_list_add (mimes, MIME_VIDEO_WMV);
+    break;
+
+  case DLNA_CAPABILITY_UPNP_AV:
+  case DLNA_CAPABILITY_UPNP_AV_XBOX:
+    for (i = 0; mime_type_list[i].mime; i++)
+      mimes = dlna_list_add (mimes, (char *) mime_type_list[i].mime);
+    break;
+
+  default:
+    break;
+  }
+
+  mimes = dlna_list_add (mimes, NULL);
+  return mimes;
+}
+
 static av_codecs_t *
 av_profile_get_codecs (AVFormatContext *ctx)
 {

@@ -109,5 +109,6 @@ struct dlna_s {
 void dlna_log (dlna_t *dlna,
                dlna_verbosity_level_t level,
                const char *format, ...);
+char **dlna_get_supported_mime_types (dlna_t *dlna);
 
 #endif /* DLNA_INTERNALS_H */
