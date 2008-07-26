@@ -102,8 +102,16 @@
 "    </action>" \
 "  </actionList>" \
 "  <serviceStateTable>" \
-"    <stateVariable sendEvents=\"no\">" \
-"      <name>A_ARG_TYPE_ProtocolInfo</name>" \
+"    <stateVariable sendEvents=\"yes\">" \
+"      <name>SourceProtocolInfo</name>" \
+"      <dataType>string</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"yes\">" \
+"      <name>SinkProtocolInfo</name>" \
+"      <dataType>string</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"yes\">" \
+"      <name>CurrentConnectionIDs</name>" \
 "      <dataType>string</dataType>" \
 "    </stateVariable>" \
 "    <stateVariable sendEvents=\"no\">" \
@@ -118,27 +126,7 @@
 "      </allowedValueList>" \
 "    </stateVariable>" \
 "    <stateVariable sendEvents=\"no\">" \
-"      <name>A_ARG_TYPE_AVTransportID</name>" \
-"      <dataType>i4</dataType>" \
-"    </stateVariable>" \
-"    <stateVariable sendEvents=\"no\">" \
-"      <name>A_ARG_TYPE_RcsID</name>" \
-"      <dataType>i4</dataType>" \
-"    </stateVariable>" \
-"    <stateVariable sendEvents=\"no\">" \
-"      <name>A_ARG_TYPE_ConnectionID</name>" \
-"      <dataType>i4</dataType>" \
-"    </stateVariable>" \
-"    <stateVariable sendEvents=\"no\">" \
 "      <name>A_ARG_TYPE_ConnectionManager</name>" \
-"      <dataType>string</dataType>" \
-"    </stateVariable>" \
-"    <stateVariable sendEvents=\"yes\">" \
-"      <name>SourceProtocolInfo</name>" \
-"      <dataType>string</dataType>" \
-"    </stateVariable>" \
-"    <stateVariable sendEvents=\"yes\">" \
-"      <name>SinkProtocolInfo</name>" \
 "      <dataType>string</dataType>" \
 "    </stateVariable>" \
 "    <stateVariable sendEvents=\"no\">" \
@@ -149,9 +137,21 @@
 "        <allowedValue>Output</allowedValue>" \
 "      </allowedValueList>" \
 "    </stateVariable>" \
-"    <stateVariable sendEvents=\"yes\">" \
-"      <name>CurrentConnectionIDs</name>" \
+"    <stateVariable sendEvents=\"no\">" \
+"      <name>A_ARG_TYPE_ProtocolInfo</name>" \
 "      <dataType>string</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"no\">" \
+"      <name>A_ARG_TYPE_ConnectionID</name>" \
+"      <dataType>i4</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"no\">" \
+"      <name>A_ARG_TYPE_AVTransportID</name>" \
+"      <dataType>i4</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"no\">" \
+"      <name>A_ARG_TYPE_RcsID</name>" \
+"      <dataType>i4</dataType>" \
 "    </stateVariable>" \
 "  </serviceStateTable>" \
 "</scpd>"
