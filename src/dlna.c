@@ -69,6 +69,7 @@ dlna_init (void)
   dlna_vfs_add_container (dlna, "root", 0, 0);
   
   dlna->interface = strdup ("lo"); /* bind to loopback as a default */
+  dlna->port = 0;
   
   /* UPnP Properties */
   dlna->friendly_name = strdup ("libdlna");
@@ -284,6 +285,19 @@ dlna_set_interface (dlna_t *dlna, char *itf)
   if (dlna->interface)
     free (dlna->interface);
   dlna->interface = strdup (itf);
+}
+
+void
+dlna_set_port (dlna_t *dlna, int port)
+{
+  if (!dlna)
+    return;
+
+  /* check for valid port number */
+  if (port <= 0 || port > 65535)
+    return;
+  
+  dlna->port = port;
 }
 
 void

@@ -308,6 +308,14 @@ void dlna_set_extension_check (dlna_t *dlna, int level);
 void dlna_set_interface (dlna_t *dlna, char *itf);
 
 /**
+ * Set library's network port to use (if available).
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] port  The port number.
+ */
+void dlna_set_port (dlna_t *dlna, int port);
+
+/**
  * Set library's WebServer Callback routines.
  *   This is used by application to overload default's HTTP routines.
  *
