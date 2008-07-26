@@ -27,6 +27,7 @@
 #include "cms.h"
 #include "cds.h"
 #include "avts.h"
+#include "msr.h"
 
 #define SERVICE_CONTENT_TYPE "text/xml"
 #define UPNP_MAX_CONTENT_LENGTH 4096

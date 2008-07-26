@@ -68,6 +68,13 @@
 "        <controlURL>%s/%s</controlURL>" \
 "        <eventSubURL>%s/%s</eventSubURL>" \
 "      </service>" \
+"      <service>" \
+"        <serviceType>urn:microsoft.com:service:X_MS_MediaReceiverRegistrar:1</serviceType>\n" \
+"        <serviceId>urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar</serviceId>\n" \
+"        <SCPDURL>%s/%s</SCPDURL>" \
+"        <controlURL>%s/%s</controlURL>" \
+"        <eventSubURL>%s/%s</eventSubURL>" \
+"      </service>" \
 "    </serviceList>" \
 "  </device>" \
 "</root>"
@@ -107,6 +114,9 @@ dlna_dms_description_get (const char *friendly_name,
     + strlen (SERVICES_VIRTUAL_DIR) + strlen (AVTS_URL) +
     + strlen (SERVICES_VIRTUAL_DIR) + strlen (AVTS_CONTROL_URL) +
     + strlen (SERVICES_VIRTUAL_DIR) + strlen (AVTS_EVENT_URL) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (MSR_URL) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (MSR_CONTROL_URL) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (MSR_EVENT_URL) +
     1;
 
   desc = malloc (len);
@@ -123,7 +133,10 @@ dlna_dms_description_get (const char *friendly_name,
            SERVICES_VIRTUAL_DIR, CDS_EVENT_URL,
            SERVICES_VIRTUAL_DIR, AVTS_URL,
            SERVICES_VIRTUAL_DIR, AVTS_CONTROL_URL,
-           SERVICES_VIRTUAL_DIR, AVTS_EVENT_URL);
+           SERVICES_VIRTUAL_DIR, AVTS_EVENT_URL,
+           SERVICES_VIRTUAL_DIR, MSR_URL,
+           SERVICES_VIRTUAL_DIR, MSR_CONTROL_URL,
+           SERVICES_VIRTUAL_DIR, MSR_EVENT_URL);
 
   return desc;
 }
