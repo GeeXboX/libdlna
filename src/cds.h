@@ -172,6 +172,22 @@
 "    </action>" \
 "  </actionList>" \
 "  <serviceStateTable>" \
+"    <stateVariable sendEvents=\"yes\">" \
+"      <name>TransferIDs</name>" \
+"      <dataType>string</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"no\">" \
+"      <name>A_ARG_TYPE_ObjectID</name>" \
+"      <dataType>string</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"no\">" \
+"      <name>A_ARG_TYPE_Result</name>" \
+"      <dataType>string</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"no\">" \
+"      <name>A_ARG_TYPE_SearchCriteria</name>" \
+"      <dataType>string</dataType>" \
+"    </stateVariable>" \
 "    <stateVariable sendEvents=\"no\">" \
 "      <name>A_ARG_TYPE_BrowseFlag</name>" \
 "      <dataType>string</dataType>" \
@@ -180,20 +196,12 @@
 "        <allowedValue>BrowseDirectChildren</allowedValue>" \
 "      </allowedValueList>" \
 "    </stateVariable>" \
-"    <stateVariable sendEvents=\"yes\">" \
-"      <name>SystemUpdateID</name>" \
-"      <dataType>ui4</dataType>" \
-"    </stateVariable>" \
 "    <stateVariable sendEvents=\"no\">" \
-"      <name>A_ARG_TYPE_Count</name>" \
-"      <dataType>ui4</dataType>" \
-"    </stateVariable>" \
-"    <stateVariable sendEvents=\"no\">" \
-"      <name>A_ARG_TYPE_SortCriteria</name>" \
+"      <name>A_ARG_TYPE_Filter</name>" \
 "      <dataType>string</dataType>" \
 "    </stateVariable>" \
 "    <stateVariable sendEvents=\"no\">" \
-"      <name>SortCapabilities</name>" \
+"      <name>A_ARG_TYPE_SortCriteria</name>" \
 "      <dataType>string</dataType>" \
 "    </stateVariable>" \
 "    <stateVariable sendEvents=\"no\">" \
@@ -201,27 +209,57 @@
 "      <dataType>ui4</dataType>" \
 "    </stateVariable>" \
 "    <stateVariable sendEvents=\"no\">" \
-"      <name>A_ARG_TYPE_ObjectID</name>" \
-"      <dataType>string</dataType>" \
+"      <name>A_ARG_TYPE_Count</name>" \
+"      <dataType>ui4</dataType>" \
 "    </stateVariable>" \
 "    <stateVariable sendEvents=\"no\">" \
 "      <name>A_ARG_TYPE_UpdateID</name>" \
 "      <dataType>ui4</dataType>" \
 "    </stateVariable>" \
 "    <stateVariable sendEvents=\"no\">" \
+"      <name>A_ARG_TYPE_TransferID</name>" \
+"      <dataType>ui4</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"no\">" \
+"      <name>A_ARG_TYPE_TransferStatus</name>" \
+"      <dataType>string</dataType>" \
+"      <allowedValueList>" \
+"        <allowedValue>COMPLETED</allowedValue>" \
+"        <allowedValue>ERROR</allowedValue>" \
+"        <allowedValue>IN_PROGRESS</allowedValue>" \
+"        <allowedValue>STOPPED</allowedValue>" \
+"      </allowedValueList>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"no\">" \
+"      <name>A_ARG_TYPE_TransferLength</name>" \
+"      <dataType>string</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"no\">" \
+"      <name>A_ARG_TYPE_TransferTotal</name>" \
+"      <dataType>string</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"no\">" \
 "      <name>A_ARG_TYPE_TagValueList</name>" \
 "      <dataType>string</dataType>" \
 "    </stateVariable>" \
 "    <stateVariable sendEvents=\"no\">" \
-"      <name>A_ARG_TYPE_Result</name>" \
-"      <dataType>string</dataType>" \
+"      <name>A_ARG_TYPE_URI</name>" \
+"      <dataType>uri</dataType>" \
 "    </stateVariable>" \
-"   <stateVariable sendEvents=\"no\">" \
+"    <stateVariable sendEvents=\"no\">" \
 "      <name>SearchCapabilities</name>" \
 "      <dataType>string</dataType>" \
 "    </stateVariable>" \
 "    <stateVariable sendEvents=\"no\">" \
-"      <name>A_ARG_TYPE_Filter</name>" \
+"      <name>SortCapabilities</name>" \
+"      <dataType>string</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"yes\">" \
+"      <name>SystemUpdateID</name>" \
+"      <dataType>ui4</dataType>" \
+"    </stateVariable>" \
+"    <stateVariable sendEvents=\"yes\">" \
+"      <name>ContainerUpdateIDs</name>" \
 "      <dataType>string</dataType>" \
 "    </stateVariable>" \
 "  </serviceStateTable>" \
