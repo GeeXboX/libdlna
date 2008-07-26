@@ -58,6 +58,7 @@
 #define SERVICE_CDS_ARG_START_INDEX           "StartingIndex"
 #define SERVICE_CDS_ARG_REQUEST_COUNT         "RequestedCount"
 #define SERVICE_CDS_ARG_SORT_CRIT             "SortCriteria"
+#define SERVICE_CDS_ARG_SEARCH_CRIT           "SearchCriteria"
 
 /* CDS Argument Values */
 #define SERVICE_CDS_ROOT_OBJECT_ID            "0"
@@ -68,6 +69,13 @@
 #define SERVICE_CDS_DIDL_NUM_RETURNED         "NumberReturned"
 #define SERVICE_CDS_DIDL_TOTAL_MATCH          "TotalMatches"
 #define SERVICE_CDS_DIDL_UPDATE_ID            "UpdateID"
+
+/* CDS Search Parameters */
+#define SEARCH_CLASS_MATCH_KEYWORD            "(upnp:class = \""
+#define SEARCH_CLASS_DERIVED_KEYWORD          "(upnp:class derivedfrom \""
+#define SEARCH_PROTOCOL_CONTAINS_KEYWORD      "(res@protocolInfo contains \""
+#define SEARCH_OBJECT_KEYWORD                 "object"
+#define SEARCH_AND                            ") and ("
 
 /* CDS DIDL Messages */
 #define DIDL_NAMESPACE \
@@ -572,6 +580,243 @@ cds_browse (dlna_t *dlna, upnp_action_event_t *ev)
   return 0;
 }
 
+static int
+cds_search_match (dlna_t *dlna, vfs_item_t *item, char *search_criteria)
+{
+  char keyword[256];
+  int derived_from = 0, protocol_contains = 0, result = 0;
+  char *and_clause = NULL;
+  char *protocol_info;
+  char *object_type = NULL;
+  
+  if (!item || !search_criteria)
+    return 0;
+
+  memset (keyword, '\0', sizeof (keyword));
+  
+  if (!strncmp (search_criteria, SEARCH_CLASS_MATCH_KEYWORD,
+                strlen (SEARCH_CLASS_MATCH_KEYWORD)))
+  {
+    strncpy (keyword, search_criteria
+             + strlen (SEARCH_CLASS_MATCH_KEYWORD), sizeof (keyword));
+  }
+  else if (!strncmp (search_criteria, SEARCH_CLASS_DERIVED_KEYWORD,
+                     strlen (SEARCH_CLASS_DERIVED_KEYWORD)))
+  {
+    derived_from = 1;
+    strncpy (keyword, search_criteria
+             + strlen (SEARCH_CLASS_DERIVED_KEYWORD), sizeof (keyword));
+  }
+  else if (!strncmp (search_criteria, SEARCH_PROTOCOL_CONTAINS_KEYWORD,
+                     strlen (SEARCH_PROTOCOL_CONTAINS_KEYWORD)))
+  {
+    protocol_contains = 1;
+    strncpy (keyword, search_criteria
+             + strlen (SEARCH_PROTOCOL_CONTAINS_KEYWORD), sizeof (keyword));
+  }
+  else
+    strcpy (keyword, SEARCH_OBJECT_KEYWORD);
+
+  protocol_info =
+    dlna_write_protocol_info (DLNA_PROTOCOL_INFO_TYPE_HTTP,
+                              DLNA_ORG_PLAY_SPEED_NORMAL,
+                              item->u.resource.cnv,
+                              DLNA_ORG_OPERATION_RANGE,
+                              dlna->flags, item->u.resource.item->profile);
+
+  object_type = dlna_profile_upnp_object_item (item->u.resource.item->profile);
+  
+  if (derived_from && object_type
+      && !strncmp (object_type, keyword, strlen (keyword)))
+    result = 1;
+  else if (protocol_contains && strstr (protocol_info, keyword))
+    result = 1;
+  else if (object_type && !strcmp (object_type, keyword))
+    result = 1;
+  free (protocol_info);
+  
+  and_clause = strstr (search_criteria, SEARCH_AND);
+  if (and_clause)
+    return (result && cds_search_match (dlna, item,
+                                        and_clause + strlen (SEARCH_AND) -1));
+
+  return 1;
+}
+
+static int
+cds_search_recursive (dlna_t *dlna, vfs_item_t *item, buffer_t *out,
+                      int count, char *filter, char *search_criteria)
+{
+  vfs_item_t **items;
+  int result_count = 0;
+
+  if (item->type != DLNA_CONTAINER)
+    return 0;
+  
+  /* go to the first child */
+  items = item->u.container.children;
+  
+  for (; *items; items++)
+  {
+    /* only fetch the requested count number or all entries if count = 0 */
+    if (count == 0 || result_count < count)
+    {
+      switch ((*items)->type)
+      {
+      case DLNA_CONTAINER:
+        result_count +=
+          cds_search_recursive (dlna, *items, out,
+                                (count == 0) ? 0 : (count - result_count),
+                                filter, search_criteria);
+        break;
+
+      case DLNA_RESOURCE:        
+        if (cds_search_match (dlna, *items, search_criteria))
+        {
+          didl_add_item (dlna, out, *items, "true", filter);
+          result_count++;
+        }
+        break;
+
+      default:
+        break;
+      }
+    }
+  }
+
+  return result_count;
+}
+
+static int
+cds_search_directchildren (dlna_t *dlna, upnp_action_event_t *ev,
+                           vfs_item_t *item, buffer_t *out, int index,
+                           int count, char *filter, char *search_criteria)
+{
+  vfs_item_t **items;
+  int i, result_count = 0;
+  char tmp[32];
+  
+  index = 0;
+
+  /* searching only has a sense on containers */
+  if (item->type != DLNA_CONTAINER)
+    return -1;
+  
+  didl_add_header (out);
+
+  /* go to the child pointed out by index */
+  items = item->u.container.children;
+  for (i = 0; i < index; i++)
+    if (*items)
+      items++;
+
+  /* UPnP CDS compliance : If starting index = 0 and requested count = 0
+     then all children must be returned */
+  if (index == 0 && count == 0)
+    count = item->u.container.children_count;
+
+  result_count =
+    cds_search_recursive (dlna, item, out, count, filter, search_criteria);
+
+  didl_add_footer (out);
+
+  upnp_add_response (ev, SERVICE_CDS_DIDL_RESULT, out->buf);
+  sprintf (tmp, "%d", result_count);
+  upnp_add_response (ev, SERVICE_CDS_DIDL_NUM_RETURNED, tmp);
+  sprintf (tmp, "%d", result_count);
+  upnp_add_response (ev, SERVICE_CDS_DIDL_TOTAL_MATCH, tmp);
+
+  return result_count;
+}
+
+/*
+ * Search:
+ *   This action allows the caller to search the content directory for
+ *   objects that match some search criteria.
+ *   The search criteria are specified as a query string operating on
+ *   properties with comparison and logical operators.
+ */
+static int
+cds_search (dlna_t *dlna, upnp_action_event_t *ev)
+{
+  /* input arguments */
+  int index, count, id, sort_criteria;
+  char *search_criteria = NULL, *filter = NULL;
+
+  /* output arguments */
+  buffer_t *out = NULL;
+  vfs_item_t *item;
+  int result_count = 0;
+  
+  if (!dlna || !ev)
+  {
+    ev->ar->ErrCode = CDS_ERR_ACTION_FAILED;
+    return 0;
+  }
+
+  /* Check for status */
+  if (!ev->status)
+  {
+    ev->ar->ErrCode = CDS_ERR_ACTION_FAILED;
+    return 0;
+  }
+
+  /* Retrieve input arguments */
+  id              = upnp_get_ui4    (ev->ar, SERVICE_CDS_ARG_OBJECT_ID);
+  search_criteria = upnp_get_string (ev->ar,
+                                     SERVICE_CDS_ARG_SEARCH_CRIT);
+  filter          = upnp_get_string (ev->ar, SERVICE_CDS_ARG_FILTER);
+  index           = upnp_get_ui4    (ev->ar, SERVICE_CDS_ARG_START_INDEX);
+  count           = upnp_get_ui4    (ev->ar, SERVICE_CDS_ARG_REQUEST_COUNT);
+  sort_criteria   = upnp_get_ui4    (ev->ar, SERVICE_CDS_ARG_SORT_CRIT);
+
+  if (!search_criteria || !filter)
+  {
+    ev->ar->ErrCode = CDS_ERR_INVALID_ARGS;
+    goto search_err;
+  }
+
+  /* find requested item in VFS */
+  item = vfs_get_item_by_id (dlna->vfs_root, id);
+  if (!item)
+    item = vfs_get_item_by_id (dlna->vfs_root, 0);
+
+  if (!item)
+  {
+    ev->ar->ErrCode = CDS_ERR_INVALID_CONTAINER;
+    goto search_err;
+  }
+  
+  out = buffer_new ();
+  result_count = cds_search_directchildren (dlna, ev, item, out, index, count,
+                                            filter, search_criteria);
+
+  if (result_count < 0)
+  {
+    ev->ar->ErrCode = CDS_ERR_ACTION_FAILED;
+    goto search_err;
+  }
+  
+  buffer_free (out);
+  upnp_add_response (ev, SERVICE_CDS_DIDL_UPDATE_ID,
+                     SERVICE_CDS_ROOT_OBJECT_ID);
+
+  free (search_criteria);
+  free (filter);
+
+  return ev->status;
+
+ search_err:
+  if (search_criteria)
+    free (search_criteria);
+  if (filter)
+    free (filter);
+  if (out)
+    buffer_free (out);
+
+  return 0;
+}
+
 /* List of UPnP ContentDirectory Service actions */
 upnp_service_action_t cds_service_actions[] = {
   /* CDS Required Actions */
@@ -581,7 +826,7 @@ upnp_service_action_t cds_service_actions[] = {
   { SERVICE_CDS_ACTION_BROWSE,         cds_browse },
 
   /* CDS Optional Actions */
-  { SERVICE_CDS_ACTION_SEARCH,         NULL },
+  { SERVICE_CDS_ACTION_SEARCH,         cds_search },
   { SERVICE_CDS_ACTION_CREATE_OBJ,     NULL },
   { SERVICE_CDS_ACTION_DESTROY_OBJ,    NULL },
   { SERVICE_CDS_ACTION_UPDATE_OBJ,     NULL },
