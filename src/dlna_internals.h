@@ -87,6 +87,9 @@ struct dlna_s {
   /* DLNA flags*/
   int flags;
 
+  /* Internal HTTP Server */
+  dlna_http_callback_t *http_callback;
+
   /* VFS for Content Directory */
   vfs_item_t *vfs_root;
   uint32_t vfs_items;

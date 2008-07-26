@@ -92,6 +92,20 @@ upnp_http_get_info (void *cookie,
   dlna_log (dlna, DLNA_MSG_INFO,
             "%s, filename : %s\n", __FUNCTION__, filename);
 
+  /* trap application-level HTTP callback */
+  if (dlna->http_callback && dlna->http_callback->get_info)
+  {
+    dlna_http_file_info_t finfo;
+    int err;
+
+    err = dlna->http_callback->get_info (filename, &finfo);
+    if (err)
+      return HTTP_ERROR;
+
+    set_service_http_info (info, finfo.file_length, finfo.content_type);
+    return HTTP_OK;
+  }
+  
   /* ask for Content Directory Service (CDS) */
   if (!strcmp (filename, CDS_LOCATION))
   {
@@ -232,6 +246,10 @@ upnp_http_open (void *cookie,
   if (mode != UPNP_READ)
     return NULL;
 
+  /* trap application-level HTTP callback */
+  if (dlna->http_callback && dlna->http_callback->open)
+    return dlna->http_callback->open (filename);
+  
   /* ask for Content Directory Service (CDS) */
   if (!strcmp (filename, CDS_LOCATION))
     return http_get_file_from_memory (CDS_LOCATION,
@@ -274,6 +292,10 @@ upnp_http_read (void *cookie,
   
   dlna_log (dlna, DLNA_MSG_INFO, "%s\n", __FUNCTION__);
 
+  /* trap application-level HTTP callback */
+  if (dlna->http_callback && dlna->http_callback->read)
+    return dlna->http_callback->read (fh, buf, buflen);
+  
   switch (hdl->type)
   {
   case HTTP_FILE_LOCAL:
@@ -299,11 +321,19 @@ upnp_http_read (void *cookie,
 }
 
 static int
-upnp_http_write (void *cookie dlna_unused,
-                 UpnpWebFileHandle fh dlna_unused,
-                 char *buf dlna_unused,
-                 size_t buflen dlna_unused)
+upnp_http_write (void *cookie,
+                 UpnpWebFileHandle fh,
+                 char *buf,
+                 size_t buflen)
 {
+  dlna_t *dlna;
+
+  dlna = (dlna_t *) cookie;
+  
+  /* trap application-level HTTP callback */
+  if (dlna->http_callback && dlna->http_callback->write)
+    return dlna->http_callback->write (fh, buf, buflen);
+  
   return 0;
 }
 
@@ -325,6 +355,10 @@ upnp_http_seek (void *cookie,
   
   dlna_log (dlna, DLNA_MSG_INFO, "%s\n", __FUNCTION__);
 
+  /* trap application-level HTTP callback */
+  if (dlna->http_callback && dlna->http_callback->seek)
+    return dlna->http_callback->seek (fh, offset, origin);
+  
   switch (origin)
   {
   case SEEK_SET:
@@ -410,6 +444,10 @@ upnp_http_close (void *cookie,
   
   dlna_log (dlna, DLNA_MSG_INFO, "%s\n", __FUNCTION__);
 
+  /* trap application-level HTTP callback */
+  if (dlna->http_callback && dlna->http_callback->close)
+    return dlna->http_callback->close (fh);
+  
   switch (hdl->type)
   {
   case HTTP_FILE_LOCAL:

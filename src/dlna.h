@@ -215,7 +215,33 @@ typedef struct dlna_item_s {
   dlna_metadata_t *metadata;
   dlna_profile_t *profile;
 } dlna_item_t;
- 
+
+/**
+ * DLNA Internal WebServer File Handler
+ */
+typedef void *dlna_http_file_handler_t;
+
+/**
+ * DLNA Internal WebServer File Information
+ */
+typedef struct dlna_http_file_info_s {
+  off_t file_length;
+  char *content_type;
+} dlna_http_file_info_t;
+
+/**
+ * DLNA Internal WebServer Operation Callbacks
+ *  Return 0 for success, 1 otherwise.
+ */
+typedef struct dlna_http_callback_s {
+  int (*get_info) (const char *filename, dlna_http_file_info_t *info);
+  dlna_http_file_handler_t (*open) (const char *filename);
+  int (*read) (dlna_http_file_handler_t hdl, char *buf, size_t len);
+  int (*write) (dlna_http_file_handler_t hdl, char *buf, size_t len);
+  int (*seek) (dlna_http_file_handler_t hdl, off_t offset, int origin);
+  int (*close) (dlna_http_file_handler_t hdl);
+} dlna_http_callback_t;
+
 /**
  * DLNA Library's controller.
  * This controls the whole library.
@@ -280,6 +306,15 @@ void dlna_set_extension_check (dlna_t *dlna, int level);
  * @param[in] itf   Name of the interface to be used.
  */
 void dlna_set_interface (dlna_t *dlna, char *itf);
+
+/**
+ * Set library's WebServer Callback routines.
+ *   This is used by application to overload default's HTTP routines.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] cb    Structure with HTTP callbacks.
+ */
+void dlna_set_http_callback (dlna_t *dlna, dlna_http_callback_t *cb);
 
 /**
  * Register all known/supported DLNA profiles.

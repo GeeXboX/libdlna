@@ -61,6 +61,9 @@ dlna_init (void)
   dlna->first_profile = NULL;
   dlna->flags = 0;
 
+  /* Internal HTTP Server */
+  dlna->http_callback = NULL;
+  
   dlna->vfs_root = NULL;
   dlna->vfs_items = 0;
   dlna_vfs_add_container (dlna, "root", 0, 0);
@@ -98,6 +101,10 @@ dlna_uninit (dlna_t *dlna)
   vfs_item_free (dlna->vfs_root);
   free (dlna->interface);
 
+  /* Internal HTTP Server */
+  if (dlna->http_callback)
+    free (dlna->http_callback);
+  
   /* UPnP Properties */
   free (dlna->friendly_name);
   free (dlna->manufacturer);
@@ -375,6 +382,15 @@ dlna_set_device_uuid (dlna_t *dlna, char *str)
   if (dlna->uuid)
     free (dlna->uuid);
   dlna->uuid = strdup (str);
+}
+
+void
+dlna_set_http_callback (dlna_t *dlna, dlna_http_callback_t *cb)
+{
+  if (!dlna)
+    return;
+
+  dlna->http_callback = cb;
 }
 
 char *
