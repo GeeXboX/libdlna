@@ -530,6 +530,14 @@ void dlna_set_device_serial_number (dlna_t *dlna, char *str);
  */
 void dlna_set_device_uuid (dlna_t *dlna, char *str);
 
+/**
+ * Set device UPnP presentation URL.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] str   Value to be set.
+ */
+void dlna_set_device_presentation_url (dlna_t *dlna, char *str);
+
 #ifdef __cplusplus
 #if 0 /* avoid EMACS indent */
 {

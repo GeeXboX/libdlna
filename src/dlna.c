@@ -80,6 +80,7 @@ dlna_init (void)
   dlna->model_url = strdup ("http://libdlna.geexbox.org/");
   dlna->serial_number = strdup ("libdlna-001");
   dlna->uuid = strdup ("01:23:45:67:89");
+  dlna->presentation = strdup ("presentation.html");
   
   /* register all FFMPEG demuxers */
   av_register_all ();
@@ -115,6 +116,7 @@ dlna_uninit (dlna_t *dlna)
   free (dlna->model_url);
   free (dlna->serial_number);
   free (dlna->uuid);
+  free (dlna->presentation);
 
   free (dlna);
 }
@@ -382,6 +384,17 @@ dlna_set_device_uuid (dlna_t *dlna, char *str)
   if (dlna->uuid)
     free (dlna->uuid);
   dlna->uuid = strdup (str);
+}
+
+void
+dlna_set_device_presentation_url (dlna_t *dlna, char *str)
+{
+  if (!dlna || !str)
+    return;
+
+  if (dlna->presentation)
+    free (dlna->presentation);
+  dlna->presentation = strdup (str);
 }
 
 void
