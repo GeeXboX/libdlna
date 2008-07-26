@@ -37,6 +37,25 @@
 /* CMS Arguments */
 #define SERVICE_CMS_ARG_SOURCE                "Source"
 #define SERVICE_CMS_ARG_SINK                  "Sink"
+#define SERVICE_CMS_ARG_CONNECTION_IDS        "ConnectionIDs"
+#define SERVICE_CMS_ARG_CONNECTION_ID         "ConnectionID"
+#define SERVICE_CMS_ARG_RCS_ID                "RcsID"
+#define SERVICE_CMS_ARG_TRANSPORT_ID          "AVTransportID"
+#define SERVICE_CMS_ARG_PROT_INFO             "ProtocolInfo"
+#define SERVICE_CMS_ARG_PEER_CON_MANAGER      "PeerConnectionManager"
+#define SERVICE_CMS_ARG_PEER_CON_ID           "PeerConnectionID"
+#define SERVICE_CMS_ARG_DIRECTION             "Direction"
+#define SERVICE_CMS_ARG_STATUS                "Status"
+
+/* CMS Argument Values */
+#define SERVICE_CMS_DEFAULT_CON_ID            "0"
+#define SERVICE_CMS_UNKNOW_ID                 "-1"
+#define SERVICE_CMS_OUTPUT                    "Output"
+#define SERVICE_CMS_STATUS_OK                 "OK"
+
+/* CMS Error Codes */
+#define SERVICE_CMS_ERR_INVALID_ARGS          402
+#define SERVICE_CMS_ERR_PARAMETER_MISMATCH    706
 
 /*
  * GetProtocolInfo:
@@ -85,17 +104,43 @@ cms_get_current_connection_ids (dlna_t *dlna, upnp_action_event_t *ev)
 
   dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
 
+  upnp_add_response (ev, SERVICE_CMS_ARG_CONNECTION_IDS, "");
+  
   return ev->status;
 }
 
 static int
 cms_get_current_connection_info (dlna_t *dlna, upnp_action_event_t *ev)
 {
+  char **mimes, **tmp;
+  
   if (!dlna || !ev)
     return 0;
 
   dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
 
+  upnp_add_response (ev, SERVICE_CMS_ARG_CONNECTION_ID,
+                     SERVICE_CMS_DEFAULT_CON_ID);
+  upnp_add_response (ev, SERVICE_CMS_ARG_RCS_ID, SERVICE_CMS_UNKNOW_ID);
+  upnp_add_response (ev, SERVICE_CMS_ARG_TRANSPORT_ID, SERVICE_CMS_UNKNOW_ID);
+
+  mimes = dlna_get_supported_mime_types (dlna);
+  tmp = mimes;
+
+  while (*tmp)
+  {
+    char protocol[512];
+
+    memset (protocol, '\0', sizeof (protocol));
+    snprintf (protocol, sizeof (protocol), "http-get:*:%s:*", *tmp++);
+    upnp_add_response (ev, SERVICE_CMS_ARG_PROT_INFO, protocol);
+  }
+  
+  upnp_add_response (ev, SERVICE_CMS_ARG_PEER_CON_MANAGER, "");
+  upnp_add_response (ev, SERVICE_CMS_ARG_PEER_CON_ID, SERVICE_CMS_UNKNOW_ID);
+  upnp_add_response (ev, SERVICE_CMS_ARG_DIRECTION, SERVICE_CMS_OUTPUT);
+  upnp_add_response (ev, SERVICE_CMS_ARG_STATUS, SERVICE_CMS_STATUS_OK);
+  
   return ev->status;
 }
 
