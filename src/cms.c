@@ -71,8 +71,6 @@ cms_get_protocol_info (dlna_t *dlna, upnp_action_event_t *ev)
   if (!dlna || !ev)
     return 0;
 
-  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
-
   source = buffer_new ();
   mimes = dlna_get_supported_mime_types (dlna);
   tmp = mimes;
@@ -102,8 +100,6 @@ cms_get_current_connection_ids (dlna_t *dlna, upnp_action_event_t *ev)
   if (!dlna || !ev)
     return 0;
 
-  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
-
   upnp_add_response (ev, SERVICE_CMS_ARG_CONNECTION_IDS, "");
   
   return ev->status;
@@ -116,8 +112,6 @@ cms_get_current_connection_info (dlna_t *dlna, upnp_action_event_t *ev)
   
   if (!dlna || !ev)
     return 0;
-
-  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
 
   upnp_add_response (ev, SERVICE_CMS_ARG_CONNECTION_ID,
                      SERVICE_CMS_DEFAULT_CON_ID);

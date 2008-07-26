@@ -152,7 +152,6 @@ cds_get_search_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
     return 0;
   }
 
-  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
   upnp_add_response (ev, SERVICE_CDS_ARG_SEARCH_CAPS, "");
   
   return ev->status;
@@ -171,7 +170,6 @@ cds_get_sort_capabilities (dlna_t *dlna, upnp_action_event_t *ev)
     return 0;
   }
 
-  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
   upnp_add_response (ev, SERVICE_CDS_ARG_SORT_CAPS, "");
   
   return ev->status;
@@ -192,7 +190,6 @@ cds_get_system_update_id (dlna_t *dlna, upnp_action_event_t *ev)
     return 0;
   }
 
-  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
   upnp_add_response (ev, SERVICE_CDS_ARG_UPDATE_ID,
                      SERVICE_CDS_ROOT_OBJECT_ID);
   
@@ -504,8 +501,6 @@ cds_browse (dlna_t *dlna, upnp_action_event_t *ev)
     return 0;
   }
   
-  dlna_log (dlna, DLNA_MSG_INFO, "%s:%d\n", __FUNCTION__, __LINE__);
-
   /* Retrieve input arguments */
   id     = upnp_get_ui4    (ev->ar, SERVICE_CDS_ARG_OBJECT_ID);
   flag   = upnp_get_string (ev->ar, SERVICE_CDS_ARG_BROWSE_FLAG);
