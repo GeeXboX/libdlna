@@ -24,6 +24,8 @@
 
 #include "upnp_internals.h"
 
+#define STARTING_ENTRY_ID_XBOX360 100000
+
 void
 vfs_item_free (vfs_item_t *item)
 {
@@ -91,15 +93,19 @@ static uint32_t
 vfs_provide_next_id (dlna_t *dlna)
 {
   uint32_t i;
+  uint32_t start = 1;
+
+  if (dlna->mode == DLNA_CAPABILITY_UPNP_AV_XBOX)
+    start += STARTING_ENTRY_ID_XBOX360;
 
   if (!dlna->vfs_root)
-    return 0;
+    return (start - 1);
   
-  for (i = 1; i < UINT_MAX; i++)
+  for (i = start; i < UINT_MAX; i++)
     if (vfs_is_id_registered (dlna, i) == DLNA_ST_ERROR)
       return i;
 
-  return 0;
+  return (start - 1);
 }
 
 vfs_item_t *
