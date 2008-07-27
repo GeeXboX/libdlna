@@ -33,6 +33,7 @@
 #define UPNP_MAX_CONTENT_LENGTH 4096
 #define VIRTUAL_DIR "/web"
 #define SERVICES_VIRTUAL_DIR "/services"
+#define XBOX_MODEL_NAME "Windows Media Connect Compatible"
 
 typedef struct upnp_service_s         upnp_service_t;
 typedef struct upnp_action_event_s    upnp_action_event_t;
