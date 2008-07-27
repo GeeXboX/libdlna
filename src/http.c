@@ -99,11 +99,11 @@ upnp_http_get_info (void *cookie,
     int err;
 
     err = dlna->http_callback->get_info (filename, &finfo);
-    if (err)
-      return HTTP_ERROR;
-
-    set_service_http_info (info, finfo.file_length, finfo.content_type);
-    return HTTP_OK;
+    if (!err)
+    {
+      set_service_http_info (info, finfo.file_length, finfo.content_type);
+      return HTTP_OK;
+    }
   }
   
   /* ask for Content Directory Service (CDS) */
@@ -248,7 +248,12 @@ upnp_http_open (void *cookie,
 
   /* trap application-level HTTP callback */
   if (dlna->http_callback && dlna->http_callback->open)
-    return dlna->http_callback->open (filename);
+  {
+    UpnpWebFileHandle *hdl;
+    hdl = dlna->http_callback->open (filename);
+    if (hdl)
+      return hdl;
+  }
   
   /* ask for Content Directory Service (CDS) */
   if (!strcmp (filename, CDS_LOCATION))
@@ -294,7 +299,12 @@ upnp_http_read (void *cookie,
 
   /* trap application-level HTTP callback */
   if (dlna->http_callback && dlna->http_callback->read)
-    return dlna->http_callback->read (fh, buf, buflen);
+  {
+    int res;
+    res = dlna->http_callback->read (fh, buf, buflen);
+    if (res > 0)
+      return res;
+  }
   
   switch (hdl->type)
   {
@@ -332,7 +342,12 @@ upnp_http_write (void *cookie,
   
   /* trap application-level HTTP callback */
   if (dlna->http_callback && dlna->http_callback->write)
-    return dlna->http_callback->write (fh, buf, buflen);
+  {
+    int res;
+    res = dlna->http_callback->write (fh, buf, buflen);
+    if (res > 0)
+      return res;
+  }
   
   return 0;
 }
@@ -357,7 +372,12 @@ upnp_http_seek (void *cookie,
 
   /* trap application-level HTTP callback */
   if (dlna->http_callback && dlna->http_callback->seek)
-    return dlna->http_callback->seek (fh, offset, origin);
+  {
+    int res;
+    res = dlna->http_callback->seek (fh, offset, origin);
+    if (res == 0)
+      return res;
+  }
   
   switch (origin)
   {
@@ -446,7 +466,12 @@ upnp_http_close (void *cookie,
 
   /* trap application-level HTTP callback */
   if (dlna->http_callback && dlna->http_callback->close)
-    return dlna->http_callback->close (fh);
+  {
+    int res;
+    res = dlna->http_callback->close (fh);
+    if (res == 0)
+      return res;
+  }
   
   switch (hdl->type)
   {
