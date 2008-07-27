@@ -393,6 +393,22 @@ uint32_t dlna_vfs_add_resource (dlna_t *dlna, char *name,
                                 uint32_t container_id);
 
 /**
+ * Remove an existing item (and all its children) from VFS layer by ID.
+ *
+ * @param[in] dlna         The DLNA library's controller.
+ * @param[in] id           Unique ID of the item to be removed.
+ */
+void dlna_vfs_remove_item_by_id (dlna_t *dlna, uint32_t id);
+
+/**
+ * Remove an existing item (and all its children) from VFS layer by name.
+ *
+ * @param[in] dlna         The DLNA library's controller.
+ * @param[in] name         Name of the item to be removed.
+ */
+void dlna_vfs_remove_item_by_name (dlna_t *dlna, char *name);
+
+/**
  * Provides UPnP A/V ContentDirectory Object Item associated to profile.
  *
  * @warning This function returns a pointer, do _NOT_ free it.

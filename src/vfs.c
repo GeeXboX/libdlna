@@ -134,6 +134,32 @@ vfs_get_item_by_id (vfs_item_t *item, uint32_t id)
   return NULL;
 }
 
+vfs_item_t *
+vfs_get_item_by_name (vfs_item_t *item, char *name)
+{
+  vfs_item_t **children;
+
+  if (!item)
+    return NULL;
+
+  /* matching 'title' */
+  if (!strcmp (item->title, name))
+    return item;
+
+  if (item->type != DLNA_CONTAINER)
+    return NULL;
+
+  for (children = item->u.container.children; *children; children++)
+  {
+    vfs_item_t *it;
+    it = vfs_get_item_by_name (*children, name);
+    if (it)
+      return it;
+  }
+
+  return NULL;
+}
+
 static int
 list_get_length (void *list)
 {
@@ -267,4 +293,32 @@ dlna_vfs_add_resource (dlna_t *dlna, char *name,
   vfs_item_add_child (dlna, item->parent, item);
   
   return item->id;
+}
+
+void
+dlna_vfs_remove_item_by_id (dlna_t *dlna, uint32_t id)
+{
+  vfs_item_t *item;
+
+  if (!dlna)
+    return;
+  
+  item = vfs_get_item_by_id (dlna->vfs_root, id);
+  dlna_log (dlna, DLNA_MSG_INFO,
+            "Removing item #%d (%s)\n", item->id, item->title);
+  vfs_item_free (item);
+}
+
+void
+dlna_vfs_remove_item_by_title (dlna_t *dlna, char *name)
+{
+  vfs_item_t *item;
+
+  if (!dlna || !name)
+    return;
+
+  item = vfs_get_item_by_name (dlna->vfs_root, name);
+  dlna_log (dlna, DLNA_MSG_INFO,
+            "Removing item #%d (%s)\n", item->id, item->title);
+  vfs_item_free (item);
 }
