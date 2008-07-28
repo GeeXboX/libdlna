@@ -58,6 +58,7 @@ vfs_item_free (dlna_t *dlna, vfs_item_t *item)
   }
   
   item->parent = NULL;
+  dlna->vfs_items--;
 }
 
 static dlna_status_code_t
