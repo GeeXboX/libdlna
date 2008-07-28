@@ -535,9 +535,9 @@ cds_browse (dlna_t *dlna, upnp_action_event_t *ev)
   free (flag);
 
   /* find requested item in VFS */
-  item = vfs_get_item_by_id (dlna->vfs_root, id);
+  item = vfs_get_item_by_id (dlna, id);
   if (!item)
-    item = vfs_get_item_by_id (dlna->vfs_root, 0);
+    item = vfs_get_item_by_id (dlna, 0);
 
   if (!item)
   {
@@ -772,9 +772,9 @@ cds_search (dlna_t *dlna, upnp_action_event_t *ev)
   }
 
   /* find requested item in VFS */
-  item = vfs_get_item_by_id (dlna->vfs_root, id);
+  item = vfs_get_item_by_id (dlna, id);
   if (!item)
-    item = vfs_get_item_by_id (dlna->vfs_root, 0);
+    item = vfs_get_item_by_id (dlna, 0);
 
   if (!item)
   {

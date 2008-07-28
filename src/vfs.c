@@ -27,11 +27,13 @@
 #define STARTING_ENTRY_ID_XBOX360 100000
 
 void
-vfs_item_free (vfs_item_t *item)
+vfs_item_free (dlna_t *dlna, vfs_item_t *item)
 {
-  if (!item)
+  if (!dlna || !dlna->vfs_root || !item)
     return;
 
+  HASH_DEL (dlna->vfs_root, item);
+  
   if (item->title)
     free (item->title);
 
@@ -49,7 +51,7 @@ vfs_item_free (vfs_item_t *item)
   {
     vfs_item_t **children;
     for (children = item->u.container.children; *children; children++)
-      vfs_item_free (*children);
+      vfs_item_free (dlna, *children);
     free (item->u.container.children);
     break;
   }
@@ -59,34 +61,16 @@ vfs_item_free (vfs_item_t *item)
 }
 
 static dlna_status_code_t
-vfs_item_is_id_registered (vfs_item_t *item, uint32_t id)
-{
-  vfs_item_t **children;
-
-  if (!item)
-    return DLNA_ST_ERROR;
-
-  /* matching 'id' */
-  if (item->id == id)
-    return DLNA_ST_OK;
-
-  if (item->type != DLNA_CONTAINER)
-    return DLNA_ST_ERROR;
-
-  for (children = item->u.container.children; *children; children++)
-    if (vfs_item_is_id_registered (*children, id) == DLNA_ST_OK)
-      return DLNA_ST_OK;
-
-  return DLNA_ST_ERROR;
-}
-
-static dlna_status_code_t
 vfs_is_id_registered (dlna_t *dlna, uint32_t id)
 {
-  if (!dlna)
+  vfs_item_t *item = NULL;
+
+  if (!dlna || !dlna->vfs_root)
     return DLNA_ST_ERROR;
 
-  return vfs_item_is_id_registered (dlna->vfs_root, id);
+  HASH_FIND_INT (dlna->vfs_root, &id, item);
+
+  return item ? DLNA_ST_OK : DLNA_ST_ERROR;
 }
 
 static uint32_t
@@ -109,53 +93,29 @@ vfs_provide_next_id (dlna_t *dlna)
 }
 
 vfs_item_t *
-vfs_get_item_by_id (vfs_item_t *item, uint32_t id)
+vfs_get_item_by_id (dlna_t *dlna, uint32_t id)
 {
-  vfs_item_t **children;
+  vfs_item_t *item = NULL;
 
-  if (!item)
+  if (!dlna || !dlna->vfs_root)
     return NULL;
 
-  /* matching 'id' */
-  if (item->id == id)
-    return item;
+  HASH_FIND_INT (dlna->vfs_root, &id, item);
 
-  if (item->type != DLNA_CONTAINER)
-    return NULL;
-
-  for (children = item->u.container.children; *children; children++)
-  {
-    vfs_item_t *it;
-    it = vfs_get_item_by_id (*children, id);
-    if (it)
-      return it;
-  }
-
-  return NULL;
+  return item;
 }
 
 vfs_item_t *
-vfs_get_item_by_name (vfs_item_t *item, char *name)
+vfs_get_item_by_name (dlna_t *dlna, char *name)
 {
-  vfs_item_t **children;
+  vfs_item_t *item = NULL;
 
-  if (!item)
+  if (!dlna || !dlna->vfs_root)
     return NULL;
-
-  /* matching 'title' */
-  if (!strcmp (item->title, name))
-    return item;
-
-  if (item->type != DLNA_CONTAINER)
-    return NULL;
-
-  for (children = item->u.container.children; *children; children++)
-  {
-    vfs_item_t *it;
-    it = vfs_get_item_by_name (*children, name);
-    if (it)
-      return it;
-  }
+  
+  for (item = dlna->vfs_root; item; item = item->hh.next)
+    if (!strcmp (item->title, name))
+      return item;
 
   return NULL;
 }
@@ -197,7 +157,7 @@ vfs_item_add_child (dlna_t *dlna, vfs_item_t *item, vfs_item_t *child)
 
 uint32_t
 dlna_vfs_add_container (dlna_t *dlna, char *name,
-                        uint32_t id, uint32_t container_id)
+                        uint32_t object_id, uint32_t container_id)
 {
   vfs_item_t *item;
   
@@ -210,14 +170,17 @@ dlna_vfs_add_container (dlna_t *dlna, char *name,
 
   item->type = DLNA_CONTAINER;
   
-  /* is requested 'id' available ? */
-  if (id == 0 || vfs_is_id_registered (dlna, id) == DLNA_ST_OK)
+  /* is requested 'object_id' available ? */
+  if (object_id == 0 || vfs_is_id_registered (dlna, object_id) == DLNA_ST_OK)
     item->id = vfs_provide_next_id (dlna);
   else
-    item->id = id;
+    item->id = object_id;
 
+  HASH_ADD_INT (dlna->vfs_root, id, item);
+  
   dlna_log (dlna, DLNA_MSG_INFO,
-            "New container id (asked for #%d, granted #%d)\n", id, item->id);
+            "New container id (asked for #%d, granted #%d)\n",
+            object_id, item->id);
 
   item->title = strdup (name);
 
@@ -229,7 +192,7 @@ dlna_vfs_add_container (dlna_t *dlna, char *name,
     dlna->vfs_root = item;
   
   /* check for a valid parent id */
-  item->parent = vfs_get_item_by_id (dlna->vfs_root, container_id);
+  item->parent = vfs_get_item_by_id (dlna, container_id);
   if (!item->parent)
     item->parent = dlna->vfs_root;
 
@@ -268,22 +231,25 @@ dlna_vfs_add_resource (dlna_t *dlna, char *name,
   item->u.resource.item = dlna_item_new (dlna, fullpath);
   item->u.resource.cnv = DLNA_ORG_CONVERSION_NONE;
 
+  HASH_ADD_INT (dlna->vfs_root, id, item);
+  
   if (!item->u.resource.item)
   {
     dlna_log (dlna, DLNA_MSG_WARNING,
               "Specified resource is not DLNA compliant. "
               "Transcoding is needed (but not yet supported)\n");
-    vfs_item_free (item);
+    vfs_item_free (dlna, item);
     return 0;
   }
 
-  dlna_log (dlna, DLNA_MSG_INFO, "New resource id #%d\n", item->id);
+  dlna_log (dlna, DLNA_MSG_INFO, "New resource id #%d (%s)\n",
+            item->id, item->title);
   item->u.resource.fullpath = strdup (fullpath);
   item->u.resource.size = size;
   item->u.resource.fd = -1;
   
   /* determine parent */
-  parent = vfs_get_item_by_id (dlna->vfs_root, container_id);
+  parent = vfs_get_item_by_id (dlna, container_id);
   item->parent = parent ? parent : dlna->vfs_root;
 
   dlna_log (dlna, DLNA_MSG_INFO,
@@ -303,10 +269,10 @@ dlna_vfs_remove_item_by_id (dlna_t *dlna, uint32_t id)
   if (!dlna)
     return;
   
-  item = vfs_get_item_by_id (dlna->vfs_root, id);
+  item = vfs_get_item_by_id (dlna, id);
   dlna_log (dlna, DLNA_MSG_INFO,
             "Removing item #%d (%s)\n", item->id, item->title);
-  vfs_item_free (item);
+  vfs_item_free (dlna, item);
 }
 
 void
@@ -317,8 +283,8 @@ dlna_vfs_remove_item_by_title (dlna_t *dlna, char *name)
   if (!dlna || !name)
     return;
 
-  item = vfs_get_item_by_name (dlna->vfs_root, name);
+  item = vfs_get_item_by_name (dlna, name);
   dlna_log (dlna, DLNA_MSG_INFO,
             "Removing item #%d (%s)\n", item->id, item->title);
-  vfs_item_free (item);
+  vfs_item_free (dlna, item);
 }

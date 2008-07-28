@@ -33,6 +33,8 @@
 #include "upnp/upnp.h"
 #include "upnp/upnptools.h"
 
+#include "uthash.h"
+
 typedef enum {
   DLNA_DEVICE_UNKNOWN,
   DLNA_DEVICE_DMS,      /* Digital Media Server */
@@ -64,11 +66,13 @@ typedef struct vfs_item_s {
   } u;
 
   struct vfs_item_s *parent;
+
+  UT_hash_handle hh;
 } vfs_item_t;
 
-vfs_item_t *vfs_get_item_by_id (vfs_item_t *item, uint32_t id);
-vfs_item_t *vfs_get_item_by_name (vfs_item_t *item, char *name);
-void vfs_item_free (vfs_item_t *item);
+vfs_item_t *vfs_get_item_by_id (dlna_t *dlna, uint32_t id);
+vfs_item_t *vfs_get_item_by_name (dlna_t *dlna, char *name);
+void vfs_item_free (dlna_t *dlna, vfs_item_t *item);
 
 /**
  * DLNA Library's controller.

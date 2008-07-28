@@ -100,7 +100,7 @@ dlna_uninit (dlna_t *dlna)
   dlna->inited = 0;
   dlna_log (dlna, DLNA_MSG_INFO, "DLNA: uninit\n");
   dlna->first_profile = NULL;
-  vfs_item_free (dlna->vfs_root);
+  vfs_item_free (dlna, dlna->vfs_root);
   free (dlna->interface);
 
   /* Internal HTTP Server */
