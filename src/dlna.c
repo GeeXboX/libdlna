@@ -301,7 +301,7 @@ dlna_set_port (dlna_t *dlna, int port)
 }
 
 void
-dlna_set_device_friendly_name (dlna_t *dlna, char *str)
+dlna_device_set_friendly_name (dlna_t *dlna, char *str)
 {
   if (!dlna || !str)
     return;
@@ -312,7 +312,7 @@ dlna_set_device_friendly_name (dlna_t *dlna, char *str)
 }
 
 void
-dlna_set_device_manufacturer (dlna_t *dlna, char *str)
+dlna_device_set_manufacturer (dlna_t *dlna, char *str)
 {
   if (!dlna || !str)
     return;
@@ -323,7 +323,7 @@ dlna_set_device_manufacturer (dlna_t *dlna, char *str)
 }
 
 void
-dlna_set_device_manufacturer_url (dlna_t *dlna, char *str)
+dlna_device_set_manufacturer_url (dlna_t *dlna, char *str)
 {
   if (!dlna || !str)
     return;
@@ -334,7 +334,7 @@ dlna_set_device_manufacturer_url (dlna_t *dlna, char *str)
 }
 
 void
-dlna_set_device_model_description (dlna_t *dlna, char *str)
+dlna_device_set_model_description (dlna_t *dlna, char *str)
 {
   if (!dlna || !str)
     return;
@@ -345,7 +345,7 @@ dlna_set_device_model_description (dlna_t *dlna, char *str)
 }
 
 void
-dlna_set_device_model_name (dlna_t *dlna, char *str)
+dlna_device_set_model_name (dlna_t *dlna, char *str)
 {
   if (!dlna || !str)
     return;
@@ -356,7 +356,7 @@ dlna_set_device_model_name (dlna_t *dlna, char *str)
 }
 
 void
-dlna_set_device_model_number (dlna_t *dlna, char *str)
+dlna_device_set_model_number (dlna_t *dlna, char *str)
 {
   if (!dlna || !str)
     return;
@@ -367,7 +367,7 @@ dlna_set_device_model_number (dlna_t *dlna, char *str)
 }
 
 void
-dlna_set_device_model_url (dlna_t *dlna, char *str)
+dlna_device_set_model_url (dlna_t *dlna, char *str)
 {
   if (!dlna || !str)
     return;
@@ -379,7 +379,7 @@ dlna_set_device_model_url (dlna_t *dlna, char *str)
 
 
 void
-dlna_set_device_serial_number (dlna_t *dlna, char *str)
+dlna_device_set_serial_number (dlna_t *dlna, char *str)
 {
   if (!dlna || !str)
     return;
@@ -390,7 +390,7 @@ dlna_set_device_serial_number (dlna_t *dlna, char *str)
 }
 
 void
-dlna_set_device_uuid (dlna_t *dlna, char *str)
+dlna_device_set_uuid (dlna_t *dlna, char *str)
 {
   if (!dlna || !str)
     return;
@@ -401,7 +401,7 @@ dlna_set_device_uuid (dlna_t *dlna, char *str)
 }
 
 void
-dlna_set_device_presentation_url (dlna_t *dlna, char *str)
+dlna_device_set_presentation_url (dlna_t *dlna, char *str)
 {
   if (!dlna || !str)
     return;

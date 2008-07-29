@@ -107,8 +107,8 @@ main (int argc, char **argv)
   dlna_set_interface (dlna, "eth0");
 
   /* set some UPnP device properties */
-  dlna_set_device_friendly_name (dlna, "libdlna DMS template");
-  dlna_set_device_uuid (dlna, "123456789");
+  dlna_device_set_friendly_name (dlna, "libdlna DMS template");
+  dlna_device_set_uuid (dlna, "123456789");
 
   /* initialize DMS: from this point you have a working/running media server */
   if (dlna_dms_init (dlna) != DLNA_ST_OK)
