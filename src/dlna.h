@@ -46,6 +46,13 @@ extern "C" {
 
 #define LIBDLNA_IDENT        "DLNA " DLNA_STRINGIFY(LIBDLNA_VERSION)
 
+/***************************************************************************/
+/*                                                                         */
+/* DLNA Library Common Utilities                                           */
+/*  Mandatory: Used to configure the whole instance of the library.        */
+/*                                                                         */
+/***************************************************************************/
+
 /* Status code for DLNA related functions */
 typedef enum {
   DLNA_ST_OK,
@@ -137,116 +144,6 @@ typedef enum {
   DLNA_ORG_FLAG_DLNA_V15                   = (1 << 20),
 } dlna_org_flags_t;
 
-typedef enum {
-  DLNA_CLASS_UNKNOWN,
-  DLNA_CLASS_IMAGE,
-  DLNA_CLASS_AUDIO,
-  DLNA_CLASS_AV,
-  DLNA_CLASS_COLLECTION
-} dlna_media_class_t;
-
-typedef enum {
-  /* Image Class */
-  DLNA_PROFILE_IMAGE_JPEG,
-  DLNA_PROFILE_IMAGE_PNG,
-  /* Audio Class */
-  DLNA_PROFILE_AUDIO_AC3,
-  DLNA_PROFILE_AUDIO_AMR,
-  DLNA_PROFILE_AUDIO_ATRAC3,
-  DLNA_PROFILE_AUDIO_LPCM,
-  DLNA_PROFILE_AUDIO_MP3,
-  DLNA_PROFILE_AUDIO_MPEG4,
-  DLNA_PROFILE_AUDIO_WMA,
-  /* AV Class */
-  DLNA_PROFILE_AV_MPEG1,
-  DLNA_PROFILE_AV_MPEG2,
-  DLNA_PROFILE_AV_MPEG4_PART2,
-  DLNA_PROFILE_AV_MPEG4_PART10, /* a.k.a. MPEG-4 AVC */
-  DLNA_PROFILE_AV_WMV9
-} dlna_media_profile_t;
-
-/**
- * DLNA profile.
- * This specifies the DLNA profile one file/stream is compatible with.
- */
-typedef struct dlna_profile_s {
-  /* Profile ID, part of DLNA.ORG_PN= string */
-  const char *id;
-  /* Profile MIME type */
-  const char *mime;
-  /* Profile Label */
-  const char *label;
-  /* Profile type: IMAGE / AUDIO / AV */
-  dlna_media_class_t media_class;
-} dlna_profile_t;
-
-/**
- * DLNA Media Object item metadata
- */
-typedef struct dlna_metadata_s {
-  char     *title;                /* <dc:title> */
-  char     *author;               /* <dc:artist> */
-  char     *comment;              /* <upnp:longDescription> */
-  char     *album;                /* <upnp:album> */
-  uint32_t track;                 /* <upnp:originalTrackNumber> */
-  char     *genre;                /* <upnp:genre> */
-} dlna_metadata_t;
-
-/**
- * DLNA Media Object item properties
- */
-typedef struct dlna_properties_s {
-  int64_t  size;                  /* res@size */
-  char     duration[64];          /* res@duration */
-  uint32_t bitrate;               /* res@bitrate */
-  uint32_t sample_frequency;      /* res@sampleFrequency */
-  uint32_t bps;                   /* res@bitsPerSample */
-  uint32_t channels;              /* res@nrAudioChannels */
-  char     resolution[64];        /* res@resolution */
-} dlna_properties_t;
-
-/**
- * DLNA Media Object item
- */
-typedef struct dlna_item_s {
-  char *filename;
-  dlna_media_class_t media_class;
-  dlna_properties_t *properties;
-  dlna_metadata_t *metadata;
-  dlna_profile_t *profile;
-} dlna_item_t;
-
-/**
- * DLNA Internal WebServer File Handler
- */
-typedef struct dlna_http_file_handler_s {
-  int external;                   /* determines whether the file has to be
-                                     handled internally by libdlna or by
-                                     external application */
-  void *priv;                     /* private file handler */
-} dlna_http_file_handler_t;
-
-/**
- * DLNA Internal WebServer File Information
- */
-typedef struct dlna_http_file_info_s {
-  off_t file_length;
-  char *content_type;
-} dlna_http_file_info_t;
-
-/**
- * DLNA Internal WebServer Operation Callbacks
- *  Return 0 for success, 1 otherwise.
- */
-typedef struct dlna_http_callback_s {
-  int (*get_info) (const char *filename, dlna_http_file_info_t *info);
-  dlna_http_file_handler_t * (*open) (const char *filename);
-  int (*read) (void *hdl, char *buf, size_t len);
-  int (*write) (void *hdl, char *buf, size_t len);
-  int (*seek) (void *hdl, off_t offset, int origin);
-  int (*close) (void *hdl);
-} dlna_http_callback_t;
-
 /**
  * DLNA Library's controller.
  * This controls the whole library.
@@ -320,14 +217,33 @@ void dlna_set_interface (dlna_t *dlna, char *itf);
  */
 void dlna_set_port (dlna_t *dlna, int port);
 
-/**
- * Set library's WebServer Callback routines.
- *   This is used by application to overload default's HTTP routines.
- *
- * @param[in] dlna  The DLNA library's controller.
- * @param[in] cb    Structure with HTTP callbacks.
- */
-void dlna_set_http_callback (dlna_t *dlna, dlna_http_callback_t *cb);
+/***************************************************************************/
+/*                                                                         */
+/* DLNA Media Profiles Handling                                            */
+/*  Mandatory: Used to register one or many DLNA profiles                  */
+/*             you want your device to support.                            */
+/*                                                                         */
+/***************************************************************************/
+
+typedef enum {
+  /* Image Class */
+  DLNA_PROFILE_IMAGE_JPEG,
+  DLNA_PROFILE_IMAGE_PNG,
+  /* Audio Class */
+  DLNA_PROFILE_AUDIO_AC3,
+  DLNA_PROFILE_AUDIO_AMR,
+  DLNA_PROFILE_AUDIO_ATRAC3,
+  DLNA_PROFILE_AUDIO_LPCM,
+  DLNA_PROFILE_AUDIO_MP3,
+  DLNA_PROFILE_AUDIO_MPEG4,
+  DLNA_PROFILE_AUDIO_WMA,
+  /* AV Class */
+  DLNA_PROFILE_AV_MPEG1,
+  DLNA_PROFILE_AV_MPEG2,
+  DLNA_PROFILE_AV_MPEG4_PART2,
+  DLNA_PROFILE_AV_MPEG4_PART10, /* a.k.a. MPEG-4 AVC */
+  DLNA_PROFILE_AV_WMV9
+} dlna_media_profile_t;
 
 /**
  * Register all known/supported DLNA profiles.
@@ -344,6 +260,35 @@ void dlna_register_all_media_profiles (dlna_t *dlna);
  */
 void dlna_register_media_profile (dlna_t *dlna, dlna_media_profile_t profile);
 
+/***************************************************************************/
+/*                                                                         */
+/* DLNA Item Profile Handling                                              */
+/*  Optional: Used to figure out which DLNA profile a file complies with.  */
+/*                                                                         */
+/***************************************************************************/
+
+typedef enum {
+  DLNA_CLASS_UNKNOWN,
+  DLNA_CLASS_IMAGE,
+  DLNA_CLASS_AUDIO,
+  DLNA_CLASS_AV,
+  DLNA_CLASS_COLLECTION
+} dlna_media_class_t;
+
+/**
+ * DLNA profile.
+ * This specifies the DLNA profile one file/stream is compatible with.
+ */
+typedef struct dlna_profile_s {
+  /* Profile ID, part of DLNA.ORG_PN= string */
+  const char *id;
+  /* Profile MIME type */
+  const char *mime;
+  /* Profile Label */
+  const char *label;
+  /* Profile type: IMAGE / AUDIO / AV */
+  dlna_media_class_t media_class;
+} dlna_profile_t;
 
 /**
  * Guess which DLNA profile one input file/stream is compatible with.
@@ -354,64 +299,6 @@ void dlna_register_media_profile (dlna_t *dlna, dlna_media_profile_t profile);
  * @return A pointer on file's DLNA profile if compatible, NULL otherwise.
  */
 dlna_profile_t *dlna_guess_media_profile (dlna_t *dlna, const char *filename);
-
-/**
- * Create a new DLNA media object item.
- *
- * @param[in] dlna     The DLNA library's controller.
- * @param[in] filename The input file to be added.
- * @return A new DLNA object item if compatible, NULL otherwise.
- */
-dlna_item_t *dlna_item_new (dlna_t *dlna, const char *filename);
-
-/**
- * Free an existing DLNA media object item.
- *
- * @param[in] item     The DLNA object item to be freed.
- */
-void dlna_item_free (dlna_item_t *item);
-
-/**
- * Add a new container to the VFS layer.
- *
- * @param[in] dlna         The DLNA library's controller.
- * @param[in] name         Displayed name of the container.
- * @param[in] object_id    Expected UPnP object ID.
- * @param[in] container_id UPnP object ID of its parent.
- * @return The attrbiuted UPnP object ID if successfull, 0 otherwise.
- */
-uint32_t dlna_vfs_add_container (dlna_t *dlna, char *name,
-                                 uint32_t object_id, uint32_t container_id);
-
-/**
- * Add a new resource to the VFS layer.
- *
- * @param[in] dlna         The DLNA library's controller.
- * @param[in] name         Displayed name of the resource.
- * @param[in] fullname     Full path to the specified resource.
- * @param[in] size         Resource file size (in bytes).
- * @param[in] container_id UPnP object ID of its parent.
- * @return The attrbiuted UPnP object ID if successfull, 0 otherwise.
- */
-uint32_t dlna_vfs_add_resource (dlna_t *dlna, char *name,
-                                char *fullpath, off_t size,
-                                uint32_t container_id);
-
-/**
- * Remove an existing item (and all its children) from VFS layer by ID.
- *
- * @param[in] dlna         The DLNA library's controller.
- * @param[in] id           Unique ID of the item to be removed.
- */
-void dlna_vfs_remove_item_by_id (dlna_t *dlna, uint32_t id);
-
-/**
- * Remove an existing item (and all its children) from VFS layer by name.
- *
- * @param[in] dlna         The DLNA library's controller.
- * @param[in] name         Name of the item to be removed.
- */
-void dlna_vfs_remove_item_by_name (dlna_t *dlna, char *name);
 
 /**
  * Provides UPnP A/V ContentDirectory Object Item associated to profile.
@@ -441,6 +328,90 @@ char * dlna_write_protocol_info (dlna_protocol_info_type_t type,
                                  dlna_org_flags_t flags,
                                  dlna_profile_t *p);
 
+/***************************************************************************/
+/*                                                                         */
+/* DLNA Item Handling                                                      */
+/*  Optional: Used to create a DLNA Media Item instance from a given file. */
+/*                                                                         */
+/***************************************************************************/
+
+/**
+ * DLNA Media Object item metadata
+ */
+typedef struct dlna_metadata_s {
+  char     *title;                /* <dc:title> */
+  char     *author;               /* <dc:artist> */
+  char     *comment;              /* <upnp:longDescription> */
+  char     *album;                /* <upnp:album> */
+  uint32_t track;                 /* <upnp:originalTrackNumber> */
+  char     *genre;                /* <upnp:genre> */
+} dlna_metadata_t;
+
+/**
+ * DLNA Media Object item properties
+ */
+typedef struct dlna_properties_s {
+  int64_t  size;                  /* res@size */
+  char     duration[64];          /* res@duration */
+  uint32_t bitrate;               /* res@bitrate */
+  uint32_t sample_frequency;      /* res@sampleFrequency */
+  uint32_t bps;                   /* res@bitsPerSample */
+  uint32_t channels;              /* res@nrAudioChannels */
+  char     resolution[64];        /* res@resolution */
+} dlna_properties_t;
+
+/**
+ * DLNA Media Object item
+ */
+typedef struct dlna_item_s {
+  char *filename;
+  dlna_media_class_t media_class;
+  dlna_properties_t *properties;
+  dlna_metadata_t *metadata;
+  dlna_profile_t *profile;
+} dlna_item_t;
+
+/**
+ * Create a new DLNA media object item.
+ *
+ * @param[in] dlna     The DLNA library's controller.
+ * @param[in] filename The input file to be added.
+ * @return A new DLNA object item if compatible, NULL otherwise.
+ */
+dlna_item_t *dlna_item_new (dlna_t *dlna, const char *filename);
+
+/**
+ * Free an existing DLNA media object item.
+ *
+ * @param[in] item     The DLNA object item to be freed.
+ */
+void dlna_item_free (dlna_item_t *item);
+
+/***************************************************************************/
+/*                                                                         */
+/* DLNA UPnP Digital Media Server (DMS) Management                         */
+/*  Mandatory: Configure the device to act as a Media Server.              */
+/*                                                                         */
+/***************************************************************************/
+
+/**
+ * Initialize a DLNA Digital Media Server compliant device.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ *
+  * @return   DLNA_ST_OK in case of success, DLNA_ST_ERROR otherwise.
+ */
+int dlna_dms_init (dlna_t *dlna);
+
+/**
+ * Uninitialize a DLNA Digital Media Server compliant device.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ *
+  * @return   DLNA_ST_OK in case of success, DLNA_ST_ERROR otherwise.
+ */
+int dlna_dms_uninit (dlna_t *dlna);
+
 /**
  * Create a valid UPnP device description for Digital Media Server (DMS).
  *
@@ -469,23 +440,20 @@ dlna_dms_description_get (const char *friendly_name,
                           const char *uuid,
                           const char *presentation_url);
 
-/**
- * Initialize a DLNA Digital Media Server compliant device.
- *
- * @param[in] dlna  The DLNA library's controller.
- *
-  * @return   DLNA_ST_OK in case of success, DLNA_ST_ERROR otherwise.
- */
-int dlna_dms_init (dlna_t *dlna);
+/***************************************************************************/
+/*                                                                         */
+/* DLNA UPnP Digital Media Player (DMP) Management                         */
+/*  Mandatory: Configure the device to act as a Media Player.              */
+/*                                                                         */
+/***************************************************************************/
 
-/**
- * Uninitialize a DLNA Digital Media Server compliant device.
- *
- * @param[in] dlna  The DLNA library's controller.
- *
-  * @return   DLNA_ST_OK in case of success, DLNA_ST_ERROR otherwise.
- */
-int dlna_dms_uninit (dlna_t *dlna);
+
+/***************************************************************************/
+/*                                                                         */
+/* DLNA UPnP Device Management                                             */
+/*  Optional: Used to overload default device parameters.                  */
+/*                                                                         */
+/***************************************************************************/
 
 /**
  * Set device UPnP friendly name.
@@ -566,6 +534,102 @@ void dlna_set_device_uuid (dlna_t *dlna, char *str);
  * @param[in] str   Value to be set.
  */
 void dlna_set_device_presentation_url (dlna_t *dlna, char *str);
+
+/***************************************************************************/
+/*                                                                         */
+/* DLNA UPnP Virtual File System (VFS) Management                          */
+/*  Optional: Routines to add/remove element from VFS.                     */
+/*                                                                         */
+/***************************************************************************/
+
+/**
+ * Add a new container to the VFS layer.
+ *
+ * @param[in] dlna         The DLNA library's controller.
+ * @param[in] name         Displayed name of the container.
+ * @param[in] object_id    Expected UPnP object ID.
+ * @param[in] container_id UPnP object ID of its parent.
+ * @return The attrbiuted UPnP object ID if successfull, 0 otherwise.
+ */
+uint32_t dlna_vfs_add_container (dlna_t *dlna, char *name,
+                                 uint32_t object_id, uint32_t container_id);
+
+/**
+ * Add a new resource to the VFS layer.
+ *
+ * @param[in] dlna         The DLNA library's controller.
+ * @param[in] name         Displayed name of the resource.
+ * @param[in] fullname     Full path to the specified resource.
+ * @param[in] size         Resource file size (in bytes).
+ * @param[in] container_id UPnP object ID of its parent.
+ * @return The attrbiuted UPnP object ID if successfull, 0 otherwise.
+ */
+uint32_t dlna_vfs_add_resource (dlna_t *dlna, char *name,
+                                char *fullpath, off_t size,
+                                uint32_t container_id);
+
+/**
+ * Remove an existing item (and all its children) from VFS layer by ID.
+ *
+ * @param[in] dlna         The DLNA library's controller.
+ * @param[in] id           Unique ID of the item to be removed.
+ */
+void dlna_vfs_remove_item_by_id (dlna_t *dlna, uint32_t id);
+
+/**
+ * Remove an existing item (and all its children) from VFS layer by name.
+ *
+ * @param[in] dlna         The DLNA library's controller.
+ * @param[in] name         Name of the item to be removed.
+ */
+void dlna_vfs_remove_item_by_name (dlna_t *dlna, char *name);
+
+/***************************************************************************/
+/*                                                                         */
+/* DLNA WebServer Callbacks & Handlers                                     */
+/*  Optional: Used to overload the internal HTTP server behavior.          */
+/*                                                                         */
+/***************************************************************************/
+
+/**
+ * DLNA Internal WebServer File Handler
+ */
+typedef struct dlna_http_file_handler_s {
+  int external;                   /* determines whether the file has to be
+                                     handled internally by libdlna or by
+                                     external application */
+  void *priv;                     /* private file handler */
+} dlna_http_file_handler_t;
+
+/**
+ * DLNA Internal WebServer File Information
+ */
+typedef struct dlna_http_file_info_s {
+  off_t file_length;
+  char *content_type;
+} dlna_http_file_info_t;
+
+/**
+ * DLNA Internal WebServer Operation Callbacks
+ *  Return 0 for success, 1 otherwise.
+ */
+typedef struct dlna_http_callback_s {
+  int (*get_info) (const char *filename, dlna_http_file_info_t *info);
+  dlna_http_file_handler_t * (*open) (const char *filename);
+  int (*read) (void *hdl, char *buf, size_t len);
+  int (*write) (void *hdl, char *buf, size_t len);
+  int (*seek) (void *hdl, off_t offset, int origin);
+  int (*close) (void *hdl);
+} dlna_http_callback_t;
+
+/**
+ * Set library's WebServer Callback routines.
+ *   This is used by application to overload default's HTTP routines.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] cb    Structure with HTTP callbacks.
+ */
+void dlna_set_http_callback (dlna_t *dlna, dlna_http_callback_t *cb);
 
 #ifdef __cplusplus
 #if 0 /* avoid EMACS indent */
