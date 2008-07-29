@@ -184,6 +184,7 @@ http_get_file_from_memory (const char *fullpath,
                            const char *description,
                            const size_t length)
 {
+  dlna_http_file_handler_t *dhdl;
   http_file_handler_t *hdl;
 
   if (!fullpath || !description || length == 0)
@@ -196,12 +197,17 @@ http_get_file_from_memory (const char *fullpath,
   hdl->detail.memory.content = strdup (description);
   hdl->detail.memory.len     = length;
 
-  return ((UpnpWebFileHandle) hdl);
+  dhdl                       = malloc (sizeof (dlna_http_file_handler_t));
+  dhdl->external             = 0;
+  dhdl->priv                 = hdl;
+  
+  return ((UpnpWebFileHandle) dhdl);
 }
 
 static UpnpWebFileHandle
 http_get_file_local (vfs_item_t *item)
 {
+  dlna_http_file_handler_t *dhdl;
   http_file_handler_t *hdl;
   int fd;
   
@@ -223,7 +229,11 @@ http_get_file_local (vfs_item_t *item)
   hdl->detail.local.fd       = fd;
   hdl->detail.local.item     = item;
 
-  return ((UpnpWebFileHandle) hdl);
+  dhdl                       = malloc (sizeof (dlna_http_file_handler_t));
+  dhdl->external             = 0;
+  dhdl->priv                 = hdl;
+
+  return ((UpnpWebFileHandle) dhdl);
 }
 
 static UpnpWebFileHandle
@@ -249,10 +259,10 @@ upnp_http_open (void *cookie,
   /* trap application-level HTTP callback */
   if (dlna->http_callback && dlna->http_callback->open)
   {
-    UpnpWebFileHandle *hdl;
-    hdl = dlna->http_callback->open (filename);
-    if (hdl)
-      return hdl;
+    dlna_http_file_handler_t *dhdl;
+    dhdl = dlna->http_callback->open (filename);
+    if (dhdl)
+      return dhdl;
   }
   
   /* ask for Content Directory Service (CDS) */
@@ -286,6 +296,7 @@ upnp_http_read (void *cookie,
                 size_t buflen)
 {
   dlna_t *dlna;
+  dlna_http_file_handler_t *dhdl;
   http_file_handler_t *hdl;
   ssize_t len = -1;
 
@@ -293,18 +304,20 @@ upnp_http_read (void *cookie,
     return HTTP_ERROR;
 
   dlna = (dlna_t *) cookie;
-  hdl = (http_file_handler_t *) fh;
+  dhdl = (dlna_http_file_handler_t *) fh;
   
   dlna_log (dlna, DLNA_MSG_INFO, "%s\n", __FUNCTION__);
 
   /* trap application-level HTTP callback */
-  if (dlna->http_callback && dlna->http_callback->read)
+  if (dhdl->external && dlna->http_callback && dlna->http_callback->read)
   {
     int res;
-    res = dlna->http_callback->read (fh, buf, buflen);
+    res = dlna->http_callback->read (dhdl->priv, buf, buflen);
     if (res > 0)
       return res;
   }
+
+  hdl = (http_file_handler_t *) dhdl->priv;
   
   switch (hdl->type)
   {
@@ -337,14 +350,16 @@ upnp_http_write (void *cookie,
                  size_t buflen)
 {
   dlna_t *dlna;
+  dlna_http_file_handler_t *dhdl;
 
   dlna = (dlna_t *) cookie;
+  dhdl = (dlna_http_file_handler_t *) fh;
   
   /* trap application-level HTTP callback */
-  if (dlna->http_callback && dlna->http_callback->write)
+  if (dhdl->external && dlna->http_callback && dlna->http_callback->write)
   {
     int res;
-    res = dlna->http_callback->write (fh, buf, buflen);
+    res = dlna->http_callback->write (dhdl->priv, buf, buflen);
     if (res > 0)
       return res;
   }
@@ -359,6 +374,7 @@ upnp_http_seek (void *cookie,
                 int origin)
 {
   dlna_t *dlna;
+  dlna_http_file_handler_t *dhdl;
   http_file_handler_t *hdl;
   off_t newpos = -1;
   
@@ -366,18 +382,20 @@ upnp_http_seek (void *cookie,
     return HTTP_ERROR;
 
   dlna = (dlna_t *) cookie;
-  hdl = (http_file_handler_t *) fh;
+  dhdl = (dlna_http_file_handler_t *) fh;
   
   dlna_log (dlna, DLNA_MSG_INFO, "%s\n", __FUNCTION__);
 
   /* trap application-level HTTP callback */
-  if (dlna->http_callback && dlna->http_callback->seek)
+  if (dhdl->external && dlna->http_callback && dlna->http_callback->seek)
   {
     int res;
-    res = dlna->http_callback->seek (fh, offset, origin);
+    res = dlna->http_callback->seek (dhdl->priv, offset, origin);
     if (res == 0)
       return res;
   }
+
+  hdl = (http_file_handler_t *) dhdl->priv;
   
   switch (origin)
   {
@@ -454,24 +472,30 @@ upnp_http_close (void *cookie,
                  UpnpWebFileHandle fh)
 {
   dlna_t *dlna;
+  dlna_http_file_handler_t *dhdl;
   http_file_handler_t *hdl;
   
   if (!cookie || !fh)
     return HTTP_ERROR;
 
   dlna = (dlna_t *) cookie;
-  hdl = (http_file_handler_t *) fh;
+  dhdl = (dlna_http_file_handler_t *) fh;
   
   dlna_log (dlna, DLNA_MSG_INFO, "%s\n", __FUNCTION__);
 
   /* trap application-level HTTP callback */
-  if (dlna->http_callback && dlna->http_callback->close)
+  if (dhdl->external && dlna->http_callback && dlna->http_callback->close)
   {
     int res;
-    res = dlna->http_callback->close (fh);
+    res = dlna->http_callback->close (dhdl->priv);
     if (res == 0)
+    {
+      free (dhdl);
       return res;
+    }
   }
+
+  hdl = (http_file_handler_t *) dhdl->priv;
   
   switch (hdl->type)
   {
@@ -491,6 +515,7 @@ upnp_http_close (void *cookie,
   if (hdl->fullpath)
     free (hdl->fullpath);
   free (hdl);
+  free (dhdl);
 
   return HTTP_OK;
 }

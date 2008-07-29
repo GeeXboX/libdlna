@@ -219,7 +219,12 @@ typedef struct dlna_item_s {
 /**
  * DLNA Internal WebServer File Handler
  */
-typedef void *dlna_http_file_handler_t;
+typedef struct dlna_http_file_handler_s {
+  int external;                   /* determines whether the file has to be
+                                     handled internally by libdlna or by
+                                     external application */
+  void *priv;                     /* private file handler */
+} dlna_http_file_handler_t;
 
 /**
  * DLNA Internal WebServer File Information
@@ -235,11 +240,11 @@ typedef struct dlna_http_file_info_s {
  */
 typedef struct dlna_http_callback_s {
   int (*get_info) (const char *filename, dlna_http_file_info_t *info);
-  dlna_http_file_handler_t (*open) (const char *filename);
-  int (*read) (dlna_http_file_handler_t hdl, char *buf, size_t len);
-  int (*write) (dlna_http_file_handler_t hdl, char *buf, size_t len);
-  int (*seek) (dlna_http_file_handler_t hdl, off_t offset, int origin);
-  int (*close) (dlna_http_file_handler_t hdl);
+  dlna_http_file_handler_t * (*open) (const char *filename);
+  int (*read) (void *hdl, char *buf, size_t len);
+  int (*write) (void *hdl, char *buf, size_t len);
+  int (*seek) (void *hdl, off_t offset, int origin);
+  int (*close) (void *hdl);
 } dlna_http_callback_t;
 
 /**
