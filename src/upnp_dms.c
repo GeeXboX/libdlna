@@ -80,31 +80,29 @@
 "</root>"
 
 char *
-dlna_dms_description_get (const char *friendly_name,
-                          const char *manufacturer,
-                          const char *manufacturer_url,
-                          const char *model_description,
-                          const char *model_name,
-                          const char *model_number,
-                          const char *model_url,
-                          const char *serial_number,
-                          const char *uuid,
-                          const char *presentation_url)
+dlna_dms_description_get (dlna_t *dlna)
 {
-  char *desc = NULL;
+  char *model_name, *desc = NULL;
   size_t len;
-
-  if (!friendly_name || !manufacturer || !manufacturer_url ||
-      !model_description || !model_name || !model_number ||
-      !model_url || !serial_number || !uuid || !presentation_url)
+ 
+  if (!dlna)
     return NULL;
+
+  if (dlna->mode == DLNA_CAPABILITY_UPNP_AV_XBOX)
+  {
+    model_name =
+      malloc (strlen (XBOX_MODEL_NAME) + strlen (dlna->model_name) + 4);
+    sprintf (model_name, "%s (%s)", XBOX_MODEL_NAME, dlna->model_name);
+  }
+  else
+    model_name = strdup (dlna->model_name);
   
-  len = strlen (UPNP_DMS_DESCRIPTION) + strlen (friendly_name)
-    + strlen (manufacturer) + strlen (manufacturer_url)
-    + strlen (model_description) + strlen (model_name)
-    + strlen (model_number) + strlen (model_url) + strlen (serial_number)
-    + strlen (uuid) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (presentation_url) +
+  len = strlen (UPNP_DMS_DESCRIPTION) + strlen (dlna->friendly_name)
+    + strlen (dlna->manufacturer) + strlen (dlna->manufacturer_url)
+    + strlen (dlna->model_description) + strlen (model_name)
+    + strlen (dlna->model_number) + strlen (dlna->model_url)
+    + strlen (dlna->serial_number) + strlen (dlna->uuid) +
+    + strlen (SERVICES_VIRTUAL_DIR) + strlen (dlna->presentation_url) +
     + strlen (SERVICES_VIRTUAL_DIR) + strlen (CMS_URL) +
     + strlen (SERVICES_VIRTUAL_DIR) + strlen (CMS_CONTROL_URL) +
     + strlen (SERVICES_VIRTUAL_DIR) + strlen (CMS_EVENT_URL) +
@@ -121,10 +119,11 @@ dlna_dms_description_get (const char *friendly_name,
 
   desc = malloc (len);
   memset (desc, 0, len);
-  sprintf (desc, UPNP_DMS_DESCRIPTION, friendly_name,
-           manufacturer, manufacturer_url, model_description,
-           model_name, model_number, model_url, serial_number, uuid,
-           SERVICES_VIRTUAL_DIR, presentation_url,
+  sprintf (desc, UPNP_DMS_DESCRIPTION, dlna->friendly_name,
+           dlna->manufacturer, dlna->manufacturer_url, dlna->model_description,
+           model_name, dlna->model_number, dlna->model_url,
+           dlna->serial_number, dlna->uuid,
+           SERVICES_VIRTUAL_DIR, dlna->presentation_url,
            SERVICES_VIRTUAL_DIR, CMS_URL,
            SERVICES_VIRTUAL_DIR, CMS_CONTROL_URL,
            SERVICES_VIRTUAL_DIR, CMS_EVENT_URL,

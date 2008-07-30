@@ -267,29 +267,7 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
   {
   case DLNA_DEVICE_DMS:
   {
-    char *model_name;
-
-    if (dlna->mode == DLNA_CAPABILITY_UPNP_AV_XBOX)
-    {
-      model_name =
-        malloc (strlen (XBOX_MODEL_NAME) + strlen (dlna->model_name) + 4);
-      sprintf (model_name, "%s (%s)", XBOX_MODEL_NAME, dlna->model_name);
-    }
-    else
-      model_name = strdup (dlna->model_name);
-    
-    description =
-      dlna_dms_description_get (dlna->friendly_name,
-                                dlna->manufacturer,
-                                dlna->manufacturer_url,
-                                dlna->model_description,
-                                model_name,
-                                dlna->model_number,
-                                dlna->model_url,
-                                dlna->serial_number,
-                                dlna->uuid,
-                                dlna->presentation_url);
-    free (model_name);
+    description = dlna_dms_description_get (dlna);
     break;
   }
   

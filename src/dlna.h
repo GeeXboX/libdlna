@@ -415,30 +415,11 @@ int dlna_dms_uninit (dlna_t *dlna);
 /**
  * Create a valid UPnP device description for Digital Media Server (DMS).
  *
- * @param[in] friendly_name      UPnP device friendly name.
- * @param[in] manufacturer       UPnP device manufacturer.
- * @param[in] manufacturer_url   UPnP device manufacturer URL.
- * @param[in] model_description  UPnP device model description.
- * @param[in] model_name         UPnP device model name.
- * @param[in] model_number       UPnP device model number.
- * @param[in] model_url          UPnP device model URL.
- * @param[in] serial_number      UPnP device serial number.
- * @param[in] uuid               UPnP device unique identifier.
- * @param[in] presentation_url   UPnP device web presentation page URL.
+ * @param[in] dlna  The DLNA library's controller.
  * 
  * @return                       The DMS device description string.
  */
-char *
-dlna_dms_description_get (const char *friendly_name,
-                          const char *manufacturer,
-                          const char *manufacturer_url,
-                          const char *model_description,
-                          const char *model_name,
-                          const char *model_number,
-                          const char *model_url,
-                          const char *serial_number,
-                          const char *uuid,
-                          const char *presentation_url);
+char *dlna_dms_description_get (dlna_t *dlna);
 
 /***************************************************************************/
 /*                                                                         */
