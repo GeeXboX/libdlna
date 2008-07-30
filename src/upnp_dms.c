@@ -26,7 +26,7 @@
 #include "dlna_internals.h"
 #include "upnp_internals.h"
 
-#define UPNP_DMS_DESCRIPTION \
+#define UPNP_DMS_DESCRIPTION_HEADER \
 "<?xml version=\"1.0\" encoding=\"utf-8\"?>" \
 "<root xmlns=\"urn:schemas-upnp-org:device-1-0\">" \
 "  <specVersion>" \
@@ -46,45 +46,29 @@
 "    <UDN>uuid:%s</UDN>" \
 "    <presentationURL>%s/%s</presentationURL>" \
 "    <dlna:X_DLNADOC xmlns:dlna=\"urn:schemas-dlna-org:device-1-0\">DMS-1.00</dlna:X_DLNADOC>" \
-"    <serviceList>" \
-"      <service>" \
-"        <serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType>" \
-"        <serviceId>urn:upnp-org:serviceId:ConnectionManager</serviceId>" \
-"        <SCPDURL>%s/%s</SCPDURL>" \
-"        <controlURL>%s/%s</controlURL>" \
-"        <eventSubURL>%s/%s</eventSubURL>" \
-"      </service>" \
-"      <service>" \
-"        <serviceType>urn:schemas-upnp-org:service:ContentDirectory:1</serviceType>" \
-"        <serviceId>urn:upnp-org:serviceId:ContentDirectory</serviceId>" \
-"        <SCPDURL>%s/%s</SCPDURL>" \
-"        <controlURL>%s/%s</controlURL>" \
-"        <eventSubURL>%s/%s</eventSubURL>" \
-"      </service>" \
-"      <service>" \
-"        <serviceType>urn:schemas-upnp-org:service:AVTransport:1</serviceType>" \
-"        <serviceId>urn:upnp-org:serviceId:AVTransport</serviceId>" \
-"        <SCPDURL>%s/%s</SCPDURL>" \
-"        <controlURL>%s/%s</controlURL>" \
-"        <eventSubURL>%s/%s</eventSubURL>" \
-"      </service>" \
-"      <service>" \
-"        <serviceType>urn:microsoft.com:service:X_MS_MediaReceiverRegistrar:1</serviceType>\n" \
-"        <serviceId>urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar</serviceId>\n" \
-"        <SCPDURL>%s/%s</SCPDURL>" \
-"        <controlURL>%s/%s</controlURL>" \
-"        <eventSubURL>%s/%s</eventSubURL>" \
-"      </service>" \
+"    <serviceList>"
+
+#define UPNP_DMS_DESCRIPTION_FOOTER \
 "    </serviceList>" \
 "  </device>" \
 "</root>"
 
+#define UPNP_SERVICE_DESCRIPTION \
+"      <service>" \
+"        <serviceType>%s</serviceType>" \
+"        <serviceId>%s</serviceId>" \
+"        <SCPDURL>%s/%s</SCPDURL>" \
+"        <controlURL>%s/%s</controlURL>" \
+"        <eventSubURL>%s/%s</eventSubURL>" \
+"      </service>" \
+
 char *
 dlna_dms_description_get (dlna_t *dlna)
 {
+  buffer_t *b = NULL;
   char *model_name, *desc = NULL;
-  size_t len;
- 
+  upnp_service_t *service;
+  
   if (!dlna)
     return NULL;
 
@@ -96,48 +80,32 @@ dlna_dms_description_get (dlna_t *dlna)
   }
   else
     model_name = strdup (dlna->model_name);
+
+  b = buffer_new ();
   
-  len = strlen (UPNP_DMS_DESCRIPTION) + strlen (dlna->friendly_name)
-    + strlen (dlna->manufacturer) + strlen (dlna->manufacturer_url)
-    + strlen (dlna->model_description) + strlen (model_name)
-    + strlen (dlna->model_number) + strlen (dlna->model_url)
-    + strlen (dlna->serial_number) + strlen (dlna->uuid) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (dlna->presentation_url) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (CMS_URL) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (CMS_CONTROL_URL) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (CMS_EVENT_URL) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (CDS_URL) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (CDS_CONTROL_URL) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (CDS_EVENT_URL) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (AVTS_URL) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (AVTS_CONTROL_URL) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (AVTS_EVENT_URL) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (MSR_URL) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (MSR_CONTROL_URL) +
-    + strlen (SERVICES_VIRTUAL_DIR) + strlen (MSR_EVENT_URL) +
-    1;
+  buffer_appendf (b, UPNP_DMS_DESCRIPTION_HEADER, dlna->friendly_name,
+                  dlna->manufacturer, dlna->manufacturer_url,
+                  dlna->model_description, model_name,
+                  dlna->model_number, dlna->model_url,
+                  dlna->serial_number, dlna->uuid,
+                  SERVICES_VIRTUAL_DIR, dlna->presentation_url);
 
-  desc = malloc (len);
-  memset (desc, 0, len);
-  sprintf (desc, UPNP_DMS_DESCRIPTION, dlna->friendly_name,
-           dlna->manufacturer, dlna->manufacturer_url, dlna->model_description,
-           model_name, dlna->model_number, dlna->model_url,
-           dlna->serial_number, dlna->uuid,
-           SERVICES_VIRTUAL_DIR, dlna->presentation_url,
-           SERVICES_VIRTUAL_DIR, CMS_URL,
-           SERVICES_VIRTUAL_DIR, CMS_CONTROL_URL,
-           SERVICES_VIRTUAL_DIR, CMS_EVENT_URL,
-           SERVICES_VIRTUAL_DIR, CDS_URL,
-           SERVICES_VIRTUAL_DIR, CDS_CONTROL_URL,
-           SERVICES_VIRTUAL_DIR, CDS_EVENT_URL,
-           SERVICES_VIRTUAL_DIR, AVTS_URL,
-           SERVICES_VIRTUAL_DIR, AVTS_CONTROL_URL,
-           SERVICES_VIRTUAL_DIR, AVTS_EVENT_URL,
-           SERVICES_VIRTUAL_DIR, MSR_URL,
-           SERVICES_VIRTUAL_DIR, MSR_CONTROL_URL,
-           SERVICES_VIRTUAL_DIR, MSR_EVENT_URL);
+  free (model_name);
+  
+  for (service = dlna->services; service; service = service->hh.next)
+    buffer_appendf (b, UPNP_SERVICE_DESCRIPTION,
+                    service->type, service->id,
+                    SERVICES_VIRTUAL_DIR, service->scpd_url,
+                    SERVICES_VIRTUAL_DIR, service->control_url,
+                    SERVICES_VIRTUAL_DIR, service->event_url);
 
+  buffer_append (b, UPNP_DMS_DESCRIPTION_FOOTER);
+
+  desc = strdup (b->buf);
+  buffer_free (b);
+  
   return desc;
+
 }
 
 int
@@ -149,6 +117,12 @@ dlna_dms_init (dlna_t *dlna)
   if (!dlna->inited)
     return DLNA_ST_ERROR;
 
+  dlna_service_register (dlna, DLNA_SERVICE_CONNECTION_MANAGER);
+  dlna_service_register (dlna, DLNA_SERVICE_CONTENT_DIRECTORY);
+  dlna_service_register (dlna, DLNA_SERVICE_AV_TRANSPORT);
+  if (dlna->mode == DLNA_CAPABILITY_UPNP_AV_XBOX)
+    dlna_service_register (dlna, DLNA_SERVICE_MS_REGISTAR);
+  
   return upnp_init (dlna, DLNA_DEVICE_DMS);
 }
 

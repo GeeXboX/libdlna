@@ -431,6 +431,29 @@ char *dlna_dms_description_get (dlna_t *dlna);
 
 /***************************************************************************/
 /*                                                                         */
+/* DLNA Services Management                                                */
+/*  Optional: Used to register common services or add new ones.            */
+/*                                                                         */
+/***************************************************************************/
+
+typedef enum {
+  DLNA_SERVICE_CONNECTION_MANAGER,
+  DLNA_SERVICE_CONTENT_DIRECTORY,
+  DLNA_SERVICE_AV_TRANSPORT,
+  DLNA_SERVICE_MS_REGISTAR,
+} dlna_service_type_t;
+
+/**
+ * Register a known DLNA/UPnP Service to be used by the device.
+ *   This is automatically done for all mandatory services at device init.
+ *
+ * @param[in] dlna  The DLNA library's controller.
+ * @param[in] srv   The service type to be registered.
+ */
+void dlna_service_register (dlna_t *dlna, dlna_service_type_t srv);
+
+/***************************************************************************/
+/*                                                                         */
 /* DLNA UPnP Device Management                                             */
 /*  Optional: Used to overload default device parameters.                  */
 /*                                                                         */

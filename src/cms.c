@@ -147,3 +147,4 @@ upnp_service_action_t cms_service_actions[] = {
   { SERVICE_CMS_ACTION_CON_INFO,      cms_get_current_connection_info },
   { NULL,                             NULL }
 };
+

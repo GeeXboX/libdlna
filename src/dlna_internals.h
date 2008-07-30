@@ -74,6 +74,35 @@ vfs_item_t *vfs_get_item_by_id (dlna_t *dlna, uint32_t id);
 vfs_item_t *vfs_get_item_by_name (dlna_t *dlna, char *name);
 void vfs_item_free (dlna_t *dlna, vfs_item_t *item);
 
+typedef struct upnp_service_s         upnp_service_t;
+typedef struct upnp_action_event_s    upnp_action_event_t;
+typedef struct upnp_service_action_s  upnp_service_action_t;
+
+struct upnp_action_event_s {
+  struct Upnp_Action_Request *ar;
+  int status;
+  upnp_service_t *service;
+};
+
+struct upnp_service_action_s {
+  char *name;
+  int (*cb) (dlna_t *, upnp_action_event_t *);
+};
+
+struct upnp_service_s {
+  char *id;
+  char *type;
+  char *scpd_url;
+  char *control_url;
+  char *event_url;
+  upnp_service_action_t *actions;
+  UT_hash_handle hh;
+};
+
+upnp_service_t *dlna_service_find (dlna_t *dlna, char *id);
+void dlna_service_unregister (dlna_t *dlna, dlna_service_type_t srv);
+void dlna_service_unregister_all (dlna_t *dlna);
+
 /**
  * DLNA Library's controller.
  * This controls the whole library.
@@ -95,6 +124,9 @@ struct dlna_s {
   /* Internal HTTP Server */
   dlna_http_callback_t *http_callback;
 
+  /* UPnP Services */
+  upnp_service_t *services;
+  
   /* VFS for Content Directory */
   vfs_item_t *vfs_root;
   uint32_t vfs_items;

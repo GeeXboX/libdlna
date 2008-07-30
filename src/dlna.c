@@ -63,6 +63,8 @@ dlna_init (void)
 
   /* Internal HTTP Server */
   dlna->http_callback = NULL;
+
+  dlna->services = NULL;
   
   dlna->vfs_root = NULL;
   dlna->vfs_items = 0;
@@ -106,6 +108,8 @@ dlna_uninit (dlna_t *dlna)
   /* Internal HTTP Server */
   if (dlna->http_callback)
     free (dlna->http_callback);
+
+  dlna_service_unregister_all (dlna);
   
   /* UPnP Properties */
   free (dlna->friendly_name);

@@ -42,75 +42,40 @@
 
 #include "upnp_internals.h"
 
-extern upnp_service_action_t cms_service_actions[];
-extern upnp_service_action_t cds_service_actions[];
-extern upnp_service_action_t avts_service_actions[];
-extern upnp_service_action_t msr_service_actions[];
-
-static upnp_service_t upnp_av_services[] = {
-  /* Connection Manager Service (CMS) */
-  {
-    CMS_SERVICE_ID,
-    CMS_SERVICE_TYPE,
-    cms_service_actions
-  },
-  /* Content Directory Service (CDS) */
-  {
-    CDS_SERVICE_ID,
-    CDS_SERVICE_TYPE,
-    cds_service_actions
-  },
-  /* AVTransport Service (AVTS) */
-  {
-    AVTS_SERVICE_ID,
-    AVTS_SERVICE_TYPE,
-    avts_service_actions
-  },
-  /* Microsoft Registrar Service (MSR) */
-  {
-    MSR_SERVICE_ID,
-    MSR_SERVICE_TYPE,
-    msr_service_actions
-  },
-  { NULL, NULL, NULL }
-};
-
 static int
 upnp_find_service_action (dlna_t *dlna,
                           upnp_service_t **service,
                           upnp_service_action_t **action,
                           struct Upnp_Action_Request *ar)
 {
-  int s, a;
-
+  int a;
+  upnp_service_t *srv;
+  
   *service = NULL;
   *action = NULL;
 
   if (!ar || !ar->ActionName)
     return DLNA_ST_ERROR;
 
-  /* parse all registered services */
-  for (s = 0; upnp_av_services[s].id; s++)
+  dlna_log (dlna, DLNA_MSG_INFO,
+            "ActionRequest: using service %s\n", ar->ServiceID);
+  
+  /* find the resquested service in all registered ones */
+  srv = dlna_service_find (dlna, ar->ServiceID);
+  if (!srv)
+    return DLNA_ST_ERROR;
+  
+  /* parse all known actions */
+  for (a = 0; srv->actions[a].name; a++)
   {
-    /* find the resquested one */
-    if (!strcmp (upnp_av_services[s].id, ar->ServiceID))
+    /* find the requested one */
+    if (!strcmp (srv->actions[a].name, ar->ActionName))
     {
       dlna_log (dlna, DLNA_MSG_INFO,
-                "ActionRequest: using service %s\n", ar->ServiceID);
-      *service = &upnp_av_services[s];
-      /* parse all known actions */
-      for (a = 0; upnp_av_services[s].actions[a].name; a++)
-      {
-        /* find the requested one */
-        if (!strcmp (upnp_av_services[s].actions[a].name, ar->ActionName))
-        {
-          dlna_log (dlna, DLNA_MSG_INFO,
-                    "ActionRequest: using action %s\n", ar->ActionName);
-          *action = &upnp_av_services[s].actions[a];
-          return DLNA_ST_OK;
-        }
-      }
-      return DLNA_ST_ERROR;
+                "ActionRequest: using action %s\n", ar->ActionName);
+      *service = srv;
+      *action = &srv->actions[a];
+      return DLNA_ST_OK;
     }
   }
 
