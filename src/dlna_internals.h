@@ -112,7 +112,7 @@ struct dlna_s {
   char *model_url;
   char *serial_number;
   char *uuid;
-  char *presentation;
+  char *presentation_url;
 };
 
 void dlna_log (dlna_t *dlna,

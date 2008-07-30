@@ -288,7 +288,7 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
                                 dlna->model_url,
                                 dlna->serial_number,
                                 dlna->uuid,
-                                dlna->presentation);
+                                dlna->presentation_url);
     free (model_name);
     break;
   }
