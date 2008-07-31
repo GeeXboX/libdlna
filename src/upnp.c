@@ -46,7 +46,7 @@ static int
 upnp_find_service_action (dlna_t *dlna,
                           upnp_service_t **service,
                           upnp_service_action_t **action,
-                          struct Upnp_Action_Request *ar)
+                          struct dlna_Action_Request *ar)
 {
   int a;
   upnp_service_t *srv;
@@ -83,7 +83,7 @@ upnp_find_service_action (dlna_t *dlna,
 }
 
 static void
-upnp_action_request_handler (dlna_t *dlna, struct Upnp_Action_Request *ar)
+upnp_action_request_handler (dlna_t *dlna, struct dlna_Action_Request *ar)
 {
   upnp_service_t *service;
   upnp_service_action_t *action;
@@ -93,7 +93,7 @@ upnp_action_request_handler (dlna_t *dlna, struct Upnp_Action_Request *ar)
   if (!dlna || !ar)
     return;
 
-  if (ar->ErrCode != UPNP_E_SUCCESS)
+  if (ar->ErrCode != DLNA_E_SUCCESS)
     return;
 
   /* ensure that message target is the specified device */
@@ -130,7 +130,7 @@ upnp_action_request_handler (dlna_t *dlna, struct Upnp_Action_Request *ar)
     event.service = service;
 
     if (action->cb (dlna, &event) && event.status)
-      ar->ErrCode = UPNP_E_SUCCESS;
+      ar->ErrCode = DLNA_E_SUCCESS;
 
     if (dlna->verbosity == DLNA_MSG_INFO)
     {
@@ -151,23 +151,23 @@ upnp_action_request_handler (dlna_t *dlna, struct Upnp_Action_Request *ar)
     strcpy (ar->ErrStr, "Unknown Service ID");
   
   ar->ActionResult = NULL;
-  ar->ErrCode = UPNP_SOAP_E_INVALID_ACTION;
+  ar->ErrCode = DLNA_SOAP_E_INVALID_ACTION;
 }
 
 static int
-device_callback_event_handler (Upnp_EventType type,
+device_callback_event_handler (dlna_EventType type,
                                void *event,
                                void *cookie)
 {
   switch (type)
   {
-  case UPNP_CONTROL_ACTION_REQUEST:
+  case DLNA_CONTROL_ACTION_REQUEST:
     upnp_action_request_handler ((dlna_t *) cookie,
-                                 (struct Upnp_Action_Request *) event);
+                                 (struct dlna_Action_Request *) event);
     break;
-  case UPNP_CONTROL_ACTION_COMPLETE:
-  case UPNP_EVENT_SUBSCRIPTION_REQUEST:
-  case UPNP_CONTROL_GET_VAR_REQUEST:
+  case DLNA_CONTROL_ACTION_COMPLETE:
+  case DLNA_EVENT_SUBSCRIPTION_REQUEST:
+  case DLNA_CONTROL_GET_VAR_REQUEST:
     break;
   default:
     break;
@@ -250,67 +250,67 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
   if (!ip)
     goto upnp_init_err;
   
-  res = UpnpInit (ip, dlna->port);
-  if (res != UPNP_E_SUCCESS)
+  res = dlnaInit (ip, dlna->port);
+  if (res != DLNA_E_SUCCESS)
   {
     dlna_log (dlna, DLNA_MSG_CRITICAL,
               "Cannot initialize UPnP subsystem\n");
     goto upnp_init_err;
   }
 
-  if (UpnpSetMaxContentLength (UPNP_MAX_CONTENT_LENGTH) != UPNP_E_SUCCESS)
+  if (dlnaSetMaxContentLength (DLNA_MAX_CONTENT_LENGTH) != DLNA_E_SUCCESS)
     dlna_log (dlna, DLNA_MSG_ERROR, "Could not set UPnP max content length\n");
 
-  dlna->port = UpnpGetServerPort ();
+  dlna->port = dlnaGetServerPort ();
   dlna_log (dlna, DLNA_MSG_INFO, "UPnP device listening on %s:%d\n",
-            UpnpGetServerIpAddress (), dlna->port);
+            dlnaGetServerIpAddress (), dlna->port);
 
-  UpnpEnableWebserver (TRUE);
+  dlnaEnableWebserver (TRUE);
 
-  res = UpnpSetVirtualDirCallbacks (&virtual_dir_callbacks, dlna);
-  if (res != UPNP_E_SUCCESS)
+  res = dlnaSetVirtualDirCallbacks (&virtual_dir_callbacks, dlna);
+  if (res != DLNA_E_SUCCESS)
   {
     dlna_log (dlna, DLNA_MSG_CRITICAL,
               "Cannot set virtual directory callbacks\n");
     goto upnp_init_err;
   }
   
-  res = UpnpAddVirtualDir (VIRTUAL_DIR);
-  if (res != UPNP_E_SUCCESS)
+  res = dlnaAddVirtualDir (VIRTUAL_DIR);
+  if (res != DLNA_E_SUCCESS)
   {
     dlna_log (dlna, DLNA_MSG_CRITICAL,
               "Cannot add virtual directory for web server\n");
     goto upnp_init_err;
   }
 
-  res = UpnpAddVirtualDir (SERVICES_VIRTUAL_DIR);
-  if (res != UPNP_E_SUCCESS)
+  res = dlnaAddVirtualDir (SERVICES_VIRTUAL_DIR);
+  if (res != DLNA_E_SUCCESS)
   {
     dlna_log (dlna, DLNA_MSG_CRITICAL,
               "Cannot add virtual directory for services\n");
     goto upnp_init_err;
   }
 
-  res = UpnpRegisterRootDevice2 (UPNPREG_BUF_DESC, description, 0, 1,
+  res = dlnaRegisterRootDevice2 (DLNAREG_BUF_DESC, description, 0, 1,
                                  device_callback_event_handler,
                                  dlna, &(dlna->dev));
-  if (res != UPNP_E_SUCCESS)
+  if (res != DLNA_E_SUCCESS)
   {
     dlna_log (dlna, DLNA_MSG_CRITICAL, "Cannot register UPnP device\n");
     goto upnp_init_err;
   }
 
-  res = UpnpUnRegisterRootDevice (dlna->dev);
-  if (res != UPNP_E_SUCCESS)
+  res = dlnaUnRegisterRootDevice (dlna->dev);
+  if (res != DLNA_E_SUCCESS)
   {
     dlna_log (dlna, DLNA_MSG_CRITICAL, "Cannot unregister UPnP device\n");
     goto upnp_init_err;
   }
 
-  res = UpnpRegisterRootDevice2 (UPNPREG_BUF_DESC, description, 0, 1,
+  res = dlnaRegisterRootDevice2 (DLNAREG_BUF_DESC, description, 0, 1,
                                  device_callback_event_handler,
                                  dlna, &(dlna->dev));
-  if (res != UPNP_E_SUCCESS)
+  if (res != DLNA_E_SUCCESS)
   {
     dlna_log (dlna, DLNA_MSG_CRITICAL, "Cannot register UPnP device\n");
     goto upnp_init_err;
@@ -318,7 +318,7 @@ upnp_init (dlna_t *dlna, dlna_device_type_t type)
 
   dlna_log (dlna, DLNA_MSG_INFO,
             "Sending UPnP advertisement for device ...\n");
-  UpnpSendAdvertisement (dlna->dev, 1800);
+  dlnaSendAdvertisement (dlna->dev, 1800);
 
   free (ip);
   free (description);
@@ -339,8 +339,8 @@ upnp_uninit (dlna_t *dlna)
     return DLNA_ST_ERROR;
 
   dlna_log (dlna, DLNA_MSG_INFO, "Stopping UPnP A/V Service ...\n");
-  UpnpUnRegisterRootDevice (dlna->dev);
-  UpnpFinish ();
+  dlnaUnRegisterRootDevice (dlna->dev);
+  dlnaFinish ();
 
   return DLNA_ST_OK;
 }
@@ -355,11 +355,11 @@ upnp_add_response (upnp_action_event_t *ev, char *key, const char *value)
     return 0;
 
   val = strdup (value);
-  res = UpnpAddToActionResponse (&ev->ar->ActionResult,
+  res = dlnaAddToActionResponse (&ev->ar->ActionResult,
                                  ev->ar->ActionName,
                                  ev->service->type, key, val);
 
-  if (res != UPNP_E_SUCCESS)
+  if (res != DLNA_E_SUCCESS)
   {
     free (val);
     return 0;
@@ -370,7 +370,7 @@ upnp_add_response (upnp_action_event_t *ev, char *key, const char *value)
 }
 
 char *
-upnp_get_string (struct Upnp_Action_Request *ar, const char *key)
+upnp_get_string (struct dlna_Action_Request *ar, const char *key)
 {
   IXML_Node *node = NULL;
 
@@ -401,7 +401,7 @@ upnp_get_string (struct Upnp_Action_Request *ar, const char *key)
 }
 
 int
-upnp_get_ui4 (struct Upnp_Action_Request *ar, const char *key)
+upnp_get_ui4 (struct dlna_Action_Request *ar, const char *key)
 {
   char *value;
   int val;

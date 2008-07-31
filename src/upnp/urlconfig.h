@@ -64,8 +64,8 @@ extern "C" {
 *		alias.
 *
 *	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_OUTOF_MEMORY - Default Error
+*		DLNA_E_SUCCESS - On Success
+*		DLNA_E_OUTOF_MEMORY - Default Error
 *
 *	Note :
 ****************************************************************************/

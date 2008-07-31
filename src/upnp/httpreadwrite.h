@@ -60,8 +60,8 @@ http_CancelHttpGet( IN void *Handle );
  *	Validates URL
  *
  * Returns:
- *	 UPNP_E_INVALID_URL
- * 	 UPNP_E_SUCCESS
+ *	 DLNA_E_INVALID_URL
+ * 	 DLNA_E_SUCCESS
  ************************************************************************/
 int http_FixUrl( IN uri_type* url, OUT uri_type* fixed_url );
 
@@ -78,8 +78,8 @@ int http_FixUrl( IN uri_type* url, OUT uri_type* fixed_url );
  *	Parses URL and then validates URL
  *
  * Returns:
- *	 UPNP_E_INVALID_URL
- * 	 UPNP_E_SUCCESS
+ *	 DLNA_E_INVALID_URL
+ * 	 DLNA_E_SUCCESS
  ************************************************************************/
 int http_FixStrUrl( IN char* urlstr, IN int urlstrlen, OUT uri_type* fixed_url );
 
@@ -96,8 +96,8 @@ int http_FixStrUrl( IN char* urlstr, IN int urlstrlen, OUT uri_type* fixed_url )
  *
  *  Returns:
  *	socket descriptor on sucess
- *	UPNP_E_OUTOF_SOCKET
- *	UPNP_E_SOCKET_CONNECT on error
+ *	DLNA_E_OUTOF_SOCKET
+ *	DLNA_E_SOCKET_CONNECT on error
  ************************************************************************/
 int http_Connect( IN uri_type* destination_url, OUT uri_type *url );
 
@@ -119,8 +119,8 @@ int http_Connect( IN uri_type* destination_url, OUT uri_type *url );
  *	parameter
  *
  * Returns:
- *	 UPNP_E_BAD_HTTPMSG
- * 	 UPNP_E_SUCCESS
+ *	 DLNA_E_BAD_HTTPMSG
+ * 	 DLNA_E_SUCCESS
  ************************************************************************/
 int http_RecvMessage( IN SOCKINFO *info, OUT http_parser_t* parser,
 		IN http_method_t request_method, 
@@ -150,9 +150,9 @@ int http_RecvMessage( IN SOCKINFO *info, OUT http_parser_t* parser,
  *			filename );		// arg for file
  *
  * Returns:
- *	UPNP_E_OUTOF_MEMORY
- * 	UPNP_E_FILE_READ_ERROR
- *	UPNP_E_SUCCESS
+ *	DLNA_E_OUTOF_MEMORY
+ * 	DLNA_E_FILE_READ_ERROR
+ *	DLNA_E_SUCCESS
  ************************************************************************/
 int http_SendMessage(
 	IN SOCKINFO *info,
@@ -177,8 +177,8 @@ int http_SendMessage(
  *	request and waits for the response from the remote end
  *
  * Returns:
- *	UPNP_E_SOCKET_ERROR
- * 	UPNP_E_SOCKET_CONNECT
+ *	DLNA_E_SOCKET_ERROR
+ * 	DLNA_E_SOCKET_CONNECT
  *	Error Codes returned by http_SendMessage
  *	Error Codes returned by http_RecvMessage
  ************************************************************************/
@@ -194,13 +194,13 @@ int http_RequestAndResponse(
 /************************************************************************
  * return codes:
  *	0 -- success
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_TIMEDOUT
- *	UPNP_E_BAD_REQUEST
- *	UPNP_E_BAD_RESPONSE
- *	UPNP_E_INVALID_URL
- *	UPNP_E_SOCKET_READ
- *	UPNP_E_SOCKET_WRITE
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_TIMEDOUT
+ *	DLNA_E_BAD_REQUEST
+ *	DLNA_E_BAD_RESPONSE
+ *	DLNA_E_INVALID_URL
+ *	DLNA_E_SOCKET_READ
+ *	DLNA_E_SOCKET_WRITE
  ************************************************************************/
 
 
@@ -220,8 +220,8 @@ int http_RequestAndResponse(
  *	from the message.
  *
  * Return: int
- *	UPNP_E_SUCCESS
- *	UPNP_E_INVALID_URL
+ *	DLNA_E_SUCCESS
+ *	DLNA_E_INVALID_URL
  ************************************************************************/
 int http_Download(
 	IN const char* url, 
@@ -237,17 +237,17 @@ int http_Download(
  * Parameters:
  *	IN void *Handle:	Handle to the http post object
  *	IN char *buf:		Buffer to send to peer, if format used
- *				is not UPNP_USING_CHUNKED, 
+ *				is not DLNA_USING_CHUNKED, 
  *	IN unsigned int *size:	Size of the data to be sent.
  *	IN int timeout:		time out value
  *
  * Description:
- *	Formats data if format used is UPNP_USING_CHUNKED.
+ *	Formats data if format used is DLNA_USING_CHUNKED.
  *	Writes data on the socket connected to the peer.
  *
  * Return: int
- *	UPNP_E_SUCCESS - On Success
- *	UPNP_E_INVALID_PARAM - Invalid Parameter
+ *	DLNA_E_SUCCESS - On Success
+ *	DLNA_E_INVALID_PARAM - Invalid Parameter
  *	-1 - On Socket Error.
  ************************************************************************/
 int http_WriteHttpPost(IN void *Handle,
@@ -266,13 +266,13 @@ int http_WriteHttpPost(IN void *Handle,
  *	IN int timeout;		time out value
  *
  * Description:
- *	Sends remaining data if using  UPNP_USING_CHUNKED 
+ *	Sends remaining data if using  DLNA_USING_CHUNKED 
  *	format. Receives any more messages. Destroys socket and any socket
  *	associated memory. Frees handle associated with the HTTP POST msg.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Sucess
- *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ *	DLNA_E_SUCCESS		- On Sucess
+ *	DLNA_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
 int http_CloseHttpPost(IN void *Handle, 
 		       IN OUT int *httpStatus,
@@ -296,11 +296,11 @@ int http_CloseHttpPost(IN void *Handle,
  *	such handles
  *
  * Return : int;
- *	UPNP_E_SUCCESS		- On Sucess
- *	UPNP_E_INVALID_PARAM	- Invalid Parameter
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_SOCKET_ERROR
- *	UPNP_E_SOCKET_CONNECT
+ *	DLNA_E_SUCCESS		- On Sucess
+ *	DLNA_E_INVALID_PARAM	- Invalid Parameter
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_SOCKET_ERROR
+ *	DLNA_E_SOCKET_CONNECT
  ************************************************************************/
 int http_OpenHttpPost(IN const char *url_str,
 		      IN OUT void **Handle,
@@ -323,11 +323,11 @@ int http_OpenHttpPost(IN const char *url_str,
  *	Parses and extracts information from the new data.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Sucess
- *	UPNP_E_INVALID_PARAM	- Invalid Parameter
- *	UPNP_E_BAD_RESPONSE
- *	UPNP_E_BAD_HTTPMSG
- *	UPNP_E_CANCELED
+ *	DLNA_E_SUCCESS		- On Sucess
+ *	DLNA_E_INVALID_PARAM	- Invalid Parameter
+ *	DLNA_E_BAD_RESPONSE
+ *	DLNA_E_BAD_HTTPMSG
+ *	DLNA_E_CANCELED
  ************************************************************************/
 int http_ReadHttpGet(
 	IN void *Handle,
@@ -348,8 +348,8 @@ int http_ReadHttpGet(
  *	Extracts information from the Handle to the HTTP get object.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Sucess
- *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ *	DLNA_E_SUCCESS		- On Sucess
+ *	DLNA_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
 int http_HttpGetProgress(
 	IN void *Handle,
@@ -368,8 +368,8 @@ int http_HttpGetProgress(
  *	Clears socket states and memory allocated for socket operations. 
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Success
- *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ *	DLNA_E_SUCCESS		- On Success
+ *	DLNA_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
 int http_CloseHttpGet(IN void *Handle);
 
@@ -393,11 +393,11 @@ int http_CloseHttpGet(IN void *Handle);
  *	response.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Success
- *	UPNP_E_INVALID_PARAM	- Invalid Paramters
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_SOCKET_ERROR
- *	UPNP_E_BAD_RESPONSE
+ *	DLNA_E_SUCCESS		- On Success
+ *	DLNA_E_INVALID_PARAM	- Invalid Paramters
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_SOCKET_ERROR
+ *	DLNA_E_BAD_RESPONSE
  ************************************************************************/
 int http_OpenHttpGet(
 	IN const char *url_str,
@@ -428,11 +428,11 @@ int http_OpenHttpGet(
  *	If a proxy URL is defined then the connection is made there.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Success
- *	UPNP_E_INVALID_PARAM	- Invalid Paramters
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_SOCKET_ERROR
- *	UPNP_E_BAD_RESPONSE
+ *	DLNA_E_SUCCESS		- On Success
+ *	DLNA_E_INVALID_PARAM	- Invalid Paramters
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_SOCKET_ERROR
+ *	DLNA_E_BAD_RESPONSE
  ************************************************************************/
 int http_OpenHttpGetProxy(IN const char *url_str,
 					IN const char *proxy_str,
@@ -459,9 +459,9 @@ int http_OpenHttpGetProxy(IN const char *url_str,
  *
  * Return: int
  *	0 -- success
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_SOCKET_WRITE
- *	UPNP_E_TIMEDOUT
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_SOCKET_WRITE
+ *	DLNA_E_TIMEDOUT
  ************************************************************************/
 int http_SendStatusResponse(
 	IN SOCKINFO *info,
@@ -516,8 +516,8 @@ int http_SendStatusResponse(
  *
  * Return: int
  *	0 - On Success
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_INVALID_URL
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_INVALID_URL
  ************************************************************************/
 int http_MakeMessage(
 	INOUT membuffer* buf, 
@@ -566,11 +566,11 @@ void http_CalcResponseVersion(
  *	response.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Success
- *	UPNP_E_INVALID_PARAM	- Invalid Paramters
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_SOCKET_ERROR
- *	UPNP_E_BAD_RESPONSE
+ *	DLNA_E_SUCCESS		- On Success
+ *	DLNA_E_INVALID_PARAM	- Invalid Paramters
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_SOCKET_ERROR
+ *	DLNA_E_BAD_RESPONSE
  ************************************************************************/
 int http_OpenHttpGetEx(IN const char *url_str,
 		     IN OUT void **Handle,
@@ -592,7 +592,7 @@ int http_OpenHttpGetEx(IN const char *url_str,
  *	Returns the server information for the operating system
  *
  * Return:
- *	UPNP_INLINE void
+ *	DLNA_INLINE void
  ************************************************************************/
 void get_sdk_info( OUT char *info );
 

@@ -58,7 +58,7 @@ extern "C" {
 #endif
 
 #include "upnp.h"
-//#include <upnp_debug.h>
+//#include <dlna_debug.h>
 
 
 #define HTTP_DATE_LENGTH 37 // length for HTTP DATE: 
@@ -153,7 +153,7 @@ int replace_escaped(char * in, int index, size_t *max);
 *
 *	Return : int ;
 *		HTTP_SUCCESS - On Success
-*		UPNP_E_OUTOF_MEMORY - On Failure to allocate memory
+*		DLNA_E_OUTOF_MEMORY - On Failure to allocate memory
 *
 *	Note :
 ************************************************************************/
@@ -190,7 +190,7 @@ void free_URL_list(URL_list * list);
 #ifdef DEBUG
 void print_uri(uri_type *in);
 #else
-static UPNP_INLINE void print_uri(uri_type *in upnp_unused) {}
+static DLNA_INLINE void print_uri(uri_type *in dlna_unused) {}
 #endif
 
 /************************************************************************
@@ -208,7 +208,7 @@ static UPNP_INLINE void print_uri(uri_type *in upnp_unused) {}
 #ifdef DEBUG
 void print_token(token *in);
 #else
-static UPNP_INLINE void print_token(token * in upnp_unused) {}
+static DLNA_INLINE void print_token(token * in dlna_unused) {}
 #endif
 
 /************************************************************************
@@ -317,7 +317,7 @@ int parse_hostport(const char *in, int max, hostport_type *out );
 *		(shortened). Extra characters are replaced with NULL.
 *
 *	Return : int ;
-*		UPNP_E_SUCCESS
+*		DLNA_E_SUCCESS
 *
 *	Note :
 ************************************************************************/
@@ -336,19 +336,19 @@ int remove_escaped_chars(char *in, size_t *size);
 *		error is returned. The input IS modified in place.)
 *
 *	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_OUTOF_MEMORY - On failure to allocate memory
-*		UPNP_E_INVALID_URL - Failure to resolve URL
+*		DLNA_E_SUCCESS - On Success
+*		DLNA_E_OUTOF_MEMORY - On failure to allocate memory
+*		DLNA_E_INVALID_URL - Failure to resolve URL
 *
 *	Note :
 *		Examples
 *       char path[30]="/../hello";
-*       remove_dots(path, strlen(path)) -> UPNP_E_INVALID_URL
+*       remove_dots(path, strlen(path)) -> DLNA_E_INVALID_URL
 *       char path[30]="/./hello";
-*       remove_dots(path, strlen(path)) -> UPNP_E_SUCCESS, 
+*       remove_dots(path, strlen(path)) -> DLNA_E_SUCCESS, 
 *       in = "/hello"
 *       char path[30]="/./hello/foo/../goodbye" -> 
-*       UPNP_E_SUCCESS, in = "/hello/goodbye"
+*       DLNA_E_SUCCESS, in = "/hello/goodbye"
 
 ************************************************************************/
 int remove_dots(char * in, int size);
@@ -425,15 +425,15 @@ int parse_token( char * in, token * out, int max_size);
 /************************************************************************
 *						Commented #defines								*
 ************************************************************************/
-//#define HTTP_E_BAD_URL UPNP_E_INVALID_URL
-//#define HTTP_E_READ_SOCKET  UPNP_E_SOCKET_READ
-//#define HTTP_E_BIND_SOCKET  UPNP_E_SOCKET_BIND
-//#define HTTP_E_WRITE_SOCKET  UPNP_E_SOCKET_WRITE
-//#define HTTP_E_CONNECT_SOCKET  UPNP_E_SOCKET_CONNECT
-//#define HTTP_E_SOCKET    UPNP_E_OUTOF_SOCKET
-//#define HTTP_E_BAD_RESPONSE UPNP_E_BAD_RESPONSE
-//#define HTTP_E_BAD_REQUEST UPNP_E_BAD_REQUEST
-//#define HTTP_E_BAD_IP_ADDRESS UPNP_E_INVALID_URL
+//#define HTTP_E_BAD_URL DLNA_E_INVALID_URL
+//#define HTTP_E_READ_SOCKET  DLNA_E_SOCKET_READ
+//#define HTTP_E_BIND_SOCKET  DLNA_E_SOCKET_BIND
+//#define HTTP_E_WRITE_SOCKET  DLNA_E_SOCKET_WRITE
+//#define HTTP_E_CONNECT_SOCKET  DLNA_E_SOCKET_CONNECT
+//#define HTTP_E_SOCKET    DLNA_E_OUTOF_SOCKET
+//#define HTTP_E_BAD_RESPONSE DLNA_E_BAD_RESPONSE
+//#define HTTP_E_BAD_REQUEST DLNA_E_BAD_REQUEST
+//#define HTTP_E_BAD_IP_ADDRESS DLNA_E_INVALID_URL
 
 //#define RESPONSE_TIMEOUT 30
 

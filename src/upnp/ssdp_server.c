@@ -77,7 +77,7 @@ struct SSDPSockArray {
  *		-1 = Send shutdown,
  *		 0 = send reply, 
  *		 1 = Send Advertisement
- *	IN UpnpDevice_Handle Hnd: Device handle
+ *	IN dlnaDevice_Handle Hnd: Device handle
  *	IN enum SsdpSearchType SearchType:Search type for sending replies
  *	IN struct sockaddr_in *DestAddr:Destination address
  *   IN char *DeviceType:Device type
@@ -89,10 +89,10 @@ struct SSDPSockArray {
  *	This function sends SSDP advertisements, replies and shutdown messages.
  *
  * Returns: int
- *	UPNP_E_SUCCESS if successful else appropriate error
+ *	DLNA_E_SUCCESS if successful else appropriate error
  ***************************************************************************/
 int AdvertiseAndReply( IN int AdFlag,
-                       IN UpnpDevice_Handle Hnd,
+                       IN dlnaDevice_Handle Hnd,
                        IN enum SsdpSearchType SearchType,
                        IN struct sockaddr_in *DestAddr,
                        IN char *DeviceType,
@@ -116,7 +116,7 @@ int AdvertiseAndReply( IN int AdFlag,
     char SERVER[200];
 
     const DOMString dbgStr;
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
         "Inside AdvertiseAndReply with AdFlag = %d\n",
         AdFlag );
 
@@ -124,7 +124,7 @@ int AdvertiseAndReply( IN int AdFlag,
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     defaultExp = SInfo->MaxAge;
 
@@ -135,18 +135,18 @@ int AdvertiseAndReply( IN int AdFlag,
     // parse the device list and send advertisements/replies 
     for( i = 0;; i++ ) {
 
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
             "Entering new device list with i = %d\n\n", i );
 
         tmpNode = ixmlNodeList_item( SInfo->DeviceList, i );
         if( tmpNode == NULL ) {
-            UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
                 "Exiting new device list with i = %d\n\n", i );
             break;
         }
 
         dbgStr = ixmlNode_getNodeName( tmpNode );
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
             "Extracting device type once for %s\n", dbgStr );
         // extract device type 
         ixmlNodeList_free( nodeList );
@@ -158,9 +158,9 @@ int AdvertiseAndReply( IN int AdFlag,
         }
 
         dbgStr = ixmlNode_getNodeName( tmpNode );
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
             "Extracting UDN for %s\n", dbgStr );
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
             "Extracting device type\n" );
 
         tmpNode2 = ixmlNodeList_item( nodeList, 0 );
@@ -172,7 +172,7 @@ int AdvertiseAndReply( IN int AdFlag,
             continue;
         }
 
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
             "Extracting device type \n" );
 
         tmpStr = ixmlNode_getNodeValue( textNode );
@@ -185,14 +185,14 @@ int AdvertiseAndReply( IN int AdFlag,
             continue;
         }
 
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
             "Extracting device type = %s\n", devType );
         if( tmpNode == NULL ) {
-            UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
                 "TempNode is NULL\n" );
 	}
         dbgStr = ixmlNode_getNodeName( tmpNode );
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
             "Extracting UDN for %s\n", dbgStr );
         // extract UDN 
         ixmlNodeList_free( nodeList );
@@ -200,25 +200,25 @@ int AdvertiseAndReply( IN int AdFlag,
         nodeList = ixmlElement_getElementsByTagName( ( IXML_Element * )
                                                      tmpNode, "UDN" );
         if( nodeList == NULL ) {
-            UpnpPrintf( UPNP_CRITICAL, API, __FILE__,
+            dlnaPrintf( DLNA_CRITICAL, API, __FILE__,
                 __LINE__, "UDN not found!!!\n" );
                 continue;
         }
         tmpNode2 = ixmlNodeList_item( nodeList, 0 );
         if( tmpNode2 == NULL ) {
-            UpnpPrintf( UPNP_CRITICAL, API, __FILE__,
+            dlnaPrintf( DLNA_CRITICAL, API, __FILE__,
                 __LINE__, "UDN not found!!!\n" );
             continue;
         }
         textNode = ixmlNode_getFirstChild( tmpNode2 );
         if( textNode == NULL ) {
-            UpnpPrintf( UPNP_CRITICAL, API, __FILE__,
+            dlnaPrintf( DLNA_CRITICAL, API, __FILE__,
                 __LINE__, "UDN not found!!!\n" );
             continue;
         }
         tmpStr = ixmlNode_getNodeValue( textNode );
         if( tmpStr == NULL ) {
-            UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_CRITICAL, API, __FILE__, __LINE__,
                 "UDN not found!!!!\n" );
                 continue;
         }
@@ -227,7 +227,7 @@ int AdvertiseAndReply( IN int AdFlag,
             continue;
         }
 
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
             "Sending UDNStr = %s \n", UDNstr );
         if( AdFlag ) {
             // send the device advertisement 
@@ -257,13 +257,13 @@ int AdvertiseAndReply( IN int AdFlag,
                     {
                         if( DeviceUDN != NULL && strlen( DeviceUDN ) != 0 ) {
                             if( strcasecmp( DeviceUDN, UDNstr ) ) {
-                                UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+                                dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
                                     "DeviceUDN=%s and search "
                                     "UDN=%s did not match\n",
                                     UDNstr, DeviceUDN );
                                     break;
                             } else {
-                                UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+                                dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
                                     "DeviceUDN=%s and search "
                                     "UDN=%s MATCH\n", UDNstr,
                                     DeviceUDN );
@@ -279,13 +279,13 @@ int AdvertiseAndReply( IN int AdFlag,
                         if( !strncasecmp
                             ( DeviceType, devType,
                               strlen( DeviceType ) ) ) {
-                            UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+                            dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
                                 "DeviceType=%s and search devType=%s MATCH\n",
                                 devType, DeviceType );
                             SendReply( DestAddr, devType, 0, UDNstr,
                                        SInfo->DescURL, defaultExp, 1 );
                         } else {
-                            UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+                            dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
                                 "DeviceType=%s and search devType=%s"
                                 " DID NOT MATCH\n",
                                 devType, DeviceType );
@@ -298,7 +298,7 @@ int AdvertiseAndReply( IN int AdFlag,
         }
         // send service advertisements for services corresponding 
         // to the same device 
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
             "Sending service Advertisement\n" );
 
         tmpNode = ixmlNodeList_item( SInfo->ServiceList, i );
@@ -310,7 +310,7 @@ int AdvertiseAndReply( IN int AdFlag,
         nodeList = ixmlElement_getElementsByTagName( ( IXML_Element * )
                                                      tmpNode, "service" );
         if( nodeList == NULL ) {
-            UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
                 "Service not found 3\n" );
             continue;
         }
@@ -325,7 +325,7 @@ int AdvertiseAndReply( IN int AdFlag,
             tmpNodeList = ixmlElement_getElementsByTagName(
                 ( IXML_Element *)tmpNode, "serviceType" );
             if( tmpNodeList == NULL ) {
-                UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+                dlnaPrintf( DLNA_CRITICAL, API, __FILE__, __LINE__,
                     "ServiceType not found \n" );
                 continue;
             }
@@ -347,7 +347,7 @@ int AdvertiseAndReply( IN int AdFlag,
                 continue;
             }
 
-            UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
                 "ServiceType = %s\n", servType );
             if( AdFlag ) {
                 if( AdFlag == 1 ) {
@@ -386,12 +386,12 @@ int AdvertiseAndReply( IN int AdFlag,
         ixmlNodeList_free( nodeList );
         nodeList = NULL;
     }
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
         "Exiting AdvertiseAndReply : \n" );
 
     HandleUnlock();
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
 }  /****************** End of AdvertiseAndReply *********************/
 
@@ -629,7 +629,7 @@ free_ssdp_event_handler_data( void *the_data )
  * Returns: xboolean
  *	returns TRUE if msg is valid else FALSE
  ***************************************************************************/
-static UPNP_INLINE xboolean
+static DLNA_INLINE xboolean
 valid_ssdp_msg( IN http_message_t * hmsg )
 {
     memptr hdr_value;
@@ -671,7 +671,7 @@ valid_ssdp_msg( IN http_message_t * hmsg )
  * Returns: int
  *	0 if successful -1 if error
  ***************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 start_event_handler( void *Data )
 {
 
@@ -685,7 +685,7 @@ start_event_handler( void *Data )
     if( status == PARSE_FAILURE ) {
         if( parser->msg.method != HTTPMETHOD_NOTIFY ||
             !parser->valid_ssdp_notify_hack ) {
-            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_INFO, SSDP, __FILE__, __LINE__,
                 "SSDP recvd bad msg code = %d\n",
                 status );
             // ignore bad msg, or not enuf mem
@@ -693,7 +693,7 @@ start_event_handler( void *Data )
         }
         // valid notify msg
     } else if( status != PARSE_SUCCESS ) {
-        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, SSDP, __FILE__, __LINE__,
             "SSDP recvd bad msg code = %d\n", status );
 
         goto error_handler;
@@ -807,7 +807,7 @@ readFromSSDPSocket( SOCKET socket )
 
     if( byteReceived > 0 ) {
         requestBuf[byteReceived] = '\0';
-        UpnpPrintf( UPNP_INFO, SSDP,
+        dlnaPrintf( DLNA_INFO, SSDP,
             __FILE__, __LINE__,
             "Start of received response ----------------------------------------------------\n"
             "%s\n"
@@ -815,7 +815,7 @@ readFromSSDPSocket( SOCKET socket )
             "From host %s\n",
             requestBuf,
             inet_ntoa( clientAddr.sin_addr ) );
-        UpnpPrintf( UPNP_PACKET, SSDP, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_PACKET, SSDP, __FILE__, __LINE__,
             "Start of received multicast packet --------------------------------------------\n"
             "%s\n"
             "End of received multicast packet ----------------------------------------------\n",
@@ -851,7 +851,7 @@ readFromSSDPSocket( SOCKET socket )
  *	for multicast traffic.
  *
  * Returns: int
- *	return UPNP_E_SUCCESS if successful else returns appropriate error
+ *	return DLNA_E_SUCCESS if successful else returns appropriate error
  ***************************************************************************/
 int
 get_ssdp_sockets( MiniServerSockArray * out )
@@ -866,11 +866,11 @@ get_ssdp_sockets( MiniServerSockArray * out )
 #if INCLUDE_CLIENT_APIS
     SOCKET ssdpReqSock;
 
-    if( ( ssdpReqSock = socket( AF_INET, SOCK_DGRAM, 0 ) ) == UPNP_INVALID_SOCKET ) {
-        UpnpPrintf( UPNP_CRITICAL,
+    if( ( ssdpReqSock = socket( AF_INET, SOCK_DGRAM, 0 ) ) == DLNA_INVALID_SOCKET ) {
+        dlnaPrintf( DLNA_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in socket operation !!!\n" );
-            return UPNP_E_OUTOF_SOCKET;
+            return DLNA_E_OUTOF_SOCKET;
     }
     setsockopt( ssdpReqSock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof( ttl ) );
     // just do it, regardless if fails or not.
@@ -878,39 +878,39 @@ get_ssdp_sockets( MiniServerSockArray * out )
     gSsdpReqSocket = ssdpReqSock;
 #endif /* INCLUDE_CLIENT_APIS */
 
-    if( ( ssdpSock = socket( AF_INET, SOCK_DGRAM, 0 ) ) == UPNP_INVALID_SOCKET ) {
-        UpnpPrintf( UPNP_CRITICAL,
+    if( ( ssdpSock = socket( AF_INET, SOCK_DGRAM, 0 ) ) == DLNA_INVALID_SOCKET ) {
+        dlnaPrintf( DLNA_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in socket operation !!!\n" );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
-        return UPNP_E_OUTOF_SOCKET;
+        CLIENTONLY( dlnaCloseSocket( ssdpReqSock ); )
+        return DLNA_E_OUTOF_SOCKET;
     }
 
     onOff = 1;
     if( setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEADDR,
             ( char * )&onOff, sizeof( onOff ) ) != 0 ) {
-        UpnpPrintf( UPNP_CRITICAL,
+        dlnaPrintf( DLNA_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in set reuse addr !!!\n" );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+        CLIENTONLY( dlnaCloseSocket( ssdpReqSock ); )
         shutdown( ssdpSock, SD_BOTH );
-        UpnpCloseSocket( ssdpSock );
-        return UPNP_E_SOCKET_ERROR;
+        dlnaCloseSocket( ssdpSock );
+        return DLNA_E_SOCKET_ERROR;
     }
     
 #ifdef __FreeBSD__
     if( setsockopt( ssdpSock, SOL_SOCKET, SO_REUSEPORT,
             ( char * )&onOff, sizeof( onOff ) ) != 0 ) {
-        UpnpPrintf( UPNP_CRITICAL,
+        dlnaPrintf( DLNA_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in set reuse port !!!\n" );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
+        CLIENTONLY( dlnaCloseSocket( ssdpReqSock ); )
         shutdown( ssdpSock, SD_BOTH );
-        UpnpCloseSocket( ssdpSock );
-        return UPNP_E_SOCKET_ERROR;
+        dlnaCloseSocket( ssdpSock );
+        return DLNA_E_SOCKET_ERROR;
     }
 #endif /* __FreeBSD__ */
 
@@ -921,14 +921,14 @@ get_ssdp_sockets( MiniServerSockArray * out )
     ssdpAddr.sin_port = htons( SSDP_PORT );
     if( bind( ssdpSock, ( struct sockaddr * )&ssdpAddr,
             sizeof( ssdpAddr ) ) != 0 ) {
-        UpnpPrintf( UPNP_CRITICAL,
+        dlnaPrintf( DLNA_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in binding !!!\n" );
             shutdown( ssdpSock, SD_BOTH );
-        UpnpCloseSocket( ssdpSock );
+        dlnaCloseSocket( ssdpSock );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
-        return UPNP_E_SOCKET_BIND;
+        CLIENTONLY( dlnaCloseSocket( ssdpReqSock ); )
+        return DLNA_E_SOCKET_BIND;
     }
 
     memset( ( void * )&ssdpMcastAddr, 0, sizeof( struct ip_mreq ) );
@@ -936,14 +936,14 @@ get_ssdp_sockets( MiniServerSockArray * out )
     ssdpMcastAddr.imr_multiaddr.s_addr = inet_addr( SSDP_IP );
     if( setsockopt( ssdpSock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
             ( char * )&ssdpMcastAddr, sizeof( struct ip_mreq ) ) != 0 ) {
-        UpnpPrintf( UPNP_CRITICAL,
+        dlnaPrintf( DLNA_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in joining" " multicast group !!!\n" );
         shutdown( ssdpSock, SD_BOTH );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
-        UpnpCloseSocket( ssdpSock );
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
-        return UPNP_E_SOCKET_ERROR;
+        dlnaCloseSocket( ssdpSock );
+        CLIENTONLY( dlnaCloseSocket( ssdpReqSock ); )
+        return DLNA_E_SOCKET_ERROR;
     }
 
     /* Set multicast interface. */
@@ -951,7 +951,7 @@ get_ssdp_sockets( MiniServerSockArray * out )
     addr.s_addr = inet_addr(LOCAL_HOST);
     if ( setsockopt(ssdpSock, IPPROTO_IP, IP_MULTICAST_IF,
             (char *)&addr, sizeof addr) != 0) {
-        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, SSDP, __FILE__, __LINE__,
             "Couldn't set multicast interface.\n" );
         /* This is probably not a critical error, so let's continue. */
     }
@@ -961,19 +961,19 @@ get_ssdp_sockets( MiniServerSockArray * out )
                 IP_MULTICAST_TTL, &ttl, sizeof( ttl ) );
     if( setsockopt( ssdpSock, SOL_SOCKET, SO_BROADCAST,
             (char *)&option, sizeof(option) ) != 0) {
-        UpnpPrintf( UPNP_CRITICAL,
+        dlnaPrintf( DLNA_CRITICAL,
             SSDP, __FILE__, __LINE__,
             "Error in setting broadcast !!!\n" );
         shutdown( ssdpSock, SD_BOTH );
         CLIENTONLY( shutdown( ssdpReqSock, SD_BOTH ); )
-        UpnpCloseSocket( ssdpSock );
-        CLIENTONLY( UpnpCloseSocket( ssdpReqSock ); )
-        return UPNP_E_NETWORK_ERROR;
+        dlnaCloseSocket( ssdpSock );
+        CLIENTONLY( dlnaCloseSocket( ssdpReqSock ); )
+        return DLNA_E_NETWORK_ERROR;
     }
 
     CLIENTONLY( out->ssdpReqSock = ssdpReqSock; )
     out->ssdpSock = ssdpSock;
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 #endif /* EXCLUDE_SSDP */

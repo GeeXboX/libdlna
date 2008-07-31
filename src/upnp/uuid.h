@@ -17,24 +17,24 @@
   ** this software for any purpose.
   */
 
-  typedef struct _uuid_upnp {
+  typedef struct _uuid_dlna {
       unsigned32          time_low;
       unsigned16          time_mid;
       unsigned16          time_hi_and_version;
       unsigned8           clock_seq_hi_and_reserved;
       unsigned8           clock_seq_low;
       byte                node[6];
-  } uuid_upnp;
+  } uuid_dlna;
 
   /* uuid_create -- generate a UUID */
-  int uuid_create(uuid_upnp * id);
-  void uuid_unpack(uuid_upnp *u, char *out);	// out will be xxxx-xx-xx-xx-xxxxxx format
+  int uuid_create(uuid_dlna * id);
+  void uuid_unpack(uuid_dlna *u, char *out);	// out will be xxxx-xx-xx-xx-xxxxxx format
 
   /* uuid_create_from_name -- create a UUID using a "name"
      from a "name space" */
   void uuid_create_from_name(
-    uuid_upnp * uid,        /* resulting UUID */
-    uuid_upnp nsid,          /* UUID to serve as context, so identical
+    uuid_dlna * uid,        /* resulting UUID */
+    uuid_dlna nsid,          /* UUID to serve as context, so identical
                              names from different name spaces generate
                              different UUIDs */
     void * name,          /* the name from which to generate a UUID */
@@ -47,4 +47,4 @@
            1   u1 is lexically after u2
      Note:   lexical ordering is not temporal ordering!
   */
-  int uuid_compare(uuid_upnp *u1, uuid_upnp *u2);
+  int uuid_compare(uuid_dlna *u1, uuid_dlna *u2);

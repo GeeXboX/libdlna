@@ -49,7 +49,7 @@
 *	Description :	Make a copy of the client subscription data
 *
 *	Return : int ;
-*		UPNP_E_OUTOF_MEMORY - On Failure to allocate memory
+*		DLNA_E_OUTOF_MEMORY - On Failure to allocate memory
 *		HTTP_SUCCESS - On Success
 *
 *	Note :
@@ -62,11 +62,11 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
             out->sid[SID_SIZE] = 0;
             out->ActualSID = ( char * )malloc( len );
             if( out->ActualSID == NULL )
-                return UPNP_E_OUTOF_MEMORY;
+                return DLNA_E_OUTOF_MEMORY;
             out->EventURL = ( char * )malloc( len1 );
             if( out->EventURL == NULL ) {
                 free(out->ActualSID);
-                return UPNP_E_OUTOF_MEMORY;
+                return DLNA_E_OUTOF_MEMORY;
             }
             memcpy( out->ActualSID, in->ActualSID, len );
             memcpy( out->EventURL, in->EventURL, len1 );
@@ -87,7 +87,7 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 *	Note :
 ************************************************************************/
             void free_client_subscription( client_subscription * sub ) {
-            upnp_timeout * event; ThreadPoolJob tempJob; if( sub ) {
+            dlna_timeout * event; ThreadPoolJob tempJob; if( sub ) {
             if( sub->ActualSID )
             free( sub->ActualSID ); if( sub->EventURL )
             free( sub->EventURL ); if( sub->RenewEventId != -1 )    //do not remove timer event of copy
@@ -95,8 +95,8 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
             {
             if( TimerThreadRemove
                 ( &gTimerThread, sub->RenewEventId, &tempJob ) == 0 ) {
-            event = ( upnp_timeout * ) tempJob.arg;
-            free_upnp_timeout( event );}
+            event = ( dlna_timeout * ) tempJob.arg;
+            free_dlna_timeout( event );}
             }
 
             sub->RenewEventId = -1;}
@@ -125,10 +125,10 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 *
 *	Parameters :
 *		client_subscription **head ; Head of the subscription list	
-*		const Upnp_SID sid ;		 Subscription ID to be mactched
+*		const dlna_SID sid ;		 Subscription ID to be mactched
 *
 *	Description :	Remove the client subscription matching the 
-*		subscritpion id represented by the const Upnp_SID sid parameter 
+*		subscritpion id represented by the const dlna_SID sid parameter 
 *		from the table and update the table.
 *
 *	Return : void ;
@@ -136,7 +136,7 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 *	Note :
 ************************************************************************/
             void RemoveClientSubClientSID( client_subscription ** head,
-                                           const Upnp_SID sid ) {
+                                           const dlna_SID sid ) {
             client_subscription * finger = ( *head );
             client_subscription * previous = NULL; while( finger ) {
             if( !( strcmp( sid, finger->sid ) ) ) {
@@ -157,10 +157,10 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 *
 *	Parameters :
 *		client_subscription *head ; Head of the subscription list	
-*		const Upnp_SID sid ;		Subscription ID to be matched
+*		const dlna_SID sid ;		Subscription ID to be matched
 *
 *	Description :	Return the client subscription from the client table 
-*		that matches const Upnp_SID sid subscrition id value. 
+*		that matches const dlna_SID sid subscrition id value. 
 *
 *	Return : client_subscription * ; The matching subscription
 *
@@ -168,7 +168,7 @@ CLIENTONLY( int copy_client_subscription( client_subscription * in,
 ************************************************************************/
             client_subscription *
             GetClientSubClientSID( client_subscription * head,
-                                   const Upnp_SID sid ) {
+                                   const dlna_SID sid ) {
             client_subscription * next = head; while( next ) {
             if( !strcmp( next->sid, sid ) )
             break;

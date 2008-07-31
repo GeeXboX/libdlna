@@ -71,9 +71,9 @@ typedef struct
 *		descriptor in the SOCKINFO structure.
 *
 *	Return : int;
-*		UPNP_E_SUCCESS	
-*		UPNP_E_OUTOF_MEMORY
-*		UPNP_E_SOCKET_ERROR
+*		DLNA_E_SUCCESS	
+*		DLNA_E_OUTOF_MEMORY
+*		DLNA_E_SOCKET_ERROR
 *	Note :
 ************************************************************************/
 int sock_init( OUT SOCKINFO* info, IN int sockfd );
@@ -92,9 +92,9 @@ int sock_init( OUT SOCKINFO* info, IN int sockfd );
 *		structure.
 *
 *	Return : int;
-*		UPNP_E_SUCCESS	
-*		UPNP_E_OUTOF_MEMORY
-*		UPNP_E_SOCKET_ERROR
+*		DLNA_E_SUCCESS	
+*		DLNA_E_OUTOF_MEMORY
+*		DLNA_E_SOCKET_ERROR
 *
 *	Note :
 ************************************************************************/
@@ -114,8 +114,8 @@ int sock_init_with_ip( OUT SOCKINFO* info, IN int sockfd,
 *
 *	Return : int;
 *		numBytes - On Success, no of bytes received		
-*		UPNP_E_TIMEDOUT - Timeout
-*		UPNP_E_SOCKET_ERROR - Error on socket calls
+*		DLNA_E_TIMEDOUT - Timeout
+*		DLNA_E_SOCKET_ERROR - Error on socket calls
 *
 *	Note :
 ************************************************************************/
@@ -135,8 +135,8 @@ int sock_read( IN SOCKINFO *info, OUT char* buffer, IN size_t bufsize,
 *
 *	Return : int;
 *		numBytes - On Success, no of bytes sent		
-*		UPNP_E_TIMEDOUT - Timeout
-*		UPNP_E_SOCKET_ERROR - Error on socket calls
+*		DLNA_E_TIMEDOUT - Timeout
+*		DLNA_E_SOCKET_ERROR - Error on socket calls
 *
 *	Note :
 ************************************************************************/
@@ -157,8 +157,8 @@ int sock_write( IN SOCKINFO *info, IN char* buffer, IN size_t bufsize,
 *		to release system resources used by the socket calls.
 *
 *	Return : int;
-*		UPNP_E_SOCKET_ERROR on failure
-*		UPNP_E_SUCCESS on success
+*		DLNA_E_SOCKET_ERROR on failure
+*		DLNA_E_SUCCESS on success
 *
 *	Note :
 ************************************************************************/

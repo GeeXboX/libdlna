@@ -491,7 +491,7 @@ const char* method_to_str( IN http_method_t method );
 #ifdef DEBUG
 void print_http_headers( IN http_message_t *hmsg );
 #else
-static UPNP_INLINE void print_http_headers( IN http_message_t *hmsg upnp_unused ) {}
+static DLNA_INLINE void print_http_headers( IN http_message_t *hmsg dlna_unused ) {}
 #endif
 
 #ifdef __cplusplus

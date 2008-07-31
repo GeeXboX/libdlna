@@ -35,9 +35,9 @@
 #include "autoconfig.h"
 
 #if defined(__GNUC__)
-#    define upnp_unused __attribute__((unused))
+#    define dlna_unused __attribute__((unused))
 #else
-#    define upnp_unused
+#    define dlna_unused
 #endif
 
 /** @name Compile time configuration options
@@ -115,7 +115,7 @@
  * SOAP messages will read at most {\tt DEFAULT_SOAP_CONTENT_LENGTH} bytes.  
  * This prevents devices that have a misbehaving web server to send 
  * a large amount of data to the control point causing it to crash.  
- * This can be adjusted dynamically with {\tt UpnpSetMaxContentLength}.
+ * This can be adjusted dynamically with {\tt dlnaSetMaxContentLength}.
  */
 //@{
 #define DEFAULT_SOAP_CONTENT_LENGTH 16000
@@ -255,8 +255,8 @@
 /** @name DEBUG_TARGET
  *  The user has the option to redirect the library output debug messages 
  *  to either the screen or to a log file.  All the output messages with 
- *  debug level 0 will go to {\tt upnp.err} and messages with debug level 
- *  greater than zero will be redirected to {\tt upnp.out}.
+ *  debug level 0 will go to {\tt dlna.err} and messages with debug level 
+ *  greater than zero will be redirected to {\tt dlna.out}.
  */
 
 //@{
@@ -266,7 +266,7 @@
 
 /** @name Other debugging features
           The UPnP SDK contains other features to aid in debugging:
-	  see <upnp/inc/upnpdebug.h>
+	  see <dlna/inc/dlnadebug.h>
  */
 
 #define DEBUG_ALL		1
@@ -293,17 +293,17 @@
  */
 
 // configure --enable-client
-#if UPNP_HAVE_CLIENT
+#if DLNA_HAVE_CLIENT
 #	define INCLUDE_CLIENT_APIS	1
 #endif
 
 // configure --enable-device
-#if UPNP_HAVE_DEVICE
+#if DLNA_HAVE_DEVICE
 #	define INCLUDE_DEVICE_APIS	1
 #endif
 
 // configure --enable-webserver --enable-device
-#if UPNP_HAVE_WEBSERVER
+#if DLNA_HAVE_WEBSERVER
 #	define INTERNAL_WEB_SERVER	1
 #endif
 

@@ -30,8 +30,8 @@
  *
  ******************************************************************************/
 
-#ifndef UPNP_DEBUG_H
-#define UPNP_DEBUG_H 
+#ifndef DLNA_DEBUG_H
+#define DLNA_DEBUG_H 
 
 #include "upnp.h"
 #include "upnpconfig.h"
@@ -50,9 +50,9 @@ extern "C" {
 
 /*! @{ */
 
-/** @name Upnp_LogLevel
+/** @name dlna_LogLevel
  *  The user has the option to select 4 different types of debugging levels,
- *  see {\tt UpnpSetLogLevel}. 
+ *  see {\tt dlnaSetLogLevel}. 
  *  The critical level will show only those messages 
  *  which can halt the normal processing of the library, like memory 
  *  allocation errors. The remaining three levels are just for debugging 
@@ -62,14 +62,14 @@ extern "C" {
  *  regarding the working of the library. If the user selects All, 
  *  then the library displays all the debugging information that it has.
  *  \begin{itemize}
- *    \item {\tt UPNP_CRITICAL [0]}
- *    \item {\tt UPNP_PACKET [1]}
- *    \item {\tt UPNP_INFO [2]}
- *    \item {\tt UPNP_ALL [3]}
+ *    \item {\tt DLNA_CRITICAL [0]}
+ *    \item {\tt DLNA_PACKET [1]}
+ *    \item {\tt DLNA_INFO [2]}
+ *    \item {\tt DLNA_ALL [3]}
  *  \end{itemize}
  */
 
-typedef enum Upnp_Module {
+typedef enum dlna_Module {
 	SSDP,
 	SOAP,
 	GENA,
@@ -81,24 +81,24 @@ typedef enum Upnp_Module {
 } Dbg_Module;
 
 /*! @{ */
-typedef enum Upnp_LogLevel_e {
-	UPNP_CRITICAL,
-	UPNP_PACKET,
-	UPNP_INFO,
-	UPNP_ALL
-} Upnp_LogLevel;
+typedef enum dlna_LogLevel_e {
+	DLNA_CRITICAL,
+	DLNA_PACKET,
+	DLNA_INFO,
+	DLNA_ALL
+} dlna_LogLevel;
 /*! @} */
 
 
 /**
- * Default log level : see {\tt Upnp_LogLevel}
+ * Default log level : see {\tt dlna_LogLevel}
  */
-#define UPNP_DEFAULT_LOG_LEVEL	UPNP_ALL
+#define DLNA_DEFAULT_LOG_LEVEL	DLNA_ALL
 
 
 
 /***************************************************************************
- * Function : UpnpInitLog
+ * Function : dlnaInitLog
  *
  * Parameters:	void
  *
@@ -107,33 +107,33 @@ typedef enum Upnp_LogLevel_e {
  *
  * Returns: int
  *	-1 : If fails
- *	UPNP_E_SUCCESS : if success
+ *	DLNA_E_SUCCESS : if success
  ***************************************************************************/
 #ifdef DEBUG
-int UpnpInitLog();
+int dlnaInitLog();
 #else
-static UPNP_INLINE int UpnpInitLog() { return UPNP_E_SUCCESS; }
+static DLNA_INLINE int dlnaInitLog() { return DLNA_E_SUCCESS; }
 #endif
 
 
 /***************************************************************************
- * Function : UpnpSetLogLevel
+ * Function : dlnaSetLogLevel
  *				
- * Parameters: Upnp_LogLevel log_level
+ * Parameters: dlna_LogLevel log_level
  *
  * Description:							
- *	This functions set the log level (see {\tt Upnp_LogLevel}
+ *	This functions set the log level (see {\tt dlna_LogLevel}
  * Returns: void
  ***************************************************************************/
 #ifdef DEBUG
-void UpnpSetLogLevel(Upnp_LogLevel log_level);
+void dlnaSetLogLevel(dlna_LogLevel log_level);
 #else
-static UPNP_INLINE void UpnpSetLogLevel(Upnp_LogLevel log_level upnp_unused) {}
+static DLNA_INLINE void dlnaSetLogLevel(dlna_LogLevel log_level dlna_unused) {}
 #endif
 
 
 /***************************************************************************
- * Function : UpnpCloseLog						
+ * Function : dlnaCloseLog						
  *								
  * Parameters:	void					
  *								
@@ -142,14 +142,14 @@ static UPNP_INLINE void UpnpSetLogLevel(Upnp_LogLevel log_level upnp_unused) {}
  * Returns: void
  ***************************************************************************/
 #ifdef DEBUG
-void UpnpCloseLog();
+void dlnaCloseLog();
 #else
-static UPNP_INLINE void UpnpCloseLog() {}
+static DLNA_INLINE void dlnaCloseLog() {}
 #endif
 
 
 /***************************************************************************
- * Function : UpnpSetLogFileNames		
+ * Function : dlnaSetLogFileNames		
  *							
  * Parameters:						
  *	IN const char* ErrFileName: name of the error file
@@ -163,21 +163,21 @@ static UPNP_INLINE void UpnpCloseLog() {}
  * Returns: void
  ***************************************************************************/
 #ifdef DEBUG
-void UpnpSetLogFileNames(
+void dlnaSetLogFileNames(
 	const char *ErrFileName,
 	const char *InfoFileName);
 #else
-static UPNP_INLINE void UpnpSetLogFileNames(
-	const char *ErrFileName upnp_unused,
-	const char *InfoFileName upnp_unused) {}
+static DLNA_INLINE void dlnaSetLogFileNames(
+	const char *ErrFileName dlna_unused,
+	const char *InfoFileName dlna_unused) {}
 #endif
 
 
 /***************************************************************************
- * Function : UpnpGetDebugFile		
+ * Function : dlnaGetDebugFile		
  *						
  * Parameters:					
- *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
+ *	IN dlna_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -190,9 +190,9 @@ static UPNP_INLINE void UpnpSetLogFileNames(
  *	else returns the right file descriptor
  ***************************************************************************/
 #ifdef DEBUG
-FILE *UpnpGetDebugFile(Upnp_LogLevel level, Dbg_Module module);
+FILE *dlnaGetDebugFile(dlna_LogLevel level, Dbg_Module module);
 #else
-static UPNP_INLINE FILE *UpnpGetDebugFile(Upnp_LogLevel level upnp_unused, Dbg_Module module upnp_unused)
+static DLNA_INLINE FILE *dlnaGetDebugFile(dlna_LogLevel level dlna_unused, Dbg_Module module dlna_unused)
 {
 	return NULL;
 }
@@ -203,7 +203,7 @@ static UPNP_INLINE FILE *UpnpGetDebugFile(Upnp_LogLevel level upnp_unused, Dbg_M
  * Function : DebugAtThisLevel					
  *									
  * Parameters:			
- *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
+ *	IN dlna_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -216,20 +216,20 @@ static UPNP_INLINE FILE *UpnpGetDebugFile(Upnp_LogLevel level upnp_unused, Dbg_M
  ***************************************************************************/
 #ifdef DEBUG
 int DebugAtThisLevel(
-	IN Upnp_LogLevel DLevel,
+	IN dlna_LogLevel DLevel,
 	IN Dbg_Module Module);
 #else
-static UPNP_INLINE int DebugAtThisLevel(
-	IN Upnp_LogLevel DLevel upnp_unused,
-	IN Dbg_Module Module upnp_unused) { return 0; }
+static DLNA_INLINE int DebugAtThisLevel(
+	IN dlna_LogLevel DLevel dlna_unused,
+	IN Dbg_Module Module dlna_unused) { return 0; }
 #endif
 
 
 /***************************************************************************
- * Function : UpnpPrintf				
+ * Function : dlnaPrintf				
  *									
  * Parameters:								
- *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
+ *	IN dlna_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -247,8 +247,8 @@ static UPNP_INLINE int DebugAtThisLevel(
  * Returns: void
  ***************************************************************************/ 
 #ifdef DEBUG
-void UpnpPrintf(
-	Upnp_LogLevel DLevel,
+void dlnaPrintf(
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	const char* DbgFileName,
 	int DbgLineNo,
@@ -260,18 +260,18 @@ void UpnpPrintf(
 #endif
 ;
 #else /* DEBUG */
-static UPNP_INLINE void UpnpPrintf(
-	Upnp_LogLevel DLevel upnp_unused,
-	Dbg_Module Module upnp_unused,
-	const char* DbgFileName upnp_unused,
-	int DbgLineNo upnp_unused,
-	const char* FmtStr upnp_unused,
+static DLNA_INLINE void dlnaPrintf(
+	dlna_LogLevel DLevel dlna_unused,
+	Dbg_Module Module dlna_unused,
+	const char* DbgFileName dlna_unused,
+	int DbgLineNo dlna_unused,
+	const char* FmtStr dlna_unused,
 	...) {}
 #endif /* DEBUG */
 
 
 /***************************************************************************
- * Function : UpnpDisplayBanner				
+ * Function : dlnaDisplayBanner				
  *							
  * Parameters:							
  *	IN FILE *fd: file descriptor where the banner will be written
@@ -285,22 +285,22 @@ static UPNP_INLINE void UpnpPrintf(
  * Returns: void
  ***************************************************************************/
 #ifdef DEBUG
-void UpnpDisplayBanner(
+void dlnaDisplayBanner(
 	FILE *fd,
 	const char **lines,
 	size_t size,
 	int starlength);
 #else
-static UPNP_INLINE void UpnpDisplayBanner(
-	FILE *fd upnp_unused,
-	const char **lines upnp_unused,
-	size_t size upnp_unused,
-	int starlength upnp_unused) {}
+static DLNA_INLINE void dlnaDisplayBanner(
+	FILE *fd dlna_unused,
+	const char **lines dlna_unused,
+	size_t size dlna_unused,
+	int starlength dlna_unused) {}
 #endif
 
 
 /***************************************************************************
- * Function : UpnpDisplayFileAndLine				
+ * Function : dlnaDisplayFileAndLine				
  *								
  * Parameters:							
  *	IN FILE *fd: File descriptor where line number and file name will be 
@@ -314,15 +314,15 @@ static UPNP_INLINE void UpnpDisplayBanner(
  * Returns: void
  ***************************************************************************/
 #ifdef DEBUG
-void UpnpDisplayFileAndLine(
+void dlnaDisplayFileAndLine(
 	FILE *fd,
 	const char *DbgFileName,
 	int DbgLineNo);
 #else
-static UPNP_INLINE void UpnpDisplayFileAndLine(
-	FILE *fd upnp_unused,
-	const char *DbgFileName upnp_unused,
-	int DbgLineNo upnp_unused) {}
+static DLNA_INLINE void dlnaDisplayFileAndLine(
+	FILE *fd dlna_unused,
+	const char *DbgFileName dlna_unused,
+	int DbgLineNo dlna_unused) {}
 #endif
 
 /*! @} */
@@ -331,5 +331,5 @@ static UPNP_INLINE void UpnpDisplayFileAndLine(
 }
 #endif
 
-#endif /* UPNP_DEBUG_H */
+#endif /* DLNA_DEBUG_H */
 

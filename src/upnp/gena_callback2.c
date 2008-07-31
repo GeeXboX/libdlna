@@ -53,7 +53,7 @@
 *	incorrect GENA requests.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 void
 error_respond( IN SOCKINFO * info,
@@ -83,10 +83,10 @@ error_respond( IN SOCKINFO * info,
 *	incoming GENA requests. 
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 void
-genaCallback( IN http_parser_t * parser upnp_unused,
+genaCallback( IN http_parser_t * parser dlna_unused,
               IN http_message_t * request,
               INOUT SOCKINFO * info )
 {
@@ -103,7 +103,7 @@ genaCallback( IN http_parser_t * parser upnp_unused,
             // subscribe
             gena_process_subscription_request( info, request );
 	}
-        UpnpPrintf( UPNP_ALL, GENA, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, GENA, __FILE__, __LINE__,
             "got subscription request\n" );
     } else if( request->method == HTTPMETHOD_UNSUBSCRIBE ) {
         found_function = TRUE;

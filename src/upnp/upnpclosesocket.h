@@ -29,9 +29,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef UPNPCLOSESOCKET_H
-#define UPNPCLOSESOCKET_H
+#ifndef DLNACLOSESOCKET_H
+#define DLNACLOSESOCKET_H
 
-#define UpnpCloseSocket close
+#define dlnaCloseSocket close
 
 #endif

@@ -36,7 +36,7 @@
 #define SOAP_BODY "Body"
 #define SOAP_URN "http:/""/schemas.xmlsoap.org/soap/envelope/"
 
-#define QUERY_STATE_VAR_URN "urn:schemas-upnp-org:control-1-0"
+#define QUERY_STATE_VAR_URN "urn:schemas-dlna-org:control-1-0"
 
 #include "upnpapi.h"
 #include "parsetools.h"
@@ -52,7 +52,7 @@
 #endif
 
 // timeout duration in secs for transmission/reception
-#define SOAP_TIMEOUT UPNP_TIMEOUT
+#define SOAP_TIMEOUT DLNA_TIMEOUT
 
 #define SREQ_HDR_NOT_FOUND	 -1
 #define SREQ_BAD_HDR_FORMAT	 -2
@@ -85,7 +85,7 @@ const char *ContentTypeHeader =
 *		0 if successful else returns appropriate error.
 *	Note :
 ****************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 get_request_type( IN http_message_t * request,
                   OUT memptr * action_name )
 {
@@ -120,13 +120,13 @@ get_request_type( IN http_message_t * request,
         membuffer_init( &soap_action_name );
         if( ( membuffer_assign( &soap_action_name,
                                 ns_value.buf, ns_value.length )
-              == UPNP_E_OUTOF_MEMORY ) ||
+              == DLNA_E_OUTOF_MEMORY ) ||
             ( membuffer_append_str( &soap_action_name,
                                     "-SOAPACTION" ) ==
-              UPNP_E_OUTOF_MEMORY )
+              DLNA_E_OUTOF_MEMORY )
              ) {
             membuffer_destroy( &soap_action_name );
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         }
 
         hdr = httpmsg_find_hdr_str( request, soap_action_name.buf );
@@ -203,7 +203,7 @@ send_error_response( IN SOCKINFO * info,
         "<faultcode>s:Client</faultcode>\n"
         "<faultstring>UPnPError</faultstring>\n"
         "<detail>\n"
-        "<UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\">\n"
+        "<UPnPError xmlns=\"urn:schemas-dlna-org:control-1-0\">\n"
         "<errorCode>";
 
     const char *mid_body = "</errorCode>\n" "<errorDescription>";
@@ -262,7 +262,7 @@ send_error_response( IN SOCKINFO * info,
 *
 *	Note :
 ****************************************************************************/
-static UPNP_INLINE void
+static DLNA_INLINE void
 send_var_query_response( IN SOCKINFO * info,
                          IN const char *var_value,
                          IN http_message_t * hmsg )
@@ -277,7 +277,7 @@ send_var_query_response( IN SOCKINFO * info,
         "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
         "<s:Body>\n"
         "<u:QueryStateVariableResponse "
-        "xmlns:u=\"urn:schemas-upnp-org:control-1-0\">\n" "<return>";
+        "xmlns:u=\"urn:schemas-dlna-org:control-1-0\">\n" "<return>";
 
     const char *end_body =
         "</return>\n"
@@ -326,12 +326,12 @@ send_var_query_response( IN SOCKINFO * info,
 *	Description :	This function separates the action node from 
 *	the root DOM node.
 *
-*	Return :	static UPNP_INLINE int
+*	Return :	static DLNA_INLINE int
 *		0 if successful, or -1 if fails.
 *
 *	Note :
 ****************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 get_action_node( IN IXML_Document * TempDoc,
                  IN char *NodeName,
                  OUT IXML_Document ** RespNode )
@@ -344,7 +344,7 @@ get_action_node( IN IXML_Document * TempDoc,
     int ret_code = -1;          // error, by default
     IXML_NodeList *nl = NULL;
 
-    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, SOAP, __FILE__, __LINE__,
         "get_action_node(): node name =%s\n ", NodeName );
 
     *RespNode = NULL;
@@ -417,7 +417,7 @@ get_action_node( IN IXML_Document * TempDoc,
 *		SOAP request.
 *
 *	Return : int
-*		UPNP_E_SUCCESS if successful else returns appropriate error
+*		DLNA_E_SUCCESS if successful else returns appropriate error
 *
 *	Note :
 ****************************************************************************/
@@ -432,7 +432,7 @@ check_soap_body( IN IXML_Document * doc,
     const DOMString ns = NULL;
     const DOMString name = NULL;
 
-    int ret_code = UPNP_E_INVALID_ACTION;
+    int ret_code = DLNA_E_INVALID_ACTION;
 
     nl = ixmlDocument_getElementsByTagNameNS( doc, SOAP_URN, SOAP_BODY );
 
@@ -446,7 +446,7 @@ check_soap_body( IN IXML_Document * doc,
 
                 if( ( !strcmp( actionName, name ) )
                     && ( !strcmp( urn, ns ) ) ) {
-                    ret_code = UPNP_E_SUCCESS;
+                    ret_code = DLNA_E_SUCCESS;
                 }
             }
         }
@@ -468,7 +468,7 @@ check_soap_body( IN IXML_Document * doc,
 *		coming from the control point
 *
 *	Return :	static int
-*		UPNP_E_SUCCESS if successful else returns appropriate error
+*		DLNA_E_SUCCESS if successful else returns appropriate error
 *
 *	Note :
 ****************************************************************************/
@@ -481,7 +481,7 @@ check_soap_action_header( IN http_message_t * request,
     http_header_t *soap_action_header = NULL;
     char *ns_compare = NULL;
     int tempSize = 0;
-    int ret_code = UPNP_E_SUCCESS;
+    int ret_code = DLNA_E_SUCCESS;
     char *temp_header_value = NULL;
     char *temp = NULL;
     char *temp2 = NULL;
@@ -492,12 +492,12 @@ check_soap_action_header( IN http_message_t * request,
                                            &header_name );
 
     if( !soap_action_header ) {
-        ret_code = UPNP_E_INVALID_ACTION;
+        ret_code = DLNA_E_INVALID_ACTION;
         return ret_code;
     }
 
     if( soap_action_header->value.length <= 0 ) {
-        ret_code = UPNP_E_INVALID_ACTION;
+        ret_code = DLNA_E_INVALID_ACTION;
         return ret_code;
     }
 
@@ -505,7 +505,7 @@ check_soap_action_header( IN http_message_t * request,
         ( char * )malloc( soap_action_header->value.length + 1 );
 
     if( !temp_header_value ) {
-        ret_code = UPNP_E_OUTOF_MEMORY;
+        ret_code = DLNA_E_OUTOF_MEMORY;
         free( temp_header_value );
         return ret_code;
     }
@@ -517,7 +517,7 @@ check_soap_action_header( IN http_message_t * request,
     temp = strchr( temp_header_value, '#' );
     if( !temp ) {
         free( temp_header_value );
-        ret_code = UPNP_E_INVALID_ACTION;
+        ret_code = DLNA_E_INVALID_ACTION;
         return ret_code;
     }
 
@@ -531,7 +531,7 @@ check_soap_action_header( IN http_message_t * request,
     ns_compare = ( char * )malloc( tempSize );
 
     if( !ns_compare ) {
-        ret_code = UPNP_E_OUTOF_MEMORY;
+        ret_code = DLNA_E_OUTOF_MEMORY;
         free( temp_header_value );
         return ret_code;
     }
@@ -539,9 +539,9 @@ check_soap_action_header( IN http_message_t * request,
     snprintf( ns_compare, tempSize, "\"%s", urn );
 
     if( strcmp( temp_header_value, ns_compare ) ) {
-        ret_code = UPNP_E_INVALID_ACTION;
+        ret_code = DLNA_E_INVALID_ACTION;
     } else {
-        ret_code = UPNP_E_SUCCESS;
+        ret_code = DLNA_E_SUCCESS;
         temp++;
         temp2 = strchr( temp, '\"' );
 
@@ -553,7 +553,7 @@ check_soap_action_header( IN http_message_t * request,
         if( *temp )
             ( *actionName ) = strdup( temp );
         if( !*actionName ) {
-            ret_code = UPNP_E_OUTOF_MEMORY;
+            ret_code = DLNA_E_OUTOF_MEMORY;
         }
     }
 
@@ -571,7 +571,7 @@ check_soap_action_header( IN http_message_t * request,
 *		IN IXML_Document *actionDoc :	action request document
 *		OUT char device_udn[LINE_SIZE] :	Device UDN string
 *		OUT char service_id[LINE_SIZE] :	Service ID string
-*		OUT Upnp_FunPtr *callback :	callback function of the device 
+*		OUT dlna_FunPtr *callback :	callback function of the device 
 *									application
 *		OUT void** cookie :	cookie stored by device application 
 *							
@@ -581,7 +581,7 @@ check_soap_action_header( IN http_message_t * request,
 *		application.
 *
 *	Return : int
-*		UPNP_E_SUCCESS if successful else returns appropriate error
+*		DLNA_E_SUCCESS if successful else returns appropriate error
 *
 *	Note :
 ****************************************************************************/
@@ -591,7 +591,7 @@ get_device_info( IN http_message_t * request,
                  IN IXML_Document * actionDoc,
                  OUT char device_udn[LINE_SIZE],
                  OUT char service_id[LINE_SIZE],
-                 OUT Upnp_FunPtr * callback,
+                 OUT dlna_FunPtr * callback,
                  OUT void **cookie )
 {
     struct Handle_Info *device_info;
@@ -622,25 +622,25 @@ get_device_info( IN http_message_t * request,
     if( isQuery ) {
         ret_code = check_soap_action_header( request, QUERY_STATE_VAR_URN,
                                              &actionName );
-        if( ( ret_code != UPNP_E_SUCCESS )
-            && ( ret_code != UPNP_E_OUTOF_MEMORY ) ) {
-            ret_code = UPNP_E_INVALID_ACTION;
+        if( ( ret_code != DLNA_E_SUCCESS )
+            && ( ret_code != DLNA_E_OUTOF_MEMORY ) ) {
+            ret_code = DLNA_E_INVALID_ACTION;
             goto error_handler;
         }
         //check soap body
         ret_code =
             check_soap_body( actionDoc, QUERY_STATE_VAR_URN, actionName );
         free( actionName );
-        if( ret_code != UPNP_E_SUCCESS ) {
+        if( ret_code != DLNA_E_SUCCESS ) {
             goto error_handler;
         }
     } else {
         ret_code = check_soap_action_header( request,
                                              serv_info->serviceType,
                                              &actionName );
-        if( ( ret_code != UPNP_E_SUCCESS )
-            && ( ret_code != UPNP_E_OUTOF_MEMORY ) ) {
-            ret_code = UPNP_E_INVALID_SERVICE;
+        if( ( ret_code != DLNA_E_SUCCESS )
+            && ( ret_code != DLNA_E_OUTOF_MEMORY ) ) {
+            ret_code = DLNA_E_INVALID_SERVICE;
             goto error_handler;
         }
         //check soap body
@@ -648,8 +648,8 @@ get_device_info( IN http_message_t * request,
             check_soap_body( actionDoc, serv_info->serviceType,
                              actionName );
         free( actionName );
-        if( ret_code != UPNP_E_SUCCESS ) {
-            ret_code = UPNP_E_INVALID_SERVICE;
+        if( ret_code != DLNA_E_SUCCESS ) {
+            ret_code = DLNA_E_INVALID_SERVICE;
             goto error_handler;
         }
     }
@@ -681,7 +681,7 @@ get_device_info( IN http_message_t * request,
 *
 *	Note :
 ****************************************************************************/
-static UPNP_INLINE void
+static DLNA_INLINE void
 send_action_response( IN SOCKINFO * info,
                       IN IXML_Document * action_resp,
                       IN http_message_t * request )
@@ -705,7 +705,7 @@ send_action_response( IN SOCKINFO * info,
     http_CalcResponseVersion( request->major_version,
                               request->minor_version, &major, &minor );
     membuffer_init( &headers );
-    err_code = UPNP_E_OUTOF_MEMORY; // one error only
+    err_code = DLNA_E_OUTOF_MEMORY; // one error only
 
     // get xml
     xml_response = ixmlPrintNode( ( IXML_Node * ) action_resp );
@@ -738,7 +738,7 @@ send_action_response( IN SOCKINFO * info,
                                  end_body, strlen( end_body ) );
 
     if( ret_code != 0 ) {
-        UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, SOAP, __FILE__, __LINE__,
             "Failed to send response: err code = %d\n",
             ret_code );
     }
@@ -769,7 +769,7 @@ error_handler:
 *		returns 0 if successful else returns -1.
 *	Note :
 ****************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 get_var_name( IN IXML_Document * TempDoc,
               OUT char *VarName )
 {
@@ -813,7 +813,7 @@ get_var_name( IN IXML_Document * TempDoc,
     Temp = ixmlNode_getNodeValue( VarNode );
     linecopy( VarName, Temp );
 
-    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, SOAP, __FILE__, __LINE__,
         "Received query for variable  name %s\n",
         VarName );
 
@@ -840,15 +840,15 @@ error_handler:
 *
 *	Note :
 ****************************************************************************/
-static UPNP_INLINE void
+static DLNA_INLINE void
 handle_query_variable( IN SOCKINFO * info,
                        IN http_message_t * request,
                        IN IXML_Document * xml_doc )
 {
-    Upnp_FunPtr soap_event_callback;
+    dlna_FunPtr soap_event_callback;
     void *cookie;
     char var_name[LINE_SIZE];
-    struct Upnp_State_Var_Request variable;
+    struct dlna_State_Var_Request variable;
     const char *err_str;
     int err_code;
 
@@ -868,15 +868,15 @@ handle_query_variable( IN SOCKINFO * info,
     }
 
     linecopy( variable.ErrStr, "" );
-    variable.ErrCode = UPNP_E_SUCCESS;
+    variable.ErrCode = DLNA_E_SUCCESS;
     namecopy( variable.StateVarName, var_name );
     variable.CurrentVal = NULL;
     variable.CtrlPtIPAddr = info->foreign_ip_addr;
 
     // send event
-    soap_event_callback( UPNP_CONTROL_GET_VAR_REQUEST, &variable, cookie );
+    soap_event_callback( DLNA_CONTROL_GET_VAR_REQUEST, &variable, cookie );
 
-    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, SOAP, __FILE__, __LINE__,
         "Return from callback for var request\n" );
 
     // validate, and handle result
@@ -887,7 +887,7 @@ handle_query_variable( IN SOCKINFO * info,
                              Soap_Invalid_Var, request );
         return;
     }
-    if( variable.ErrCode != UPNP_E_SUCCESS ) {
+    if( variable.ErrCode != DLNA_E_SUCCESS ) {
         if( strlen( variable.ErrStr ) > 0 ) {
             err_code = SOAP_INVALID_VAR;
             err_str = Soap_Invalid_Var;
@@ -930,8 +930,8 @@ handle_invoke_action( IN SOCKINFO * info,
 {
     char save_char;
     IXML_Document *resp_node = NULL;
-    struct Upnp_Action_Request action;
-    Upnp_FunPtr soap_event_callback;
+    struct dlna_Action_Request action;
+    dlna_FunPtr soap_event_callback;
     void *cookie = NULL;
     int err_code;
     const char *err_str;
@@ -955,7 +955,7 @@ handle_invoke_action( IN SOCKINFO * info,
                                 action.ServiceID, &soap_event_callback,
                                 &cookie );
 
-    if( err_code != UPNP_E_SUCCESS ) {
+    if( err_code != DLNA_E_SUCCESS ) {
         goto error_handler;
     }
 
@@ -963,15 +963,15 @@ handle_invoke_action( IN SOCKINFO * info,
     linecopy( action.ErrStr, "" );
     action.ActionRequest = resp_node;
     action.ActionResult = NULL;
-    action.ErrCode = UPNP_E_SUCCESS;
+    action.ErrCode = DLNA_E_SUCCESS;
     action.CtrlPtIPAddr = info->foreign_ip_addr;
 
-    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, SOAP, __FILE__, __LINE__,
                          "Calling Callback\n" );
 
-    soap_event_callback( UPNP_CONTROL_ACTION_REQUEST, &action, cookie );
+    soap_event_callback( DLNA_CONTROL_ACTION_REQUEST, &action, cookie );
 
-    if( action.ErrCode != UPNP_E_SUCCESS ) {
+    if( action.ErrCode != DLNA_E_SUCCESS ) {
         if( strlen( action.ErrStr ) <= 0 ) {
             err_code = SOAP_ACTION_FAILED;
             err_str = Soap_Action_Failed;
@@ -1020,7 +1020,7 @@ handle_invoke_action( IN SOCKINFO * info,
 *	Note :
 ****************************************************************************/
 void
-soap_device_callback( IN http_parser_t * parser upnp_unused,
+soap_device_callback( IN http_parser_t * parser dlna_unused,
                       IN http_message_t * request,
                       INOUT SOCKINFO * info )
 {
@@ -1045,7 +1045,7 @@ soap_device_callback( IN http_parser_t * parser upnp_unused,
     err_code = ixmlParseBufferEx( request->entity.buf, &xml_doc );
     if( err_code != IXML_SUCCESS ) {
         if( err_code == IXML_INSUFFICIENT_MEMORY ) {
-            err_code = UPNP_E_OUTOF_MEMORY;
+            err_code = DLNA_E_OUTOF_MEMORY;
         } else {
             err_code = SOAP_ACTION_FAILED;
         }

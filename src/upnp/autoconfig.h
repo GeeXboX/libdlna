@@ -92,19 +92,19 @@
 /* #undef NO_MINUS_C_MINUS_O */
 
 /* Name of package */
-#define PACKAGE "libupnp"
+#define PACKAGE "libdlna"
 
 /* Define to the address where bug reports for this package should be sent. */
 #define PACKAGE_BUGREPORT "mroberto@users.sourceforge.net"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "libupnp"
+#define PACKAGE_NAME "libdlna"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libupnp 1.6.3"
+#define PACKAGE_STRING "libdlna 1.6.3"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "libupnp"
+#define PACKAGE_TARNAME "libdlna"
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "1.6.3"
@@ -116,32 +116,32 @@
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
-/* see upnpconfig.h */
-#define UPNP_HAVE_CLIENT 1
+/* see dlnaconfig.h */
+#define DLNA_HAVE_CLIENT 1
 
-/* see upnpconfig.h */
-/* #undef UPNP_HAVE_DEBUG */
+/* see dlnaconfig.h */
+/* #undef DLNA_HAVE_DEBUG */
 
-/* see upnpconfig.h */
-#define UPNP_HAVE_DEVICE 1
+/* see dlnaconfig.h */
+#define DLNA_HAVE_DEVICE 1
 
-/* see upnpconfig.h */
-#define UPNP_HAVE_TOOLS 1
+/* see dlnaconfig.h */
+#define DLNA_HAVE_TOOLS 1
 
-/* see upnpconfig.h */
-#define UPNP_HAVE_WEBSERVER 1
+/* see dlnaconfig.h */
+#define DLNA_HAVE_WEBSERVER 1
 
-/* see upnpconfig.h */
-#define UPNP_VERSION_MAJOR 1
+/* see dlnaconfig.h */
+#define DLNA_VERSION_MAJOR 1
 
-/* see upnpconfig.h */
-#define UPNP_VERSION_MINOR 6
+/* see dlnaconfig.h */
+#define DLNA_VERSION_MINOR 6
 
-/* see upnpconfig.h */
-#define UPNP_VERSION_PATCH 3
+/* see dlnaconfig.h */
+#define DLNA_VERSION_PATCH 3
 
-/* see upnpconfig.h */
-#define UPNP_VERSION_STRING "1.6.3"
+/* see dlnaconfig.h */
+#define DLNA_VERSION_STRING "1.6.3"
 
 /* Version number of package */
 #define VERSION "1.6.3"

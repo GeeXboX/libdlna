@@ -123,7 +123,7 @@ void SetGenaCallback( MiniServerCallback callback );
  *
  * Return: int;
  *	Actual port socket is bound to - On Success: 
- *	A negative number UPNP_E_XXX - On Error   			
+ *	A negative number DLNA_E_XXX - On Error   			
  ************************************************************************/
 int StartMiniServer( unsigned short listen_port );
 

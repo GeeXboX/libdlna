@@ -44,7 +44,7 @@
 static ithread_mutex_t GlobalDebugMutex;
 
 // Global log level
-static Upnp_LogLevel g_log_level = UPNP_DEFAULT_LOG_LEVEL;
+static dlna_LogLevel g_log_level = DLNA_DEFAULT_LOG_LEVEL;
 
 //File handle for the error log file
 static FILE *ErrFileHnd = NULL;
@@ -53,15 +53,15 @@ static FILE *ErrFileHnd = NULL;
 static FILE *InfoFileHnd = NULL;
 
 //Name of the error file
-static const char *errFileName = "IUpnpErrFile.txt";
+static const char *errFileName = "IdlnaErrFile.txt";
 
 //Name of the info file
-static const char *infoFileName = "IUpnpInfoFile.txt";
+static const char *infoFileName = "IdlnaInfoFile.txt";
 
 
 
 /***************************************************************************
- * Function : UpnpSetLogFileNames					
+ * Function : dlnaSetLogFileNames					
  *								
  * Parameters:							
  *	IN const char* ErrFileName: name of the error file
@@ -75,7 +75,7 @@ static const char *infoFileName = "IUpnpInfoFile.txt";
  * Returns: void
  ***************************************************************************/
 void
-UpnpSetLogFileNames ( IN const char *ErrFileName,
+dlnaSetLogFileNames ( IN const char *ErrFileName,
 		      IN const char *InfoFileName )
 {
     if( ErrFileName ) {
@@ -88,7 +88,7 @@ UpnpSetLogFileNames ( IN const char *ErrFileName,
 
 
 /***************************************************************************
- * Function : UpnpInitLog
+ * Function : dlnaInitLog
  *
  * Parameters:	void
  *
@@ -97,10 +97,10 @@ UpnpSetLogFileNames ( IN const char *ErrFileName,
  *
  * Returns: int
  *	-1 : If fails
- *	UPNP_E_SUCCESS : if success
+ *	DLNA_E_SUCCESS : if success
  ***************************************************************************/
 int
-UpnpInitLog()
+dlnaInitLog()
 {
     ithread_mutex_init( &GlobalDebugMutex, NULL );
 
@@ -110,28 +110,28 @@ UpnpInitLog()
         if( ( InfoFileHnd = fopen( infoFileName, "a" ) ) == NULL )
             return -1;
     }
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 
 /***************************************************************************
- * Function : UpnpSetLogLevel
+ * Function : dlnaSetLogLevel
  *				
- * Parameters:	Upnp_LogLevel log_level
+ * Parameters:	dlna_LogLevel log_level
  *
  * Description:							
- *	This functions set the log level (see {\tt Upnp_LogLevel}
+ *	This functions set the log level (see {\tt dlna_LogLevel}
  * Returns: void
  ***************************************************************************/
 void 
-UpnpSetLogLevel (Upnp_LogLevel log_level)
+dlnaSetLogLevel (dlna_LogLevel log_level)
 {
 	g_log_level = log_level;
 }
 
 
 /***************************************************************************
- * Function : UpnpCloseLog					
+ * Function : dlnaCloseLog					
  *								
  * Parameters:	void					
  *								
@@ -140,7 +140,7 @@ UpnpSetLogLevel (Upnp_LogLevel log_level)
  * Returns: void
  ***************************************************************************/
 void
-UpnpCloseLog()
+dlnaCloseLog()
 {
     if( DEBUG_TARGET == 1 ) {
         fflush( ErrFileHnd );
@@ -157,7 +157,7 @@ UpnpCloseLog()
  * Function : DebugAtThisLevel					
  *									
  * Parameters:			
- *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
+ *	IN dlna_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -170,7 +170,7 @@ UpnpCloseLog()
  ***************************************************************************/
 #ifdef DEBUG
 int DebugAtThisLevel(
-	IN Upnp_LogLevel DLevel,
+	IN dlna_LogLevel DLevel,
 	IN Dbg_Module Module)
 {
 	int ret = DLevel <= g_log_level;
@@ -190,10 +190,10 @@ int DebugAtThisLevel(
 
 
 /***************************************************************************
- * Function : UpnpPrintf					
+ * Function : dlnaPrintf					
  *									
  * Parameters:			
- *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
+ *	IN dlna_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -211,8 +211,8 @@ int DebugAtThisLevel(
  * Returns: void
  ***************************************************************************/
 #ifdef DEBUG
-void UpnpPrintf(
-	IN Upnp_LogLevel DLevel,
+void dlnaPrintf(
+	IN dlna_LogLevel DLevel,
 	IN Dbg_Module Module,
 	IN const char *DbgFileName,
 	IN int DbgLineNo,
@@ -229,19 +229,19 @@ void UpnpPrintf(
 	va_start(ArgList, FmtStr);
 	if (!DEBUG_TARGET) {
 		if( DbgFileName ) {
-			UpnpDisplayFileAndLine(stdout, DbgFileName, DbgLineNo);
+			dlnaDisplayFileAndLine(stdout, DbgFileName, DbgLineNo);
 		}
 		vfprintf(stdout, FmtStr, ArgList);
 		fflush(stdout);
 	} else if (DLevel == 0) {
 		if (DbgFileName) {
-			UpnpDisplayFileAndLine(ErrFileHnd, DbgFileName, DbgLineNo);
+			dlnaDisplayFileAndLine(ErrFileHnd, DbgFileName, DbgLineNo);
 		}
 		vfprintf(ErrFileHnd, FmtStr, ArgList);
 		fflush(ErrFileHnd);
 	} else {
 		if (DbgFileName) {
-			UpnpDisplayFileAndLine(InfoFileHnd, DbgFileName, DbgLineNo);
+			dlnaDisplayFileAndLine(InfoFileHnd, DbgFileName, DbgLineNo);
 		}
 		vfprintf(InfoFileHnd, FmtStr, ArgList);
 		fflush(InfoFileHnd);
@@ -253,10 +253,10 @@ void UpnpPrintf(
 
 
 /***************************************************************************
- * Function : UpnpGetDebugFile					
+ * Function : dlnaGetDebugFile					
  *				
  * Parameters:			
- *	IN Upnp_LogLevel DLevel: The level of the debug logging. It will decide 
+ *	IN dlna_LogLevel DLevel: The level of the debug logging. It will decide 
  *		whether debug statement will go to standard output, 
  *		or any of the log files.
  *	IN Dbg_Module Module: debug will go in the name of this module
@@ -269,7 +269,7 @@ void UpnpPrintf(
  *	else returns the right file descriptor
  ***************************************************************************/
 #ifdef DEBUG
-FILE *GetDebugFile( Upnp_LogLevel DLevel, Dbg_Module Module )
+FILE *GetDebugFile( dlna_LogLevel DLevel, Dbg_Module Module )
 {
 	FILE *ret;
 
@@ -291,7 +291,7 @@ FILE *GetDebugFile( Upnp_LogLevel DLevel, Dbg_Module Module )
 
 
 /***************************************************************************
- * Function : UpnpDisplayFileAndLine				
+ * Function : dlnaDisplayFileAndLine				
  *	
  * Parameters:	
  *	IN FILE *fd: File descriptor where line number and file name will be 
@@ -305,7 +305,7 @@ FILE *GetDebugFile( Upnp_LogLevel DLevel, Dbg_Module Module )
  * Returns: void
  ***************************************************************************/
 #ifdef DEBUG
-void UpnpDisplayFileAndLine(
+void dlnaDisplayFileAndLine(
 	IN FILE * fd,
 	IN const char *DbgFileName,
 	IN int DbgLineNo)
@@ -320,14 +320,14 @@ void UpnpDisplayFileAndLine(
 			DbgFileName, DbgLineNo);
 		lines[1] = FileAndLine;
 	}
-	UpnpDisplayBanner(fd, lines, 2, starlength);
+	dlnaDisplayBanner(fd, lines, 2, starlength);
 	fflush(fd);
 }
 #endif
 
 
 /***************************************************************************
- * Function : UpnpDisplayBanner	
+ * Function : dlnaDisplayBanner	
  *
  * Parameters:			
  *	IN FILE *fd: file descriptor where the banner will be written
@@ -341,7 +341,7 @@ void UpnpDisplayFileAndLine(
  * Returns: void
  ***************************************************************************/
 #ifdef DEBUG
-void UpnpDisplayBanner(
+void dlnaDisplayBanner(
 	IN FILE * fd,
 	IN const char **lines,
 	IN size_t size,

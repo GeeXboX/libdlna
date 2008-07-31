@@ -39,8 +39,8 @@
 
 #include <assert.h>
 #include <stdarg.h>
-#ifndef UPNP_USE_BCBPP
-	#ifndef UPNP_USE_MSVCPP
+#ifndef DLNA_USE_BCBPP
+	#ifndef DLNA_USE_MSVCPP
 		#include <inttypes.h>
 		#include <stdint.h>
 	#endif
@@ -86,8 +86,8 @@ const int CHUNK_TAIL_SIZE = 10;
  *	Validates URL
  *
  * Returns:
- *	 UPNP_E_INVALID_URL
- * 	 UPNP_E_SUCCESS
+ *	 DLNA_E_INVALID_URL
+ * 	 DLNA_E_SUCCESS
  ************************************************************************/
 int
 http_FixUrl( IN uri_type * url,
@@ -98,11 +98,11 @@ http_FixUrl( IN uri_type * url,
     *fixed_url = *url;
 
     if( token_string_casecmp( &fixed_url->scheme, "http" ) != 0 ) {
-        return UPNP_E_INVALID_URL;
+        return DLNA_E_INVALID_URL;
     }
 
     if( fixed_url->hostport.text.size == 0 ) {
-        return UPNP_E_INVALID_URL;
+        return DLNA_E_INVALID_URL;
     }
     // set pathquery to "/" if it is empty
     if( fixed_url->pathquery.size == 0 ) {
@@ -110,7 +110,7 @@ http_FixUrl( IN uri_type * url,
         fixed_url->pathquery.size = 1;
     }
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 
@@ -126,8 +126,8 @@ http_FixUrl( IN uri_type * url,
  *	Parses URL and then validates URL
  *
  * Returns:
- *	 UPNP_E_INVALID_URL
- * 	 UPNP_E_SUCCESS
+ *	 DLNA_E_INVALID_URL
+ * 	 DLNA_E_SUCCESS
  ************************************************************************/
 int
 http_FixStrUrl( IN char *urlstr,
@@ -137,7 +137,7 @@ http_FixStrUrl( IN char *urlstr,
     uri_type url;
 
     if( parse_uri( urlstr, urlstrlen, &url ) != HTTP_SUCCESS ) {
-        return UPNP_E_INVALID_URL;
+        return DLNA_E_INVALID_URL;
     }
 
     return http_FixUrl( &url, fixed_url );
@@ -156,8 +156,8 @@ http_FixStrUrl( IN char *urlstr,
  *
  *  Returns:
  *	socket descriptor on sucess
- *	UPNP_E_OUTOF_SOCKET
- *	UPNP_E_SOCKET_CONNECT on error
+ *	DLNA_E_OUTOF_SOCKET
+ *	DLNA_E_SOCKET_CONNECT on error
  ************************************************************************/
 int
 http_Connect( IN uri_type * destination_url,
@@ -169,18 +169,18 @@ http_Connect( IN uri_type * destination_url,
 
     connfd = socket( AF_INET, SOCK_STREAM, 0 );
     if( connfd == -1 ) {
-        return UPNP_E_OUTOF_SOCKET;
+        return DLNA_E_OUTOF_SOCKET;
     }
 
     if( connect( connfd, ( struct sockaddr * )&url->hostport.IPv4address,
                  sizeof( struct sockaddr_in ) ) == -1 ) {
 #ifdef WIN32
-        UpnpPrintf(UPNP_CRITICAL, HTTP, __FILE__, __LINE__,
+        dlnaPrintf(DLNA_CRITICAL, HTTP, __FILE__, __LINE__,
             "connect error: %d\n", WSAGetLastError());
 #endif
         shutdown( connfd, SD_BOTH );
-        UpnpCloseSocket( connfd );
-        return UPNP_E_SOCKET_CONNECT;
+        dlnaCloseSocket( connfd );
+        return DLNA_E_SOCKET_CONNECT;
     }
 
     return connfd;
@@ -204,8 +204,8 @@ http_Connect( IN uri_type * destination_url,
  *	parameter
  *
  * Returns:
- *	 UPNP_E_BAD_HTTPMSG
- * 	 UPNP_E_SUCCESS
+ *	 DLNA_E_BAD_HTTPMSG
+ * 	 DLNA_E_SUCCESS
  ************************************************************************/
 int
 http_RecvMessage( IN SOCKINFO * info,
@@ -232,7 +232,7 @@ http_RecvMessage( IN SOCKINFO * info,
             status = parser_append( parser, buf, num_read );
 
             if( status == PARSE_SUCCESS ) {
-                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
                     "<<< (RECVD) <<<\n%s\n-----------------\n",
                     parser->msg.msg.buf );
                     print_http_headers( &parser->msg );
@@ -240,13 +240,13 @@ http_RecvMessage( IN SOCKINFO * info,
                 if( parser->content_length >
                     ( unsigned int )g_maxContentLength ) {
                     *http_error_code = HTTP_REQ_ENTITY_TOO_LARGE;
-                    return UPNP_E_OUTOF_BOUNDS;
+                    return DLNA_E_OUTOF_BOUNDS;
                 }
 
                 return 0;
             } else if( status == PARSE_FAILURE ) {
                 *http_error_code = parser->http_error_code;
-                return UPNP_E_BAD_HTTPMSG;
+                return DLNA_E_BAD_HTTPMSG;
             } else if( status == PARSE_INCOMPLETE_ENTITY ) {
                 // read until close
                 ok_on_close = TRUE;
@@ -256,7 +256,7 @@ http_RecvMessage( IN SOCKINFO * info,
             }
         } else if( num_read == 0 ) {
             if( ok_on_close ) {
-                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
                     "<<< (RECVD) <<<\n%s\n-----------------\n",
                     parser->msg.msg.buf );
                     print_http_headers( &parser->msg );
@@ -265,7 +265,7 @@ http_RecvMessage( IN SOCKINFO * info,
             } else {
                 // partial msg
                 *http_error_code = HTTP_BAD_REQUEST;    // or response
-                return UPNP_E_BAD_HTTPMSG;
+                return DLNA_E_BAD_HTTPMSG;
             }
         } else {
             *http_error_code = parser->http_error_code;
@@ -297,9 +297,9 @@ http_RecvMessage( IN SOCKINFO * info,
  *			filename );		// arg for file
  *
  * Returns:
- *	UPNP_E_OUTOF_MEMORY
- * 	UPNP_E_FILE_READ_ERROR
- *	UPNP_E_SUCCESS
+ *	DLNA_E_OUTOF_MEMORY
+ * 	DLNA_E_FILE_READ_ERROR
+ *	DLNA_E_SUCCESS
  ************************************************************************/
 int
 http_SendMessage( IN SOCKINFO * info,
@@ -346,7 +346,7 @@ http_SendMessage( IN SOCKINFO * info,
             ChunkBuf = (char *)malloc(
                 Data_Buf_Size + CHUNK_HEADER_SIZE + CHUNK_TAIL_SIZE);
             if( !ChunkBuf ) {
-                return UPNP_E_OUTOF_MEMORY;
+                return DLNA_E_OUTOF_MEMORY;
             }
 
             file_buf = ChunkBuf + CHUNK_HEADER_SIZE;
@@ -354,25 +354,25 @@ http_SendMessage( IN SOCKINFO * info,
             // file name
             filename = va_arg(argp, char *);
             if( Instr && Instr->IsVirtualFile ) {
-                Fp = (virtualDirCallback.open)(virtualDirCallback.cookie, filename, UPNP_READ );
+                Fp = (virtualDirCallback.open)(virtualDirCallback.cookie, filename, DLNA_READ );
             } else  {
                 Fp = fopen( filename, "rb" );
             }
             if( Fp == NULL ) {
                 free( ChunkBuf );
-                return UPNP_E_FILE_READ_ERROR;
+                return DLNA_E_FILE_READ_ERROR;
             }
 
             if( Instr && Instr->IsRangeActive && Instr->IsVirtualFile ) {
                 if( virtualDirCallback.seek(virtualDirCallback.cookie, Fp, Instr->RangeOffset,
                                              SEEK_CUR ) != 0 ) {
                     free( ChunkBuf );
-                    return UPNP_E_FILE_READ_ERROR;
+                    return DLNA_E_FILE_READ_ERROR;
                 }
             } else if( Instr && Instr->IsRangeActive ) {
                 if( fseeko( Fp, Instr->RangeOffset, SEEK_CUR ) != 0 ) {
                     free( ChunkBuf );
-                    return UPNP_E_FILE_READ_ERROR;
+                    return DLNA_E_FILE_READ_ERROR;
                 }
             }
 
@@ -400,7 +400,7 @@ http_SendMessage( IN SOCKINFO * info,
                         char *str = "0\r\n\r\n";
                         num_written = sock_write(info, str, strlen(str), TimeOut);
                     } else {
-                        RetVal = UPNP_E_FILE_READ_ERROR;
+                        RetVal = DLNA_E_FILE_READ_ERROR;
                     }
                     goto Cleanup_File;
                 }
@@ -434,7 +434,7 @@ http_SendMessage( IN SOCKINFO * info,
                 } else {
                     // write data
                     num_written = sock_write( info, file_buf, num_read, TimeOut );
-                    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
                         ">>> (SENT) >>>\n%.*s\n------------\n",
                         ( int )num_written, file_buf );
                     // Send error nothing we can do
@@ -459,7 +459,7 @@ Cleanup_File:
             buf_length = va_arg(argp, size_t);
             if( buf_length > 0 ) {
                 num_written = sock_write( info, buf, buf_length, TimeOut );
-                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
                     ">>> (SENT) >>>\n"
 		    "%.*s\nbuf_length=%d, num_written=%d\n"
 		    "------------\n",
@@ -495,8 +495,8 @@ end:
  *	request and waits for the response from the remote end
  *
  * Returns:
- *	UPNP_E_SOCKET_ERROR
- * 	UPNP_E_SOCKET_CONNECT
+ *	DLNA_E_SOCKET_ERROR
+ * 	DLNA_E_SOCKET_CONNECT
  *	Error Codes returned by http_SendMessage
  *	Error Codes returned by http_RecvMessage
  ************************************************************************/
@@ -516,13 +516,13 @@ http_RequestAndResponse( IN uri_type * destination,
     tcp_connection = socket( AF_INET, SOCK_STREAM, 0 );
     if( tcp_connection == -1 ) {
         parser_response_init( response, req_method );
-        return UPNP_E_SOCKET_ERROR;
+        return DLNA_E_SOCKET_ERROR;
     }
-    if( sock_init( &info, tcp_connection ) != UPNP_E_SUCCESS )
+    if( sock_init( &info, tcp_connection ) != DLNA_E_SUCCESS )
     {
         sock_destroy( &info, SD_BOTH );
         parser_response_init( response, req_method );
-        return UPNP_E_SOCKET_ERROR;
+        return DLNA_E_SOCKET_ERROR;
     }
     // connect
     ret_code = connect( info.socket,
@@ -532,7 +532,7 @@ http_RequestAndResponse( IN uri_type * destination,
     if( ret_code == -1 ) {
         sock_destroy( &info, SD_BOTH );
         parser_response_init( response, req_method );
-        return UPNP_E_SOCKET_CONNECT;
+        return DLNA_E_SOCKET_CONNECT;
     }
     // send request
     ret_code = http_SendMessage( &info, &timeout_secs, "b",
@@ -568,8 +568,8 @@ http_RequestAndResponse( IN uri_type * destination,
  *	from the message.
  *
  * Return: int
- *	UPNP_E_SUCCESS
- *	UPNP_E_INVALID_URL
+ *	DLNA_E_SUCCESS
+ *	DLNA_E_INVALID_URL
  ************************************************************************/
 int
 http_Download( IN const char *url_str,
@@ -593,11 +593,11 @@ http_Download( IN const char *url_str,
     char *urlPath = alloca( strlen( url_str ) + 1 );
 
     //ret_code = parse_uri( (char*)url_str, strlen(url_str), &url );
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__, "DOWNLOAD URL : %s\n",
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__, "DOWNLOAD URL : %s\n",
         url_str );
     ret_code =
         http_FixStrUrl( ( char * )url_str, strlen( url_str ), &url );
-    if( ret_code != UPNP_E_SUCCESS ) {
+    if( ret_code != DLNA_E_SUCCESS ) {
         return ret_code;
     }
     // make msg
@@ -606,19 +606,19 @@ http_Download( IN const char *url_str,
     strcpy( urlPath, url_str );
     hoststr = strstr( urlPath, "//" );
     if( hoststr == NULL ) {
-        return UPNP_E_INVALID_URL;
+        return DLNA_E_INVALID_URL;
     }
 
     hoststr += 2;
     temp = strchr( hoststr, '/' );
     if( temp == NULL ) {
-        return UPNP_E_INVALID_URL;
+        return DLNA_E_INVALID_URL;
     }
 
     *temp = '\0';
     hostlen = strlen( hoststr );
     *temp = '/';
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
         "HOSTNAME : %s Length : %"PRIzu"\n", hoststr, hostlen );
 
     ret_code = http_MakeMessage(
@@ -628,13 +628,13 @@ http_Download( IN const char *url_str,
         "HOST: ",
         hoststr, hostlen );
     if( ret_code != 0 ) {
-        UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
             "HTTP Makemessage failed\n" );
             membuffer_destroy( &request );
         return ret_code;
     }
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
         "HTTP Buffer:\n %s\n----------END--------\n", request.buf );
     // get doc msg
     ret_code =
@@ -647,7 +647,7 @@ http_Download( IN const char *url_str,
         return ret_code;
     }
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__, "Response\n" );
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__, "Response\n" );
     print_http_headers( &response.msg );
 
         // optional content-type
@@ -723,9 +723,9 @@ typedef struct HTTPPOSTHANDLE {
  *	Makes the message for the HTTP POST message
  *
  * Returns:
- *	UPNP_E_INVALID_URL
- * 	UPNP_E_INVALID_PARAM
- *	UPNP_E_SUCCESS
+ *	DLNA_E_INVALID_URL
+ * 	DLNA_E_INVALID_PARAM
+ *	DLNA_E_SUCCESS
  ************************************************************************/
 int
 MakePostMessage( const char *url_str,
@@ -740,11 +740,11 @@ MakePostMessage( const char *url_str,
     char *hoststr,
      *temp;
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
                          "DOWNLOAD URL : %s\n", url_str );
     ret_code =
         http_FixStrUrl( ( char * )url_str, strlen( url_str ), url );
-    if( ret_code != UPNP_E_SUCCESS ) {
+    if( ret_code != DLNA_E_SUCCESS ) {
         return ret_code;
     }
     // make msg
@@ -753,19 +753,19 @@ MakePostMessage( const char *url_str,
     strcpy( urlPath, url_str );
     hoststr = strstr( urlPath, "//" );
     if( hoststr == NULL ) {
-        return UPNP_E_INVALID_URL;
+        return DLNA_E_INVALID_URL;
     }
 
     hoststr += 2;
     temp = strchr( hoststr, '/' );
     if( temp == NULL ) {
-        return UPNP_E_INVALID_URL;
+        return DLNA_E_INVALID_URL;
     }
 
     *temp = '\0';
     hostlen = strlen( hoststr );
     *temp = '/';
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
         "HOSTNAME : %s Length : %"PRIzu"\n", hoststr, hostlen );
 
     if( contentLength >= 0 ) {
@@ -777,7 +777,7 @@ MakePostMessage( const char *url_str,
 	    hoststr, hostlen,
             contentType,
             (off_t)contentLength );
-    } else if( contentLength == UPNP_USING_CHUNKED ) {
+    } else if( contentLength == DLNA_USING_CHUNKED ) {
         ret_code = http_MakeMessage(
             request, 1, 1,
             "Q" "s" "bcDCU" "TKc",
@@ -785,7 +785,7 @@ MakePostMessage( const char *url_str,
             "HOST: ",
 	    hoststr, hostlen,
             contentType );
-    } else if( contentLength == UPNP_UNTIL_CLOSE ) {
+    } else if( contentLength == DLNA_UNTIL_CLOSE ) {
         ret_code = http_MakeMessage(
             request, 1, 1,
             "Q" "s" "bcDCU" "Tc",
@@ -794,22 +794,22 @@ MakePostMessage( const char *url_str,
 	    hoststr, hostlen,
             contentType );
     } else {
-        ret_code = UPNP_E_INVALID_PARAM;
+        ret_code = DLNA_E_INVALID_PARAM;
     }
 
     if( ret_code != 0 ) {
-        UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
             "HTTP Makemessage failed\n" );
         membuffer_destroy( request );
 
         return ret_code;
     }
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
         "HTTP Buffer:\n %s\n" "----------END--------\n",
         request->buf );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -818,17 +818,17 @@ MakePostMessage( const char *url_str,
  * Parameters:
  *	IN void *Handle:	Handle to the http post object
  *	IN char *buf:		Buffer to send to peer, if format used
- *				is not UPNP_USING_CHUNKED, 
+ *				is not DLNA_USING_CHUNKED, 
  *	IN unsigned int *size:	Size of the data to be sent.
  *	IN int timeout:		time out value
  *
  * Description:
- *	Formats data if format used is UPNP_USING_CHUNKED.
+ *	Formats data if format used is DLNA_USING_CHUNKED.
  *	Writes data on the socket connected to the peer.
  *
  * Return: int
- *	UPNP_E_SUCCESS - On Success
- *	UPNP_E_INVALID_PARAM - Invalid Parameter
+ *	DLNA_E_SUCCESS - On Success
+ *	DLNA_E_INVALID_PARAM - Invalid Parameter
  *	-1 - On Socket Error.
  ************************************************************************/
 int
@@ -845,15 +845,15 @@ http_WriteHttpPost( IN void *Handle,
 
     if( ( !handle ) || ( !size ) || ( ( ( *size ) > 0 ) && !buf ) ) {
         if(size) ( *size ) = 0;
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
-    if( handle->contentLength == UPNP_USING_CHUNKED ) {
+    if( handle->contentLength == DLNA_USING_CHUNKED ) {
         if( ( *size ) ) {
             int tempSize = 0;
             tempbuf = ( char * )malloc(
                 *size + CHUNK_HEADER_SIZE + CHUNK_TAIL_SIZE );
             if ( tempbuf == NULL) {
-                return UPNP_E_OUTOF_MEMORY;
+                return DLNA_E_OUTOF_MEMORY;
             }
 
 	    // begin chunk
@@ -882,7 +882,7 @@ http_WriteHttpPost( IN void *Handle,
         return numWritten;
     } else {
         ( *size ) = numWritten;
-        return UPNP_E_SUCCESS;
+        return DLNA_E_SUCCESS;
     }
 }
 
@@ -896,13 +896,13 @@ http_WriteHttpPost( IN void *Handle,
  *	IN int timeout;		time out value
  *
  * Description:
- *	Sends remaining data if using  UPNP_USING_CHUNKED 
+ *	Sends remaining data if using  DLNA_USING_CHUNKED 
  *	format. Receives any more messages. Destroys socket and any socket
  *	associated memory. Frees handle associated with the HTTP POST msg.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Sucess
- *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ *	DLNA_E_SUCCESS		- On Sucess
+ *	DLNA_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
 int
 http_CloseHttpPost( IN void *Handle,
@@ -916,10 +916,10 @@ http_CloseHttpPost( IN void *Handle,
     http_post_handle_t *handle = Handle;
 
     if( ( !handle ) || ( !httpStatus ) ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
-    if( handle->contentLength == UPNP_USING_CHUNKED ) {
+    if( handle->contentLength == DLNA_USING_CHUNKED ) {
         retc = sock_write( &handle->sock_info, "0\r\n\r\n", strlen( "0\r\n\r\n" ), &timeout );  //send last chunk
     }
     //read response
@@ -956,11 +956,11 @@ http_CloseHttpPost( IN void *Handle,
  *	such handles
  *
  * Return : int;
- *	UPNP_E_SUCCESS		- On Sucess
- *	UPNP_E_INVALID_PARAM	- Invalid Parameter
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_SOCKET_ERROR
- *	UPNP_E_SOCKET_CONNECT
+ *	DLNA_E_SUCCESS		- On Sucess
+ *	DLNA_E_INVALID_PARAM	- Invalid Parameter
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_SOCKET_ERROR
+ *	DLNA_E_SOCKET_CONNECT
  ************************************************************************/
 int
 http_OpenHttpPost( IN const char *url_str,
@@ -976,14 +976,14 @@ http_OpenHttpPost( IN const char *url_str,
     uri_type url;
 
     if( ( !url_str ) || ( !Handle ) || ( !contentType ) ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     ( *Handle ) = handle;
 
     if( ( ret_code =
           MakePostMessage( url_str, &request, &url, contentLength,
-                           contentType ) ) != UPNP_E_SUCCESS ) {
+                           contentType ) ) != DLNA_E_SUCCESS ) {
         return ret_code;
     }
 
@@ -991,21 +991,21 @@ http_OpenHttpPost( IN const char *url_str,
         ( http_post_handle_t * ) malloc( sizeof( http_post_handle_t ) );
 
     if( handle == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     handle->contentLength = contentLength;
 
     tcp_connection = socket( AF_INET, SOCK_STREAM, 0 );
     if( tcp_connection == -1 ) {
-        ret_code = UPNP_E_SOCKET_ERROR;
+        ret_code = DLNA_E_SOCKET_ERROR;
         goto errorHandler;
     }
 
-    if( sock_init( &handle->sock_info, tcp_connection ) != UPNP_E_SUCCESS )
+    if( sock_init( &handle->sock_info, tcp_connection ) != DLNA_E_SUCCESS )
     {
         sock_destroy( &handle->sock_info, SD_BOTH );
-        ret_code = UPNP_E_SOCKET_ERROR;
+        ret_code = DLNA_E_SOCKET_ERROR;
         goto errorHandler;
     }
 
@@ -1015,7 +1015,7 @@ http_OpenHttpPost( IN const char *url_str,
 
     if( ret_code == -1 ) {
         sock_destroy( &handle->sock_info, SD_BOTH );
-        ret_code = UPNP_E_SOCKET_CONNECT;
+        ret_code = DLNA_E_SOCKET_CONNECT;
         goto errorHandler;
     }
     // send request
@@ -1052,9 +1052,9 @@ typedef struct HTTPGETHANDLE {
 *	Makes the message for the HTTP GET method
 *
 * Returns:
-*	UPNP_E_INVALID_URL
+*	DLNA_E_INVALID_URL
 * 	Error Codes returned by http_MakeMessage
-*	UPNP_E_SUCCESS
+*	DLNA_E_SUCCESS
 ************************************************************************/
 int
 MakeGetMessage( const char *url_str,
@@ -1070,13 +1070,13 @@ MakeGetMessage( const char *url_str,
     char *hoststr,
      *temp;
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
         "DOWNLOAD URL : %s\n", url_str );
 
     ret_code =
         http_FixStrUrl( ( char * )url_str, strlen( url_str ), url );
 
-    if( ret_code != UPNP_E_SUCCESS ) {
+    if( ret_code != DLNA_E_SUCCESS ) {
         return ret_code;
     }
     // make msg
@@ -1085,19 +1085,19 @@ MakeGetMessage( const char *url_str,
     strcpy( urlPath, url_str );
     hoststr = strstr( urlPath, "//" );
     if( hoststr == NULL ) {
-        return UPNP_E_INVALID_URL;
+        return DLNA_E_INVALID_URL;
     }
 
     hoststr += 2;
     temp = strchr( hoststr, '/' );
     if( temp == NULL ) {
-        return UPNP_E_INVALID_URL;
+        return DLNA_E_INVALID_URL;
     }
 
     *temp = '\0';
     hostlen = strlen( hoststr );
     *temp = '/';
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
         "HOSTNAME : %s Length : %"PRIzu"\n", hoststr, hostlen );
 
     if( proxy_str ) {
@@ -1116,18 +1116,18 @@ MakeGetMessage( const char *url_str,
         hoststr, hostlen );
 
     if( ret_code != 0 ) {
-        UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
             "HTTP Makemessage failed\n" );
         membuffer_destroy( request );
 
         return ret_code;
     }
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
         "HTTP Buffer:\n %s\n" "----------END--------\n",
         request->buf );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -1147,7 +1147,7 @@ MakeGetMessage( const char *url_str,
  * Return: int
  *	PARSE_OK - On Success
  *	PARSE_FAILURE - Failure to parse data correctly
- *	UPNP_E_BAD_HTTPMSG - Socker read() returns an error
+ *	DLNA_E_BAD_HTTPMSG - Socker read() returns an error
  ************************************************************************/
 int
 ReadResponseLineAndHeaders( IN SOCKINFO * info,
@@ -1196,7 +1196,7 @@ ReadResponseLineAndHeaders( IN SOCKINFO * info,
 
             // partial msg
             *http_error_code = HTTP_BAD_REQUEST;    // or response
-            return UPNP_E_BAD_HTTPMSG;
+            return DLNA_E_BAD_HTTPMSG;
 
         } else {
             *http_error_code = parser->http_error_code;
@@ -1243,7 +1243,7 @@ ReadResponseLineAndHeaders( IN SOCKINFO * info,
 
             // partial msg
             *http_error_code = HTTP_BAD_REQUEST;    // or response
-            return UPNP_E_BAD_HTTPMSG;
+            return DLNA_E_BAD_HTTPMSG;
 
         } else {
             *http_error_code = parser->http_error_code;
@@ -1268,11 +1268,11 @@ ReadResponseLineAndHeaders( IN SOCKINFO * info,
  *	Parses and extracts information from the new data.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Sucess
- *	UPNP_E_INVALID_PARAM	- Invalid Parameter
- *	UPNP_E_BAD_RESPONSE
- *	UPNP_E_BAD_HTTPMSG
- *	UPNP_E_CANCELED
+ *	DLNA_E_SUCCESS		- On Sucess
+ *	DLNA_E_INVALID_PARAM	- Invalid Parameter
+ *	DLNA_E_BAD_RESPONSE
+ *	DLNA_E_BAD_HTTPMSG
+ *	DLNA_E_CANCELED
  ************************************************************************/
 int
 http_ReadHttpGet( IN void *Handle,
@@ -1291,7 +1291,7 @@ http_ReadHttpGet( IN void *Handle,
 
     if( ( !handle ) || ( !size ) || ( ( ( *size ) > 0 ) && !buf ) ) {
         if(size) ( *size ) = 0;
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     //first parse what has already been gotten
     if( handle->response.position != POS_COMPLETE ) {
@@ -1308,7 +1308,7 @@ http_ReadHttpGet( IN void *Handle,
                && ( status != PARSE_INCOMPLETE ) ) {
         //error
         ( *size ) = 0;
-        return UPNP_E_BAD_RESPONSE;
+        return DLNA_E_BAD_RESPONSE;
     }
     //read more if necessary entity
     while( ( ( handle->entity_offset + ( *size ) ) >
@@ -1338,11 +1338,11 @@ http_ReadHttpGet( IN void *Handle,
                        && ( status != PARSE_INCOMPLETE ) ) {
                 //error
                 ( *size ) = 0;
-                return UPNP_E_BAD_RESPONSE;
+                return DLNA_E_BAD_RESPONSE;
             }
         } else if( num_read == 0 ) {
             if( ok_on_close ) {
-                UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
                     "<<< (RECVD) <<<\n%s\n-----------------\n",
                     handle->response.msg.msg.buf );
                     handle->response.position = POS_COMPLETE;
@@ -1350,7 +1350,7 @@ http_ReadHttpGet( IN void *Handle,
                 // partial msg
                 ( *size ) = 0;
                 handle->response.http_error_code = HTTP_BAD_REQUEST;    // or response
-                return UPNP_E_BAD_HTTPMSG;
+                return DLNA_E_BAD_HTTPMSG;
             }
         } else {
             ( *size ) = 0;
@@ -1372,9 +1372,9 @@ http_ReadHttpGet( IN void *Handle,
     handle->entity_offset += ( *size );
 
     if ( handle->cancel )
-        return UPNP_E_CANCELED;
+        return DLNA_E_CANCELED;
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -1389,8 +1389,8 @@ http_ReadHttpGet( IN void *Handle,
  *	Extracts information from the Handle to the HTTP get object.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Sucess
- *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ *	DLNA_E_SUCCESS		- On Sucess
+ *	DLNA_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
 int http_HttpGetProgress( IN void *Handle, 
                       OUT unsigned int *length,
@@ -1399,11 +1399,11 @@ int http_HttpGetProgress( IN void *Handle,
     http_get_handle_t *handle = Handle;
 
     if( ( !handle ) || ( !length ) || ( !total ) ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     *length = handle->response.msg.entity.length;
     *total = handle->response.content_length;
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -1416,8 +1416,8 @@ int http_HttpGetProgress( IN void *Handle,
  *	Set the cancel flag of the HttpGet handle
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Success
- *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ *	DLNA_E_SUCCESS		- On Success
+ *	DLNA_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
 int
 http_CancelHttpGet( IN void *Handle )
@@ -1425,12 +1425,12 @@ http_CancelHttpGet( IN void *Handle )
     http_get_handle_t *handle = Handle;
 
     if( !handle ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     handle->cancel = 1;
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 
@@ -1445,8 +1445,8 @@ http_CancelHttpGet( IN void *Handle )
  *	Clears socket states and memory allocated for socket operations. 
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Success
- *	UPNP_E_INVALID_PARAM	- Invalid Parameter
+ *	DLNA_E_SUCCESS		- On Success
+ *	DLNA_E_INVALID_PARAM	- Invalid Parameter
  ************************************************************************/
 int
 http_CloseHttpGet( IN void *Handle )
@@ -1454,14 +1454,14 @@ http_CloseHttpGet( IN void *Handle )
     http_get_handle_t *handle = Handle;
 
     if( !handle ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     sock_destroy( &handle->sock_info, SD_BOTH );    //should shutdown completely
     httpmsg_destroy( &handle->response.msg );
     handle->entity_offset = 0;
     free( handle );
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -1483,11 +1483,11 @@ http_CloseHttpGet( IN void *Handle )
  *	response.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Success
- *	UPNP_E_INVALID_PARAM	- Invalid Paramters
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_SOCKET_ERROR
- *	UPNP_E_BAD_RESPONSE
+ *	DLNA_E_SUCCESS		- On Success
+ *	DLNA_E_INVALID_PARAM	- Invalid Paramters
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_SOCKET_ERROR
+ *	DLNA_E_BAD_RESPONSE
  ************************************************************************/
 int
 http_OpenHttpGet( IN const char *url_str,
@@ -1520,11 +1520,11 @@ http_OpenHttpGet( IN const char *url_str,
  *	If a proxy URL is defined then the connection is made there.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Success
- *	UPNP_E_INVALID_PARAM	- Invalid Paramters
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_SOCKET_ERROR
- *	UPNP_E_BAD_RESPONSE
+ *	DLNA_E_SUCCESS		- On Success
+ *	DLNA_E_INVALID_PARAM	- Invalid Paramters
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_SOCKET_ERROR
+ *	DLNA_E_BAD_RESPONSE
  ************************************************************************/
 int
 http_OpenHttpGetProxy( IN const char *url_str,
@@ -1548,7 +1548,7 @@ http_OpenHttpGetProxy( IN const char *url_str,
 
     if( ( !url_str ) || ( !Handle ) || ( !contentType )
         || ( !httpStatus ) ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     ( *httpStatus ) = 0;
@@ -1557,7 +1557,7 @@ http_OpenHttpGetProxy( IN const char *url_str,
     ( *contentLength ) = 0;
 
     if( ( ret_code =
-          MakeGetMessage( url_str, proxy_str, &request, &url ) ) != UPNP_E_SUCCESS ) {
+          MakeGetMessage( url_str, proxy_str, &request, &url ) ) != DLNA_E_SUCCESS ) {
         return ret_code;
     }
     if( proxy_str ) {
@@ -1570,7 +1570,7 @@ http_OpenHttpGetProxy( IN const char *url_str,
     handle = ( http_get_handle_t * ) malloc( sizeof( http_get_handle_t ) );
 
     if( handle == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     handle->entity_offset = 0;
@@ -1579,14 +1579,14 @@ http_OpenHttpGetProxy( IN const char *url_str,
 
     tcp_connection = socket( AF_INET, SOCK_STREAM, 0 );
     if( tcp_connection == -1 ) {
-        ret_code = UPNP_E_SOCKET_ERROR;
+        ret_code = DLNA_E_SOCKET_ERROR;
         goto errorHandler;
     }
 
-    if( sock_init( &handle->sock_info, tcp_connection ) != UPNP_E_SUCCESS )
+    if( sock_init( &handle->sock_info, tcp_connection ) != DLNA_E_SUCCESS )
     {
         sock_destroy( &handle->sock_info, SD_BOTH );
-        ret_code = UPNP_E_SOCKET_ERROR;
+        ret_code = DLNA_E_SOCKET_ERROR;
         goto errorHandler;
     }
 
@@ -1596,7 +1596,7 @@ http_OpenHttpGetProxy( IN const char *url_str,
 
     if( ret_code == -1 ) {
         sock_destroy( &handle->sock_info, SD_BOTH );
-        ret_code = UPNP_E_SOCKET_CONNECT;
+        ret_code = DLNA_E_SOCKET_CONNECT;
         goto errorHandler;
     }
     // send request
@@ -1612,19 +1612,19 @@ http_OpenHttpGetProxy( IN const char *url_str,
                                     &timeout, &http_error_code );
 
     if( status != PARSE_OK ) {
-        ret_code = UPNP_E_BAD_RESPONSE;
+        ret_code = DLNA_E_BAD_RESPONSE;
         goto errorHandler;
     }
 
     status = parser_get_entity_read_method( &handle->response );
 
     if( ( status != PARSE_CONTINUE_1 ) && ( status != PARSE_SUCCESS ) ) {
-        ret_code = UPNP_E_BAD_RESPONSE;
+        ret_code = DLNA_E_BAD_RESPONSE;
         goto errorHandler;
     }
 
     ( *httpStatus ) = handle->response.msg.status_code;
-    ret_code = UPNP_E_SUCCESS;
+    ret_code = DLNA_E_SUCCESS;
 
     if( httpmsg_find_hdr( &handle->response.msg, HDR_CONTENT_TYPE, &ctype )
         == NULL ) {
@@ -1636,11 +1636,11 @@ http_OpenHttpGetProxy( IN const char *url_str,
     if( handle->response.position == POS_COMPLETE ) {
         ( *contentLength ) = 0;
     } else if( handle->response.ent_position == ENTREAD_USING_CHUNKED ) {
-        ( *contentLength ) = UPNP_USING_CHUNKED;
+        ( *contentLength ) = DLNA_USING_CHUNKED;
     } else if( handle->response.ent_position == ENTREAD_USING_CLEN ) {
         ( *contentLength ) = handle->response.content_length;
     } else if( handle->response.ent_position == ENTREAD_UNTIL_CLOSE ) {
-        ( *contentLength ) = UPNP_UNTIL_CLOSE;
+        ( *contentLength ) = DLNA_UNTIL_CLOSE;
     }
 
   errorHandler:
@@ -1649,7 +1649,7 @@ http_OpenHttpGetProxy( IN const char *url_str,
 
     membuffer_destroy( &request );
 
-    if( ret_code != UPNP_E_SUCCESS ) {
+    if( ret_code != DLNA_E_SUCCESS ) {
         httpmsg_destroy( &handle->response.msg );
     }
     return ret_code;
@@ -1671,9 +1671,9 @@ http_OpenHttpGetProxy( IN const char *url_str,
  *
  * Return: int
  *	0 -- success
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_SOCKET_WRITE
- *	UPNP_E_TIMEDOUT
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_SOCKET_WRITE
+ *	DLNA_E_TIMEDOUT
  ************************************************************************/
 int
 http_SendStatusResponse( IN SOCKINFO * info,
@@ -1756,8 +1756,8 @@ http_SendStatusResponse( IN SOCKINFO * info,
  *
  * Return: int
  *	0 - On Success
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_INVALID_URL
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_INVALID_URL
  ************************************************************************/
 int
 http_MakeMessage( INOUT membuffer * buf,
@@ -1784,7 +1784,7 @@ http_MakeMessage( INOUT membuffer * buf,
     const char *temp_str;
     uri_type url;
     uri_type *uri_ptr;
-    int error_code = UPNP_E_OUTOF_MEMORY;
+    int error_code = DLNA_E_OUTOF_MEMORY;
 
     va_list argp;
     char tempbuf[200];
@@ -1799,7 +1799,7 @@ http_MakeMessage( INOUT membuffer * buf,
             // C string
             s = ( char * )va_arg( argp, char * );
             assert( s );
-            UpnpPrintf(UPNP_ALL,HTTP,__FILE__,__LINE__,"Adding a string : %s\n", s); 
+            dlnaPrintf(DLNA_ALL,HTTP,__FILE__,__LINE__,"Adding a string : %s\n", s); 
             if( membuffer_append( buf, s, strlen( s ) ) != 0 ) {
                 goto error_handler;
             }
@@ -1826,7 +1826,7 @@ http_MakeMessage( INOUT membuffer * buf,
             // mem buffer
             s = ( char * )va_arg( argp, char * );
 
-            UpnpPrintf(UPNP_ALL,HTTP,__FILE__,__LINE__,
+            dlnaPrintf(DLNA_ALL,HTTP,__FILE__,__LINE__,
                 "Adding a char Buffer starting with: %c\n", s[0]);
             assert( s );
             length = ( size_t ) va_arg( argp, size_t );
@@ -1980,7 +1980,7 @@ http_MakeMessage( INOUT membuffer * buf,
             uri_ptr = ( uri_type * ) va_arg( argp, uri_type * );
             assert( uri_ptr );
             if( http_FixUrl( uri_ptr, &url ) != 0 ) {
-                error_code = UPNP_E_INVALID_URL;
+                error_code = DLNA_E_INVALID_URL;
                 goto error_handler;
             }
             if (http_MakeMessage(
@@ -2057,9 +2057,9 @@ http_CalcResponseVersion( IN int request_major_vers,
 *	Makes the message for the HTTP GET method
 *
 * Returns:
-*	UPNP_E_INVALID_URL
+*	DLNA_E_INVALID_URL
 * 	Error Codes returned by http_MakeMessage
-*	UPNP_E_SUCCESS
+*	DLNA_E_SUCCESS
 ************************************************************************/
 int
 MakeGetMessageEx( const char *url_str,
@@ -2067,25 +2067,25 @@ MakeGetMessageEx( const char *url_str,
                   uri_type * url,
                   struct SendInstruction *pRangeSpecifier )
 {
-    int errCode = UPNP_E_SUCCESS;
+    int errCode = DLNA_E_SUCCESS;
     char *urlPath = NULL;
     size_t hostlen = 0;
     char *hoststr,
      *temp;
 
     do {
-        UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
             "DOWNLOAD URL : %s\n", url_str );
 
         if( ( errCode = http_FixStrUrl( ( char * )url_str,
-            strlen( url_str ), url ) ) != UPNP_E_SUCCESS ) {
+            strlen( url_str ), url ) ) != DLNA_E_SUCCESS ) {
             break;
         }
         // make msg
         membuffer_init( request );
         urlPath = alloca( strlen( url_str ) + 1 );
         if( !urlPath ) {
-            errCode = UPNP_E_OUTOF_MEMORY;
+            errCode = DLNA_E_OUTOF_MEMORY;
             break;
         }
 
@@ -2093,21 +2093,21 @@ MakeGetMessageEx( const char *url_str,
         strcpy( urlPath, url_str );
         hoststr = strstr( urlPath, "//" );
         if( hoststr == NULL ) {
-            errCode = UPNP_E_INVALID_URL;
+            errCode = DLNA_E_INVALID_URL;
             break;
         }
 
         hoststr += 2;
         temp = strchr( hoststr, '/' );
         if( temp == NULL ) {
-            errCode = UPNP_E_INVALID_URL;
+            errCode = DLNA_E_INVALID_URL;
             break;
         }
 
         *temp = '\0';
         hostlen = strlen( hoststr );
         *temp = '/';
-        UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
             "HOSTNAME : %s Length : %"PRIzu"\n",
             hoststr, hostlen );
 
@@ -2120,7 +2120,7 @@ MakeGetMessageEx( const char *url_str,
                 pRangeSpecifier );
 
         if( errCode != 0 ) {
-            UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
                 "HTTP Makemessage failed\n" );
             membuffer_destroy( request );
 
@@ -2128,7 +2128,7 @@ MakeGetMessageEx( const char *url_str,
         }
     } while( 0 );
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
         "HTTP Buffer:\n %s\n" "----------END--------\n",
         request->buf );
 
@@ -2156,11 +2156,11 @@ MakeGetMessageEx( const char *url_str,
  *	response.
  *
  * Return: int
- *	UPNP_E_SUCCESS		- On Success
- *	UPNP_E_INVALID_PARAM	- Invalid Paramters
- *	UPNP_E_OUTOF_MEMORY
- *	UPNP_E_SOCKET_ERROR
- *	UPNP_E_BAD_RESPONSE
+ *	DLNA_E_SUCCESS		- On Success
+ *	DLNA_E_INVALID_PARAM	- Invalid Paramters
+ *	DLNA_E_OUTOF_MEMORY
+ *	DLNA_E_SOCKET_ERROR
+ *	DLNA_E_BAD_RESPONSE
  ************************************************************************/
 int
 http_OpenHttpGetEx( IN const char *url_str,
@@ -2179,7 +2179,7 @@ http_OpenHttpGetEx( IN const char *url_str,
     http_get_handle_t *handle = NULL;
     uri_type url;
     parse_status_t status;
-    int errCode = UPNP_E_SUCCESS;
+    int errCode = DLNA_E_SUCCESS;
 
     //  char rangeBuf[SIZE_RANGE_BUFFER];
     struct SendInstruction rangeBuf;
@@ -2188,7 +2188,7 @@ http_OpenHttpGetEx( IN const char *url_str,
         // Checking Input parameters
         if( ( !url_str ) || ( !Handle ) ||
             ( !contentType ) || ( !httpStatus ) ) {
-            errCode = UPNP_E_INVALID_PARAM;
+            errCode = DLNA_E_INVALID_PARAM;
             break;
         }
         // Initialize output parameters
@@ -2198,7 +2198,7 @@ http_OpenHttpGetEx( IN const char *url_str,
         ( *contentLength ) = 0;
 
         if( lowRange > highRange ) {
-            errCode = UPNP_E_INTERNAL_ERROR;
+            errCode = DLNA_E_INTERNAL_ERROR;
             break;
         }
 
@@ -2210,14 +2210,14 @@ http_OpenHttpGetEx( IN const char *url_str,
 
         if( ( errCode = MakeGetMessageEx( url_str,
                                           &request, &url, &rangeBuf ) )
-            != UPNP_E_SUCCESS ) {
+            != DLNA_E_SUCCESS ) {
             break;
         }
 
         handle =
             ( http_get_handle_t * ) malloc( sizeof( http_get_handle_t ) );
         if( handle == NULL ) {
-            errCode = UPNP_E_OUTOF_MEMORY;
+            errCode = DLNA_E_OUTOF_MEMORY;
             break;
         }
 
@@ -2228,15 +2228,15 @@ http_OpenHttpGetEx( IN const char *url_str,
 
         tcp_connection = socket( AF_INET, SOCK_STREAM, 0 );
         if( tcp_connection == -1 ) {
-            errCode = UPNP_E_SOCKET_ERROR;
+            errCode = DLNA_E_SOCKET_ERROR;
             free( handle );
             break;
         }
 
         if( sock_init( &handle->sock_info, tcp_connection ) !=
-            UPNP_E_SUCCESS ) {
+            DLNA_E_SUCCESS ) {
             sock_destroy( &handle->sock_info, SD_BOTH );
-            errCode = UPNP_E_SOCKET_ERROR;
+            errCode = DLNA_E_SOCKET_ERROR;
             free( handle );
             break;
         }
@@ -2246,7 +2246,7 @@ http_OpenHttpGetEx( IN const char *url_str,
                            sizeof( struct sockaddr_in ) );
         if( errCode == -1 ) {
             sock_destroy( &handle->sock_info, SD_BOTH );
-            errCode = UPNP_E_SOCKET_CONNECT;
+            errCode = DLNA_E_SOCKET_CONNECT;
             free( handle );
             break;
         }
@@ -2255,7 +2255,7 @@ http_OpenHttpGetEx( IN const char *url_str,
                                     &timeout,
                                     "b", request.buf, request.length );
 
-        if( errCode != UPNP_E_SUCCESS ) {
+        if( errCode != DLNA_E_SUCCESS ) {
             sock_destroy( &handle->sock_info, SD_BOTH );
             free( handle );
             break;
@@ -2266,20 +2266,20 @@ http_OpenHttpGetEx( IN const char *url_str,
                                              &timeout, &http_error_code );
 
         if( status != PARSE_OK ) {
-            errCode = UPNP_E_BAD_RESPONSE;
+            errCode = DLNA_E_BAD_RESPONSE;
             free( handle );
             break;
         }
 
         status = parser_get_entity_read_method( &handle->response );
         if( ( status != PARSE_CONTINUE_1 ) && ( status != PARSE_SUCCESS ) ) {
-            errCode = UPNP_E_BAD_RESPONSE;
+            errCode = DLNA_E_BAD_RESPONSE;
             free( handle );
             break;
         }
 
         ( *httpStatus ) = handle->response.msg.status_code;
-        errCode = UPNP_E_SUCCESS;
+        errCode = DLNA_E_SUCCESS;
 
         if( httpmsg_find_hdr( &handle->response.msg,
                               HDR_CONTENT_TYPE, &ctype ) == NULL ) {
@@ -2291,11 +2291,11 @@ http_OpenHttpGetEx( IN const char *url_str,
         if( handle->response.position == POS_COMPLETE ) {
             ( *contentLength ) = 0;
         } else if( handle->response.ent_position == ENTREAD_USING_CHUNKED ) {
-            ( *contentLength ) = UPNP_USING_CHUNKED;
+            ( *contentLength ) = DLNA_USING_CHUNKED;
         } else if( handle->response.ent_position == ENTREAD_USING_CLEN ) {
             ( *contentLength ) = handle->response.content_length;
         } else if( handle->response.ent_position == ENTREAD_UNTIL_CLOSE ) {
-            ( *contentLength ) = UPNP_UNTIL_CLOSE;
+            ( *contentLength ) = DLNA_UNTIL_CLOSE;
         }
 
         ( *Handle ) = handle;
@@ -2318,7 +2318,7 @@ http_OpenHttpGetEx( IN const char *url_str,
  *	Returns the server information for the operating system
  *
  * Return:
- *	UPNP_INLINE void
+ *	DLNA_INLINE void
  ************************************************************************/
 // 'info' should have a size of at least 100 bytes
 void

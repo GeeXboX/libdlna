@@ -52,7 +52,7 @@ extern TimerThread gTimerThread;
 
 CLIENTONLY(
 typedef struct CLIENT_SUBSCRIPTION {
-  Upnp_SID sid;
+  dlna_SID sid;
   char * ActualSID;
   char * EventURL;
   int RenewEventId;
@@ -69,7 +69,7 @@ typedef struct CLIENT_SUBSCRIPTION {
 *	Description :	Make a copy of the client subscription data
 *
 *	Return : int ;
-*		UPNP_E_OUTOF_MEMORY - On Failure to allocate memory
+*		DLNA_E_OUTOF_MEMORY - On Failure to allocate memory
 *		HTTP_SUCCESS - On Success
 *
 *	Note :
@@ -111,10 +111,10 @@ void freeClientSubList(client_subscription * list);
 *
 *	Parameters :
 *		client_subscription **head ; Head of the subscription list	
-*		const Upnp_SID sid ;		 Subscription ID to be mactched
+*		const dlna_SID sid ;		 Subscription ID to be mactched
 *
 *	Description :	Remove the client subscription matching the 
-*		subscritpion id represented by the const Upnp_SID sid parameter 
+*		subscritpion id represented by the const dlna_SID sid parameter 
 *		from the table and update the table.
 *
 *	Return : void ;
@@ -122,24 +122,24 @@ void freeClientSubList(client_subscription * list);
 *	Note :
 ************************************************************************/
 void RemoveClientSubClientSID(client_subscription **head, 
-				       const Upnp_SID sid);
+				       const dlna_SID sid);
 
 /************************************************************************
 *	Function :	GetClientSubClientSID
 *
 *	Parameters :
 *		client_subscription *head ; Head of the subscription list	
-*		const Upnp_SID sid ;		Subscription ID to be matched
+*		const dlna_SID sid ;		Subscription ID to be matched
 *
 *	Description :	Return the client subscription from the client table 
-*		that matches const Upnp_SID sid subscrition id value. 
+*		that matches const dlna_SID sid subscrition id value. 
 *
 *	Return : client_subscription * ; The matching subscription
 *
 *	Note :
 ************************************************************************/
 client_subscription * GetClientSubClientSID(client_subscription *head
-						     , const Upnp_SID sid);
+						     , const dlna_SID sid);
 
 /************************************************************************
 *	Function :	GetClientSubActualSID

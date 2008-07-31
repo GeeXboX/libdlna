@@ -68,7 +68,7 @@
 *	Description : This function compares 'name' and node's name	
 *
 *	Return : int
-*		0 if both are equal; 1 if not equal, and UPNP_E_OUTOF_MEMORY
+*		0 if both are equal; 1 if not equal, and DLNA_E_OUTOF_MEMORY
 *
 *	Note :
 ****************************************************************************/
@@ -86,7 +86,7 @@ dom_cmp_name( IN char *name,
 
     node_name = ixmlNode_getNodeName( node );
     if( node_name == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     if( strcmp( name, node_name ) == 0 ) {
@@ -114,7 +114,7 @@ dom_cmp_name( IN char *name,
 *		looking for a node having the name 'node_name'. 
 *
 *	Return : int
-*		return UPNP_E_SUCCESS if successful else returns appropriate error
+*		return DLNA_E_SUCCESS if successful else returns appropriate error
 *
 *	Note :
 ****************************************************************************/
@@ -127,7 +127,7 @@ dom_find_node( IN char *node_name,
 
     // invalid args
     if( node_name == NULL || start_node == NULL ) {
-        return UPNP_E_NOT_FOUND;
+        return DLNA_E_NOT_FOUND;
     }
 
     node = ixmlNode_getFirstChild( start_node );
@@ -135,13 +135,13 @@ dom_find_node( IN char *node_name,
         // match name
         if( dom_cmp_name( node_name, node ) == 0 ) {
             *matching_node = node;
-            return UPNP_E_SUCCESS;
+            return DLNA_E_SUCCESS;
         }
         // free and next node
         node = ixmlNode_getNextSibling( node ); // next node
     }
 
-    return UPNP_E_NOT_FOUND;
+    return DLNA_E_NOT_FOUND;
 }
 
 /****************************************************************************
@@ -159,7 +159,7 @@ dom_find_node( IN char *node_name,
 *		name in the 'name' array.
 *
 *	Return : int
-*		return UPNP_E_SUCCESS if successful else returns appropriate error
+*		return DLNA_E_SUCCESS if successful else returns appropriate error
 *	Note :
 ****************************************************************************/
 static int
@@ -178,25 +178,25 @@ dom_find_deep_node( IN char *names[],
     if( dom_cmp_name( names[0], start_node ) == 0 ) {
         if( num_names == 1 ) {
             *matching_node = start_node;
-            return UPNP_E_SUCCESS;
+            return DLNA_E_SUCCESS;
         }
     }
 
     for( i = 1; i < num_names; i++ ) {
         if( dom_find_node( names[i], node, &match_node ) !=
-            UPNP_E_SUCCESS ) {
-            return UPNP_E_NOT_FOUND;
+            DLNA_E_SUCCESS ) {
+            return DLNA_E_NOT_FOUND;
         }
 
         if( i == num_names - 1 ) {
             *matching_node = match_node;
-            return UPNP_E_SUCCESS;
+            return DLNA_E_SUCCESS;
         }
 
         node = match_node;      // try again
     }
 
-    return UPNP_E_NOT_FOUND;    // this line not reached
+    return DLNA_E_NOT_FOUND;    // this line not reached
 }
 
 /****************************************************************************
@@ -244,7 +244,7 @@ get_node_value( IN IXML_Node * node )
 *
 *	Note :
 ****************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 get_host_and_path( IN char *ctrl_url,
                    OUT const memptr *host,
                    OUT const memptr *path,
@@ -277,7 +277,7 @@ get_host_and_path( IN char *ctrl_url,
 *
 *	Note :
 ****************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 get_action_name( IN char *action,
                  OUT memptr * name )
 {
@@ -299,11 +299,11 @@ get_action_name( IN char *action,
 *	Description :	This function adds "MAN" field in the HTTP header
 *
 *	Return : int
-*		returns 0 on success; UPNP_E_OUTOFMEMORY on error
+*		returns 0 on success; DLNA_E_OUTOFMEMORY on error
 *
 *	Note :
 ****************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 add_man_header( INOUT membuffer * headers )
 {
     char *soap_action_hdr;
@@ -312,7 +312,7 @@ add_man_header( INOUT membuffer * headers )
 
     // change POST to M-POST
     if( membuffer_insert( headers, "M-", 2, 0 ) != 0 ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     soap_action_hdr = strstr( headers->buf, "SOAPACTION:" );
@@ -321,7 +321,7 @@ add_man_header( INOUT membuffer * headers )
     // insert MAN header
     if( membuffer_insert( headers, man_hdr, strlen( man_hdr ),
                           soap_action_hdr - headers->buf ) != 0 ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     return 0;
@@ -352,7 +352,7 @@ soap_request_and_response( IN membuffer * request,
     ret_code = http_RequestAndResponse( destination_url, request->buf,
                                         request->length,
                                         SOAPMETHOD_POST,
-                                        UPNP_TIMEOUT, response );
+                                        DLNA_TIMEOUT, response );
     if( ret_code != 0 ) {
         httpmsg_destroy( &response->msg );
         return ret_code;
@@ -369,7 +369,7 @@ soap_request_and_response( IN membuffer * request,
         // try again
         ret_code = http_RequestAndResponse( destination_url, request->buf,
                                             HTTPMETHOD_MPOST,
-                                            request->length, UPNP_TIMEOUT,
+                                            request->length, DLNA_TIMEOUT,
                                             response );
         if( ret_code != 0 ) {
             httpmsg_destroy( &response->msg );
@@ -387,7 +387,7 @@ soap_request_and_response( IN membuffer * request,
 *			IN http_message_t* hmsg :	HTTP response message
 *			IN int code :	return code in the HTTP response
 *			IN char*name :	name of the action
-*			OUT int *upnp_error_code :	UPnP error code
+*			OUT int *dlna_error_code :	UPnP error code
 *			OUT IXML_Node ** action_value :	SOAP response node 
 *			OUT DOMString * str_value : state varible value ( in the case of 
 *							querry state variable request)	
@@ -406,7 +406,7 @@ static int
 get_response_value( IN http_message_t * hmsg,
                     IN int code,
                     IN char *name,
-                    OUT int *upnp_error_code,
+                    OUT int *dlna_error_code,
                     OUT IXML_Node ** action_value,
                     OUT DOMString * str_value )
 {
@@ -422,7 +422,7 @@ get_response_value( IN http_message_t * hmsg,
     char *names[5];
     const DOMString nodeValue;
 
-    err_code = UPNP_E_BAD_RESPONSE; // default error
+    err_code = DLNA_E_BAD_RESPONSE; // default error
 
     // only 200 and 500 status codes are relevant
     if( ( hmsg->status_code != HTTP_OK &&
@@ -455,17 +455,17 @@ get_response_value( IN http_message_t * hmsg,
         names[1] = "Body";
         names[2] = name;
         if( dom_find_deep_node( names, 3, root_node, &node ) ==
-            UPNP_E_SUCCESS ) {
+            DLNA_E_SUCCESS ) {
             node_str = ixmlPrintNode( node );
             if( node_str == NULL ) {
-                err_code = UPNP_E_OUTOF_MEMORY;
+                err_code = DLNA_E_OUTOF_MEMORY;
                 goto error_handler;
             }
 
             if( ixmlParseBufferEx( node_str,
                                    ( IXML_Document ** ) action_value ) !=
                 IXML_SUCCESS ) {
-                err_code = UPNP_E_BAD_RESPONSE;
+                err_code = DLNA_E_BAD_RESPONSE;
                 goto error_handler;
             }
 
@@ -482,7 +482,7 @@ get_response_value( IN http_message_t * hmsg,
         names[2] = "QueryStateVariableResponse";
         names[3] = "return";
         if( dom_find_deep_node( names, 4, root_node, &node )
-            == UPNP_E_SUCCESS ) {
+            == DLNA_E_SUCCESS ) {
             nodeValue = get_node_value( node );
             if( nodeValue == NULL ) {
                 goto error_handler;
@@ -504,12 +504,12 @@ get_response_value( IN http_message_t * hmsg,
         names[3] = "detail";
         names[4] = "UPnPError";
         if( dom_find_deep_node( names, 5, root_node, &error_node )
-            != UPNP_E_SUCCESS ) {
+            != DLNA_E_SUCCESS ) {
             goto error_handler;
         }
 
         if( dom_find_node( "errorCode", error_node, &node )
-            != UPNP_E_SUCCESS ) {
+            != DLNA_E_SUCCESS ) {
             goto error_handler;
         }
 
@@ -518,15 +518,15 @@ get_response_value( IN http_message_t * hmsg,
             goto error_handler;
         }
 
-        *upnp_error_code = atoi( temp_str );
-        if( *upnp_error_code < 400 ) {
-            err_code = *upnp_error_code;
+        *dlna_error_code = atoi( temp_str );
+        if( *dlna_error_code < 400 ) {
+            err_code = *dlna_error_code;
             goto error_handler; // bad SOAP error code
         }
 
         if( code == SOAP_VAR_RESP ) {
             if( dom_find_node( "errorDescription", error_node, &node )
-                != UPNP_E_SUCCESS ) {
+                != DLNA_E_SUCCESS ) {
                 goto error_handler;
             }
 
@@ -544,14 +544,14 @@ get_response_value( IN http_message_t * hmsg,
         else if( code == SOAP_ACTION_RESP ) {
             error_node_str = ixmlPrintNode( error_node );
             if( error_node_str == NULL ) {
-                err_code = UPNP_E_OUTOF_MEMORY;
+                err_code = DLNA_E_OUTOF_MEMORY;
                 goto error_handler;
             }
 
             if( ixmlParseBufferEx( error_node_str,
                                    ( IXML_Document ** ) action_value ) !=
                 IXML_SUCCESS ) {
-                err_code = UPNP_E_BAD_RESPONSE;
+                err_code = DLNA_E_BAD_RESPONSE;
 
                 goto error_handler;
             }
@@ -581,7 +581,7 @@ get_response_value( IN http_message_t * hmsg,
 *		pass the response to the API layer
 *
 *	Return :	int
-*		returns UPNP_E_SUCCESS if successful else returns appropriate error
+*		returns DLNA_E_SUCCESS if successful else returns appropriate error
 *	Note :
 ****************************************************************************/
 int
@@ -598,8 +598,8 @@ SoapSendAction( IN char *action_url,
     int ret_code;
     http_parser_t response;
     uri_type url;
-    int upnp_error_code;
-    char *upnp_error_str;
+    int dlna_error_code;
+    char *dlna_error_str;
     xboolean got_response = FALSE;
 
     off_t content_length;
@@ -617,9 +617,9 @@ SoapSendAction( IN char *action_url,
 
     *response_node = NULL;      // init
 
-    err_code = UPNP_E_OUTOF_MEMORY; // default error
+    err_code = DLNA_E_OUTOF_MEMORY; // default error
 
-    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, SOAP, __FILE__, __LINE__,
         "Inside SoapSendAction():" );
     // init
     membuffer_init( &request );
@@ -632,16 +632,16 @@ SoapSendAction( IN char *action_url,
     }
     // get action name
     if( get_action_name( action_str, &name ) != 0 ) {
-        err_code = UPNP_E_INVALID_ACTION;
+        err_code = DLNA_E_INVALID_ACTION;
         goto error_handler;
     }
     // parse url
     if( http_FixStrUrl( action_url, strlen( action_url ), &url ) != 0 ) {
-        err_code = UPNP_E_INVALID_URL;
+        err_code = DLNA_E_INVALID_URL;
         goto error_handler;
     }
 
-    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, SOAP, __FILE__, __LINE__,
         "path=%.*s, hostport=%.*s\n",
         (int)url.pathquery.size,
         url.pathquery.buff,
@@ -670,7 +670,7 @@ SoapSendAction( IN char *action_url,
 
     ret_code = soap_request_and_response( &request, &url, &response );
     got_response = TRUE;
-    if( ret_code != UPNP_E_SUCCESS ) {
+    if( ret_code != DLNA_E_SUCCESS ) {
         err_code = ret_code;
         goto error_handler;
     }
@@ -681,14 +681,14 @@ SoapSendAction( IN char *action_url,
     }
     // get action node from the response
     ret_code = get_response_value( &response.msg, SOAP_ACTION_RESP,
-                                   responsename.buf, &upnp_error_code,
+                                   responsename.buf, &dlna_error_code,
                                    ( IXML_Node ** ) response_node,
-                                   &upnp_error_str );
+                                   &dlna_error_str );
 
     if( ret_code == SOAP_ACTION_RESP ) {
-        err_code = UPNP_E_SUCCESS;
+        err_code = DLNA_E_SUCCESS;
     } else if( ret_code == SOAP_ACTION_RESP_ERROR ) {
-        err_code = upnp_error_code;
+        err_code = dlna_error_code;
     } else {
         err_code = ret_code;
     }
@@ -721,7 +721,7 @@ error_handler:
 *		pass the SOAP header along the SOAP body ( soap action request)
 *
 *	Return :	int
-*		returns UPNP_E_SUCCESS if successful else returns appropriate error
+*		returns DLNA_E_SUCCESS if successful else returns appropriate error
 *	Note :
 ****************************************************************************/
 int
@@ -740,8 +740,8 @@ SoapSendActionEx( IN char *action_url,
     int ret_code;
     http_parser_t response;
     uri_type url;
-    int upnp_error_code;
-    char *upnp_error_str;
+    int dlna_error_code;
+    char *dlna_error_str;
     xboolean got_response = FALSE;
 
     char *xml_start =
@@ -768,9 +768,9 @@ SoapSendActionEx( IN char *action_url,
 
     *response_node = NULL;      // init
 
-    err_code = UPNP_E_OUTOF_MEMORY; // default error
+    err_code = DLNA_E_OUTOF_MEMORY; // default error
 
-    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, SOAP, __FILE__, __LINE__,
         "Inside SoapSendActionEx():" );
     // init
     membuffer_init( &request );
@@ -788,16 +788,16 @@ SoapSendActionEx( IN char *action_url,
     }
     // get action name
     if( get_action_name( action_str, &name ) != 0 ) {
-        err_code = UPNP_E_INVALID_ACTION;
+        err_code = DLNA_E_INVALID_ACTION;
         goto error_handler;
     }
     // parse url
     if( http_FixStrUrl( action_url, strlen( action_url ), &url ) != 0 ) {
-        err_code = UPNP_E_INVALID_URL;
+        err_code = DLNA_E_INVALID_URL;
         goto error_handler;
     }
 
-    UpnpPrintf( UPNP_INFO, SOAP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, SOAP, __FILE__, __LINE__,
         "path=%.*s, hostport=%.*s\n",
         (int)url.pathquery.size,
         url.pathquery.buff,
@@ -838,7 +838,7 @@ SoapSendActionEx( IN char *action_url,
 
     ret_code = soap_request_and_response( &request, &url, &response );
     got_response = TRUE;
-    if( ret_code != UPNP_E_SUCCESS ) {
+    if( ret_code != DLNA_E_SUCCESS ) {
         err_code = ret_code;
         goto error_handler;
     }
@@ -849,14 +849,14 @@ SoapSendActionEx( IN char *action_url,
     }
     // get action node from the response
     ret_code = get_response_value( &response.msg, SOAP_ACTION_RESP,
-                                   responsename.buf, &upnp_error_code,
+                                   responsename.buf, &dlna_error_code,
                                    ( IXML_Node ** ) response_node,
-                                   &upnp_error_str );
+                                   &dlna_error_str );
 
     if( ret_code == SOAP_ACTION_RESP ) {
-        err_code = UPNP_E_SUCCESS;
+        err_code = DLNA_E_SUCCESS;
     } else if( ret_code == SOAP_ACTION_RESP_ERROR ) {
-        err_code = upnp_error_code;
+        err_code = dlna_error_code;
     } else {
         err_code = ret_code;
     }
@@ -901,7 +901,7 @@ SoapGetServiceVarStatus( IN char *action_url,
     membuffer request;
     int ret_code;
     http_parser_t response;
-    int upnp_error_code;
+    int dlna_error_code;
 
     off_t content_length;
     char *xml_start =
@@ -909,7 +909,7 @@ SoapGetServiceVarStatus( IN char *action_url,
         "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
         "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\r\n"
         "<s:Body>\r\n"
-        "<u:QueryStateVariable xmlns:u=\"urn:schemas-upnp-org:control-1-0\">\r\n"
+        "<u:QueryStateVariable xmlns:u=\"urn:schemas-dlna-org:control-1-0\">\r\n"
         "<u:varName>";
 
     char *xml_end =
@@ -924,7 +924,7 @@ SoapGetServiceVarStatus( IN char *action_url,
 
     // get host hdr and url path
     if( get_host_and_path( action_url, &host, &path, &url ) == -1 ) {
-        return UPNP_E_INVALID_URL;
+        return DLNA_E_INVALID_URL;
     }
     // make headers
     request.size_inc = 50;
@@ -936,26 +936,26 @@ SoapGetServiceVarStatus( IN char *action_url,
 	"HOST: ", host.buf, host.length,
 	content_length,
 	ContentTypeHeader,
-	"SOAPACTION: \"urn:schemas-upnp-org:control-1-0#QueryStateVariable\"",
+	"SOAPACTION: \"urn:schemas-dlna-org:control-1-0#QueryStateVariable\"",
 	xml_start, var_name, xml_end ) != 0 ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     // send msg and get reply
     ret_code = soap_request_and_response( &request, &url, &response );
     membuffer_destroy( &request );
-    if( ret_code != UPNP_E_SUCCESS ) {
+    if( ret_code != DLNA_E_SUCCESS ) {
         return ret_code;
     }
     // get variable value from the response
     ret_code = get_response_value( &response.msg, SOAP_VAR_RESP, NULL,
-                                   &upnp_error_code, NULL, var_value );
+                                   &dlna_error_code, NULL, var_value );
 
     httpmsg_destroy( &response.msg );
 
     if( ret_code == SOAP_VAR_RESP ) {
-        return UPNP_E_SUCCESS;
+        return DLNA_E_SUCCESS;
     } else if( ret_code == SOAP_VAR_RESP_ERROR ) {
-        return upnp_error_code;
+        return dlna_error_code;
     } else {
         return ret_code;
     }

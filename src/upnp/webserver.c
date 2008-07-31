@@ -37,8 +37,8 @@
 #include "config.h"
 #include <assert.h>
 #include <fcntl.h>
-#ifndef UPNP_USE_BCBPP
-#ifndef UPNP_USE_MSVCPP
+#ifndef DLNA_USE_BCBPP
+#ifndef DLNA_USE_MSVCPP
     #include <inttypes.h>
     #include <stdint.h>
 #endif
@@ -206,7 +206,7 @@ extern str_int_entry Http_Header_Names[NUM_HTTP_HEADER_NAMES];
  * Returns:
  *	 void
  ************************************************************************/
-static UPNP_INLINE void
+static DLNA_INLINE void
 media_list_init( void )
 {
     int i;
@@ -244,7 +244,7 @@ media_list_init( void )
  *	 0 on success;
  *	-1 on error
  ************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 search_extension( IN const char *extension,
                   OUT const char **con_type,
                   OUT const char **con_subtype )
@@ -289,9 +289,9 @@ search_extension( IN const char *extension,
  *
  * Returns:
  *	 0 - On Sucess
- *	 UPNP_E_OUTOF_MEMORY - on memory allocation failures
+ *	 DLNA_E_OUTOF_MEMORY - on memory allocation failures
  ************************************************************************/
-UPNP_INLINE int
+DLNA_INLINE int
 get_content_type( IN const char *filename,
                   OUT DOMString * content_type )
 {
@@ -322,7 +322,7 @@ get_content_type( IN const char *filename,
     temp = ( char * )malloc( length );
 
     if( !temp ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     sprintf( temp, "%s/%s", type, subtype );
@@ -331,7 +331,7 @@ get_content_type( IN const char *filename,
     free( temp );
 
     if( !content_type ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     return 0;
@@ -349,7 +349,7 @@ get_content_type( IN const char *filename,
  * Returns:
  *	 void
  ************************************************************************/
-static UPNP_INLINE void
+static DLNA_INLINE void
 glob_alias_init( void )
 {
     struct xml_alias_t *alias = &gAliasDoc;
@@ -371,7 +371,7 @@ glob_alias_init( void )
  * Returns:
  *	 BOOLEAN
  ************************************************************************/
-static UPNP_INLINE xboolean
+static DLNA_INLINE xboolean
 is_valid_alias( IN const struct xml_alias_t *alias )
 {
     return alias->doc.buf != NULL;
@@ -453,7 +453,7 @@ alias_release( IN struct xml_alias_t *alias )
  *
  * Returns:
  *	0 - OK
- *	UPNP_E_OUTOF_MEMORY: note: alias_content is not freed here
+ *	DLNA_E_OUTOF_MEMORY: note: alias_content is not freed here
  ************************************************************************/
 int
 web_server_set_alias( IN const char *alias_name,
@@ -513,7 +513,7 @@ web_server_set_alias( IN const char *alias_name,
     membuffer_destroy( &alias.name );
     membuffer_destroy( &alias.doc );
     free( alias.ct );
-    return UPNP_E_OUTOF_MEMORY;
+    return DLNA_E_OUTOF_MEMORY;
 }
 
 /************************************************************************
@@ -528,7 +528,7 @@ web_server_set_alias( IN const char *alias_name,
  *
  * Returns:
  *	0 - OK
- *	UPNP_E_OUTOF_MEMORY: note: alias_content is not freed here
+ *	DLNA_E_OUTOF_MEMORY: note: alias_content is not freed here
  ************************************************************************/
 int
 web_server_init( void )
@@ -544,7 +544,7 @@ web_server_init( void )
 
         ret_code = ithread_mutex_init( &gWebMutex, NULL );
         if( ret_code == -1 ) {
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         }
         bWebServerState = WEB_SERVER_ENABLED;
     }
@@ -637,7 +637,7 @@ get_file_info( IN const char *filename,
 
     rc = get_content_type( filename, &info->content_type );
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
         "file info: %s, length: %lld, last_mod=%s readable=%d\n",
         filename, (long long)info->file_length,
         asctime( gmtime( &info->last_modified ) ),
@@ -699,7 +699,7 @@ web_server_set_root_dir( IN const char *root_dir )
  *	TRUE - On Success
  *	FALSE if request is not an alias
  ************************************************************************/
-static UPNP_INLINE xboolean
+static DLNA_INLINE xboolean
 get_alias( IN const char *request_file,
            OUT struct xml_alias_t *alias,
            OUT struct File_Info *info )
@@ -936,7 +936,7 @@ GetNextRange( char **SrcRangeStr,
  *
  * Returns:
  *	HTTP_BAD_REQUEST
- *	UPNP_E_OUTOF_MEMORY
+ *	DLNA_E_OUTOF_MEMORY
  *	HTTP_REQUEST_RANGE_NOT_SATISFIABLE
  *	HTTP_OK	
  ************************************************************************/
@@ -959,7 +959,7 @@ CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
 
     RangeInput = malloc( strlen( ByteRangeSpecifier ) + 1 );
     if( !RangeInput )
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     strcpy( RangeInput, ByteRangeSpecifier );
 
     //CONTENT-RANGE: bytes 222-3333/4000  HTTP_PARTIAL_CONTENT
@@ -1049,7 +1049,7 @@ CreateHTTPRangeResponseHeader( char *ByteRangeSpecifier,
  *
  * Returns:
  *	HTTP_BAD_REQUEST
- *	UPNP_E_OUTOF_MEMORY
+ *	DLNA_E_OUTOF_MEMORY
  *	HTTP_REQUEST_RANGE_NOT_SATISFIABLE
  *	HTTP_OK
  ************************************************************************/
@@ -1068,7 +1068,7 @@ CheckOtherHTTPHeaders( IN http_message_t * Req,
 
     TmpBuf = ( char * )malloc( LINE_SIZE );
     if( !TmpBuf )
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
 
     node = ListHead( &Req->headers );
 
@@ -1084,7 +1084,7 @@ CheckOtherHTTPHeaders( IN http_message_t * Req,
             free( TmpBuf );
             TmpBuf = ( char * )malloc( header->value.length + 1 );
             if( !TmpBuf )
-                return UPNP_E_OUTOF_MEMORY;
+                return DLNA_E_OUTOF_MEMORY;
         }
 
         memcpy( TmpBuf, header->value.buf, header->value.length );
@@ -1183,7 +1183,7 @@ CheckOtherHTTPHeaders( IN http_message_t * Req,
  *
  * Returns:
  *	HTTP_BAD_REQUEST
- *	UPNP_E_OUTOF_MEMORY
+ *	DLNA_E_OUTOF_MEMORY
  *	HTTP_REQUEST_RANGE_NOT_SATISFIABLE
  *	HTTP_OK
  ************************************************************************/
@@ -1208,7 +1208,7 @@ process_request( IN http_message_t * req,
       resp_minor;
     xboolean alias_grabbed;
     size_t dummy;
-    struct UpnpVirtualDirCallbacks *pVirtualDirCallback;
+    struct dlnaVirtualDirCallbacks *pVirtualDirCallback;
 
     print_http_headers( req );
 
@@ -1299,7 +1299,7 @@ process_request( IN http_message_t * req,
                 }
                 // get info
                 if( ( pVirtualDirCallback->
-                      get_info(virtualDirCallback.cookie, filename->buf, &finfo ) != UPNP_E_SUCCESS )
+                      get_info(virtualDirCallback.cookie, filename->buf, &finfo ) != DLNA_E_SUCCESS )
                     || finfo.is_directory ) {
                     err_code = HTTP_NOT_FOUND;
                     goto error_handler;
@@ -1383,7 +1383,7 @@ process_request( IN http_message_t * req,
 
     if( req->method == HTTPMETHOD_POST ) {
         *rtype = RESP_POST;
-        err_code = UPNP_E_SUCCESS;
+        err_code = DLNA_E_SUCCESS;
         goto error_handler;
     }
 
@@ -1481,12 +1481,12 @@ process_request( IN http_message_t * req,
         membuffer_destroy( headers );
     }
 
-    err_code = UPNP_E_SUCCESS;
+    err_code = DLNA_E_SUCCESS;
 
   error_handler:
     free( request_doc );
     ixmlFreeDOMString( finfo.content_type );
-    if( err_code != UPNP_E_SUCCESS && alias_grabbed ) {
+    if( err_code != DLNA_E_SUCCESS && alias_grabbed ) {
         alias_release( alias );
     }
 
@@ -1531,7 +1531,7 @@ http_RecvPostMessage( http_parser_t * parser,
 
     if( Instr && Instr->IsVirtualFile ) {
 
-        Fp = (virtualDirCallback.open)(virtualDirCallback.cookie, filename, UPNP_WRITE );
+        Fp = (virtualDirCallback.open)(virtualDirCallback.cookie, filename, DLNA_WRITE );
         if( Fp == NULL ) {
             return HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -1586,7 +1586,7 @@ http_RecvPostMessage( http_parser_t * parser,
                 }
             } else if( num_read == 0 ) {
                 if( ok_on_close ) {
-                    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+                    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
                         "<<< (RECVD) <<<\n%s\n-----------------\n",
                         parser->msg.msg.buf );
                     print_http_headers( &parser->msg );
@@ -1698,7 +1698,7 @@ web_server_callback( IN http_parser_t * parser,
     ret =
         process_request( req, &rtype, &headers, &filename, &xmldoc,
                          &RespInstr );
-    if( ret != UPNP_E_SUCCESS ) {
+    if( ret != DLNA_E_SUCCESS ) {
         // send error code
         http_SendStatusResponse( info, ret, req->major_version,
                                  req->minor_version );
@@ -1757,7 +1757,7 @@ web_server_callback( IN http_parser_t * parser,
         }
     }
 
-    UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
         "webserver: request processed...\n" );
 
     membuffer_destroy( &headers );

@@ -49,23 +49,23 @@
 * Function : genaUnregisterDevice
 *																	
 * Parameters:														
-*	IN UpnpDevice_Handle device_handle: Handle of the root device
+*	IN dlnaDevice_Handle device_handle: Handle of the root device
 *
 * Description:														
 *	This function cleans the service table of the device. 
 *
 * Returns: int
-*	returns UPNP_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE
+*	returns DLNA_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE
 ****************************************************************************/
 int
-genaUnregisterDevice( IN UpnpDevice_Handle device_handle )
+genaUnregisterDevice( IN dlnaDevice_Handle device_handle )
 {
     struct Handle_Info *handle_info;
 
     HandleLock();
     if( GetHandleInfo( device_handle, &handle_info ) != HND_DEVICE ) {
 
-        UpnpPrintf( UPNP_CRITICAL, GENA, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_CRITICAL, GENA, __FILE__, __LINE__,
             "genaUnregisterDevice : BAD Handle : %d\n",
             device_handle );
 
@@ -76,7 +76,7 @@ genaUnregisterDevice( IN UpnpDevice_Handle device_handle )
     freeServiceTable( &handle_info->ServiceTable );
     HandleUnlock();
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -92,7 +92,7 @@ genaUnregisterDevice( IN UpnpDevice_Handle device_handle )
 *	This function to generate XML propery Set for notifications				
 *
 * Returns: int
-*	returns UPNP_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE
+*	returns DLNA_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE
 *
 * Note: XML_VERSION comment is NOT sent due to interop issues with other 
 *		UPnP vendors
@@ -123,7 +123,7 @@ GeneratePropertySet( IN char **names,
     buffer = ( char * )malloc( size + 1 );
 
     if( buffer == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     memset( buffer, 0, size + 1 );
 
@@ -184,11 +184,11 @@ free_notify_struct( IN notify_thread_struct * input )
 *					reply.
 *
 *	Return : int
-*		on success: returns UPNP_E_SUCCESS; else returns a UPNP error
+*		on success: returns DLNA_E_SUCCESS; else returns a DLNA error
 *
 *	Note : called by genaNotify
 ****************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 notify_send_and_recv( IN uri_type * destination_url,
                       IN membuffer * mid_msg,
                       IN char *propertySet,
@@ -203,14 +203,14 @@ notify_send_and_recv( IN uri_type * destination_url,
     SOCKINFO info;
 
     // connect
-    UpnpPrintf( UPNP_ALL, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_ALL, GENA, __FILE__, __LINE__,
         "gena notify to: %.*s\n",
         (int)destination_url->hostport.text.size,
         destination_url->hostport.text.buff );
 
     conn_fd = http_Connect( destination_url, &url );
     if( conn_fd < 0 ) {
-        return conn_fd;         // return UPNP error
+        return conn_fd;         // return DLNA error
     }
 
     if( ( ret_code = sock_init( &info, conn_fd ) ) != 0 ) {
@@ -226,7 +226,7 @@ notify_send_and_recv( IN uri_type * destination_url,
         mid_msg->buf ) != 0 ) {
         membuffer_destroy( &start_msg );
         sock_destroy( &info, SD_BOTH );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     timeout = HTTP_DEFAULT_TIMEOUT;
@@ -257,7 +257,7 @@ notify_send_and_recv( IN uri_type * destination_url,
     //  sock_destroy( &info,SD_RECEIVE);
     membuffer_destroy( &start_msg );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /****************************************************************************
@@ -305,7 +305,7 @@ genaNotify( IN char *headers,
         "SID: ", sub->sid,
         "SEQ: ", sub->ToSendEventKey ) != 0 ) {
         membuffer_destroy( &mid_msg );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     // send a notify to each url until one goes thru
     for( i = 0; i < sub->DeliveryURLs.size; i++ ) {
@@ -314,14 +314,14 @@ genaNotify( IN char *headers,
         if( ( return_code = notify_send_and_recv( url,
                                                   &mid_msg, propertySet,
                                                   &response ) ) ==
-            UPNP_E_SUCCESS ) {
+            DLNA_E_SUCCESS ) {
             break;
         }
     }
 
     membuffer_destroy( &mid_msg );
 
-    if( return_code == UPNP_E_SUCCESS ) {
+    if( return_code == DLNA_E_SUCCESS ) {
         if( response.msg.status_code == HTTP_OK ) {
             return_code = GENA_SUCCESS;
         } else {
@@ -437,13 +437,13 @@ genaNotifyThread( IN void *input )
 *	Function :	genaInitNotify
 *
 *	Parameters :
-*		   IN UpnpDevice_Handle device_handle :	Device handle
+*		   IN dlnaDevice_Handle device_handle :	Device handle
 *		   IN char *UDN :	Device udn
 *		   IN char *servId :	Service ID
 *		   IN char **VarNames :	Array of variable names
 *		   IN char **VarValues :	Array of variable values
 *		   IN int var_count :	array size
-*		   IN Upnp_SID sid :	subscription ID
+*		   IN dlna_SID sid :	subscription ID
 *
 *	Description :	This function sends the intial state table dump to 
 *		newly subscribed control point. 
@@ -455,13 +455,13 @@ genaNotifyThread( IN void *input )
 *			intial state table dump.
 ****************************************************************************/
 int
-genaInitNotify( IN UpnpDevice_Handle device_handle,
+genaInitNotify( IN dlnaDevice_Handle device_handle,
                 IN char *UDN,
                 IN char *servId,
                 IN char **VarNames,
                 IN char **VarValues,
                 IN int var_count,
-                IN Upnp_SID sid )
+                IN dlna_SID sid )
 {
     char *UDN_copy = NULL;
     char *servId_copy = NULL;
@@ -477,13 +477,13 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
 
     notify_thread_struct *thread_struct = NULL;
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "GENA BEGIN INITIAL NOTIFY " );
 
     reference_count = ( int * )malloc( sizeof( int ) );
 
     if( reference_count == NULL )
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
 
     ( *reference_count ) = 0;
 
@@ -491,14 +491,14 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
 
     if( UDN_copy == NULL ) {
         free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     servId_copy = ( char * )malloc( strlen( servId ) + 1 );
 
     if( servId_copy == NULL ) {
         free( UDN_copy );
         free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     strcpy( UDN_copy, UDN );
@@ -523,7 +523,7 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
         return GENA_E_BAD_SERVICE;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "FOUND SERVICE IN INIT NOTFY: UDN %s, ServID: %s ",
         UDN, servId );
 
@@ -536,7 +536,7 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
         return GENA_E_BAD_SID;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "FOUND SUBSCRIPTION IN INIT NOTIFY: SID %s ", sid );
 
     sub->active = 1;
@@ -552,14 +552,14 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
         return return_code;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "GENERATED PROPERY SET IN INIT NOTIFY: \n'%s'\n",
         propertySet );
 
     headers_size = strlen( "CONTENT-TYPE text/xml\r\n" ) +
         strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
-        strlen( "NT: upnp:event\r\n" ) +
-        strlen( "NTS: upnp:propchange\r\n" ) + 1;
+        strlen( "NT: dlna:event\r\n" ) +
+        strlen( "NTS: dlna:propchange\r\n" ) + 1;
 
     headers = ( char * )malloc( headers_size );
 
@@ -569,11 +569,11 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
         free( servId_copy );
         free( reference_count );
         HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: "
-             "%"PRIzu"\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
+             "%"PRIzu"\r\nNT: dlna:event\r\nNTS: dlna:propchange\r\n",
              strlen( propertySet ) + 1 );
 
     //schedule thread for initial notification
@@ -583,7 +583,7 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
         malloc( sizeof( notify_thread_struct ) );
 
     if( thread_struct == NULL ) {
-        return_code = UPNP_E_OUTOF_MEMORY;
+        return_code = DLNA_E_OUTOF_MEMORY;
     } else {
         ( *reference_count ) = 1;
         thread_struct->servId = servId_copy;
@@ -603,7 +603,7 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
         if( ( return_code =
               ThreadPoolAdd( &gSendThreadPool, &job, NULL ) ) != 0 ) {
             if( return_code == EOUTOFMEM ) {
-                return_code = UPNP_E_OUTOF_MEMORY;
+                return_code = DLNA_E_OUTOF_MEMORY;
             }
         } else {
             return_code = GENA_SUCCESS;
@@ -629,11 +629,11 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
 *	Function :	genaInitNotifyExt
 *
 *	Parameters :
-*		   IN UpnpDevice_Handle device_handle :	Device handle
+*		   IN dlnaDevice_Handle device_handle :	Device handle
 *		   IN char *UDN :	Device udn
 *		   IN char *servId :	Service ID
 *		   IN IXML_Document *PropSet :	Document of the state table
-*		   IN Upnp_SID sid :	subscription ID
+*		   IN dlna_SID sid :	subscription ID
 *
 *	Description :	This function is similar to the genaInitNofity. The only 
 *	difference is that it takes the xml document for the state table and 
@@ -646,11 +646,11 @@ genaInitNotify( IN UpnpDevice_Handle device_handle,
 *			intial state table dump.
 ****************************************************************************/
 int
-genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
+genaInitNotifyExt( IN dlnaDevice_Handle device_handle,
                    IN char *UDN,
                    IN char *servId,
                    IN IXML_Document * PropSet,
-                   IN Upnp_SID sid )
+                   IN dlna_SID sid )
 {
     char *UDN_copy = NULL;
     char *servId_copy = NULL;
@@ -667,12 +667,12 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
 
     notify_thread_struct *thread_struct = NULL;
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "GENA BEGIN INITIAL NOTIFY EXT" );
     reference_count = ( int * )malloc( sizeof( int ) );
 
     if( reference_count == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     ( *reference_count ) = 0;
@@ -680,14 +680,14 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
     UDN_copy = ( char * )malloc( strlen( UDN ) + 1 );
     if( UDN_copy == NULL ) {
         free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     servId_copy = ( char * )malloc( strlen( servId ) + 1 );
     if( servId_copy == NULL ) {
         free( UDN_copy );
         free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     strcpy( UDN_copy, UDN );
@@ -711,7 +711,7 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
         HandleUnlock();
         return GENA_E_BAD_SERVICE;
     }
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "FOUND SERVICE IN INIT NOTFY EXT: UDN %s, ServID: %s\n",
         UDN, servId );
 
@@ -723,7 +723,7 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
         HandleUnlock();
         return GENA_E_BAD_SID;
     }
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "FOUND SUBSCRIPTION IN INIT NOTIFY EXT: SID %s", sid );
 
     sub->active = 1;
@@ -734,17 +734,17 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
         free( reference_count );
         free( servId_copy );
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "GENERATED PROPERY SET IN INIT EXT NOTIFY: %s",
         propertySet );
 
     headers_size = strlen( "CONTENT-TYPE text/xml\r\n" ) +
         strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
-        strlen( "NT: upnp:event\r\n" ) +
-        strlen( "NTS: upnp:propchange\r\n" ) + 1;
+        strlen( "NT: dlna:event\r\n" ) +
+        strlen( "NTS: dlna:propchange\r\n" ) + 1;
 
     headers = ( char * )malloc( headers_size );
     if( headers == NULL ) {
@@ -753,11 +753,11 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
         free( reference_count );
         ixmlFreeDOMString( propertySet );
         HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: "
-             "%ld\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
+             "%ld\r\nNT: dlna:event\r\nNTS: dlna:propchange\r\n",
              (long) strlen( propertySet ) + 1 );
 
     //schedule thread for initial notification
@@ -767,7 +767,7 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
         malloc( sizeof( notify_thread_struct ) );
 
     if( thread_struct == NULL ) {
-        return_code = UPNP_E_OUTOF_MEMORY;
+        return_code = DLNA_E_OUTOF_MEMORY;
     } else {
         ( *reference_count ) = 1;
         thread_struct->servId = servId_copy;
@@ -787,7 +787,7 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
         if( ( return_code =
               ThreadPoolAdd( &gSendThreadPool, &job, NULL ) ) != 0 ) {
             if( return_code == EOUTOFMEM ) {
-                return_code = UPNP_E_OUTOF_MEMORY;
+                return_code = DLNA_E_OUTOF_MEMORY;
             }
         } else {
             return_code = GENA_SUCCESS;
@@ -811,7 +811,7 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
 *	Function :	genaNotifyAllExt
 *
 *	Parameters :
-*			IN UpnpDevice_Handle device_handle : Device handle
+*			IN dlnaDevice_Handle device_handle : Device handle
 *			IN char *UDN :	Device udn
 *			IN char *servId :	Service ID
 *           IN IXML_Document *PropSet :	XML document Event varible property set
@@ -825,7 +825,7 @@ genaInitNotifyExt( IN UpnpDevice_Handle device_handle,
 *			is it takes the document instead of event variable array
 ****************************************************************************/
 int
-genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
+genaNotifyAllExt( IN dlnaDevice_Handle device_handle,
                   IN char *UDN,
                   IN char *servId,
                   IN IXML_Document * PropSet )
@@ -848,7 +848,7 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
     reference_count = ( int * )malloc( sizeof( int ) );
 
     if( reference_count == NULL )
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
 
     ( *reference_count = 0 );
 
@@ -856,7 +856,7 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
 
     if( UDN_copy == NULL ) {
         free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     servId_copy = ( char * )malloc( strlen( servId ) + 1 );
@@ -864,7 +864,7 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
     if( servId_copy == NULL ) {
         free( UDN_copy );
         free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     strcpy( UDN_copy, UDN );
@@ -875,13 +875,13 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
         free( UDN_copy );
         free( servId_copy );
         free( reference_count );
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     headers_size = strlen( "CONTENT-TYPE text/xml\r\n" ) +
         strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
-        strlen( "NT: upnp:event\r\n" ) +
-        strlen( "NTS: upnp:propchange\r\n" ) + 1;
+        strlen( "NT: dlna:event\r\n" ) +
+        strlen( "NTS: dlna:propchange\r\n" ) + 1;
 
     headers = ( char * )malloc( headers_size );
     if( headers == NULL ) {
@@ -889,12 +889,12 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
         free( servId_copy );
         ixmlFreeDOMString( propertySet );
         free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     //changed to add null terminator at end of content
     //content length = (length in bytes of property set) + null char
     sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: "
-             "%ld\r\nNT: upnp:event\r\nNTS: upnp:propchange\r\n",
+             "%ld\r\nNT: dlna:event\r\nNTS: dlna:propchange\r\n",
              (long) strlen( propertySet ) + 1 );
 
     HandleLock();
@@ -912,7 +912,7 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
                     malloc( sizeof( notify_thread_struct ) );
                 if( thread_struct == NULL ) {
                     break;
-                    return_code = UPNP_E_OUTOF_MEMORY;
+                    return_code = DLNA_E_OUTOF_MEMORY;
                 }
 
                 ( *reference_count )++;
@@ -938,7 +938,7 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
                 if( ( return_code = ThreadPoolAdd( &gSendThreadPool,
                                                    &job, NULL ) ) != 0 ) {
                     if( return_code == EOUTOFMEM ) {
-                        return_code = UPNP_E_OUTOF_MEMORY;
+                        return_code = DLNA_E_OUTOF_MEMORY;
                     }
                     break;
                 }
@@ -966,7 +966,7 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
 *	Function :	genaNotifyAll
 *
 *	Parameters :
-*		IN UpnpDevice_Handle device_handle : Device handle
+*		IN dlnaDevice_Handle device_handle : Device handle
 *		IN char *UDN :	Device udn
 *		IN char *servId :	Service ID
 *	    IN char **VarNames : array of varible names
@@ -982,7 +982,7 @@ genaNotifyAllExt( IN UpnpDevice_Handle device_handle,
 *			is it takes event variable array instead of xml document.
 ****************************************************************************/
 int
-genaNotifyAll( IN UpnpDevice_Handle device_handle,
+genaNotifyAll( IN dlnaDevice_Handle device_handle,
                IN char *UDN,
                IN char *servId,
                IN char **VarNames,
@@ -1008,7 +1008,7 @@ genaNotifyAll( IN UpnpDevice_Handle device_handle,
     reference_count = ( int * )malloc( sizeof( int ) );
 
     if( reference_count == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     ( *reference_count = 0 );
@@ -1017,14 +1017,14 @@ genaNotifyAll( IN UpnpDevice_Handle device_handle,
 
     if( UDN_copy == NULL ) {
         free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     servId_copy = ( char * )malloc( strlen( servId ) + 1 );
     if( servId_copy == NULL ) {
         free( UDN_copy );
         free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     strcpy( UDN_copy, UDN );
@@ -1042,8 +1042,8 @@ genaNotifyAll( IN UpnpDevice_Handle device_handle,
 
     headers_size = strlen( "CONTENT-TYPE text/xml\r\n" ) +
         strlen( "CONTENT-LENGTH: \r\n" ) + MAX_CONTENT_LENGTH +
-        strlen( "NT: upnp:event\r\n" ) +
-        strlen( "NTS: upnp:propchange\r\n" ) + 1;
+        strlen( "NT: dlna:event\r\n" ) +
+        strlen( "NTS: dlna:propchange\r\n" ) + 1;
 
     headers = ( char * )malloc( headers_size );
     if( headers == NULL ) {
@@ -1051,12 +1051,12 @@ genaNotifyAll( IN UpnpDevice_Handle device_handle,
         free( servId_copy );
         ixmlFreeDOMString( propertySet );
         free( reference_count );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     //changed to add null terminator at end of content
     //content length = (length in bytes of property set) + null char
     sprintf( headers, "CONTENT-TYPE: text/xml\r\nCONTENT-LENGTH: %ld\r\nNT:"
-             " upnp:event\r\nNTS: upnp:propchange\r\n",
+             " dlna:event\r\nNTS: dlna:propchange\r\n",
              (long) strlen( propertySet ) + 1 );
 
     HandleLock();
@@ -1073,7 +1073,7 @@ genaNotifyAll( IN UpnpDevice_Handle device_handle,
                     ( notify_thread_struct * )
                     malloc( sizeof( notify_thread_struct ) );
                 if( thread_struct == NULL ) {
-                    return_code = UPNP_E_OUTOF_MEMORY;
+                    return_code = DLNA_E_OUTOF_MEMORY;
                     break;
                 }
                 ( *reference_count )++;
@@ -1101,7 +1101,7 @@ genaNotifyAll( IN UpnpDevice_Handle device_handle,
                       ThreadPoolAdd( &gSendThreadPool, &job, NULL ) )
                     != 0 ) {
                     if( return_code == EOUTOFMEM ) {
-                        return_code = UPNP_E_OUTOF_MEMORY;
+                        return_code = DLNA_E_OUTOF_MEMORY;
                         break;
                     }
                 }
@@ -1139,7 +1139,7 @@ genaNotifyAll( IN UpnpDevice_Handle device_handle,
 *		of a subscription request.
 *
 *	Return :	static int
-*		returns UPNP_E_SUCCESS if successful else returns appropriate error
+*		returns DLNA_E_SUCCESS if successful else returns appropriate error
 *	Note :
 ****************************************************************************/
 static int
@@ -1153,7 +1153,7 @@ respond_ok( IN SOCKINFO * info,
     membuffer response;
     int return_code;
     char timeout_str[100];
-    int upnp_timeout = UPNP_TIMEOUT;
+    int dlna_timeout = DLNA_TIMEOUT;
 
     http_CalcResponseVersion( request->major_version,
                               request->minor_version, &major, &minor );
@@ -1176,10 +1176,10 @@ respond_ok( IN SOCKINFO * info,
         timeout_str ) != 0 ) {
         membuffer_destroy( &response );
         error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
-    return_code = http_SendMessage( info, &upnp_timeout, "b",
+    return_code = http_SendMessage( info, &dlna_timeout, "b",
                                     response.buf, response.length );
 
     membuffer_destroy( &response );
@@ -1203,7 +1203,7 @@ respond_ok( IN SOCKINFO * info,
 *
 *	Return :	int
 *		if successful returns the number of URLs parsed 
-*		else UPNP_E_OUTOF_MEMORY
+*		else DLNA_E_OUTOF_MEMORY
 *	Note :
 ****************************************************************************/
 static int
@@ -1233,7 +1233,7 @@ create_url_list( IN memptr * url_list,
                 && ( temp.hostport.text.size != 0 ) ) {
                 URLcount++;
             } else {
-                if( return_code == UPNP_E_OUTOF_MEMORY ) {
+                if( return_code == DLNA_E_OUTOF_MEMORY ) {
                     return return_code;
                 }
             }
@@ -1249,7 +1249,7 @@ create_url_list( IN memptr * url_list,
             free( out->parsedURLs );
             out->URLs = NULL;
             out->parsedURLs = NULL;
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         }
         memcpy( out->URLs, URLS->buff, URLS->size );
         out->URLs[URLS->size] = 0;
@@ -1264,7 +1264,7 @@ create_url_list( IN memptr * url_list,
                          0 ) ) {
                     URLcount++;
                 } else {
-                    if( return_code == UPNP_E_OUTOF_MEMORY ) {
+                    if( return_code == DLNA_E_OUTOF_MEMORY ) {
                         free( out->URLs );
                         free( out->parsedURLs );
                         out->URLs = NULL;
@@ -1299,23 +1299,23 @@ void
 gena_process_subscription_request( IN SOCKINFO * info,
                                    IN http_message_t * request )
 {
-    Upnp_SID temp_sid;
+    dlna_SID temp_sid;
     int return_code = 1;
     int time_out = 1801;
     service_info *service;
-    struct Upnp_Subscription_Request request_struct;
+    struct dlna_Subscription_Request request_struct;
     subscription *sub;
-    uuid_upnp uid;
+    uuid_dlna uid;
     struct Handle_Info *handle_info;
     void *cookie;
-    Upnp_FunPtr callback_fun;
-    UpnpDevice_Handle device_handle;
+    dlna_FunPtr callback_fun;
+    dlnaDevice_Handle device_handle;
     memptr nt_hdr;
     char *event_url_path = NULL;
     memptr callback_hdr;
     memptr timeout_hdr;
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "Subscription Request Received:\n" );
 
     if( httpmsg_find_hdr( request, HDR_NT, &nt_hdr ) == NULL ) {
@@ -1325,8 +1325,8 @@ gena_process_subscription_request( IN SOCKINFO * info,
 
     // check NT header
     //Windows Millenium Interoperability:
-    //we accept either upnp:event, or upnp:propchange for the NT header
-    if( memptr_cmp_nocase( &nt_hdr, "upnp:event" ) != 0 ) {
+    //we accept either dlna:event, or dlna:propchange for the NT header
+    if( memptr_cmp_nocase( &nt_hdr, "dlna:event" ) != 0 ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, request );
         return;
     }
@@ -1345,7 +1345,7 @@ gena_process_subscription_request( IN SOCKINFO * info,
         return;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "SubscriptionRequest for event URL path: %s\n",
         event_url_path );
 
@@ -1368,7 +1368,7 @@ gena_process_subscription_request( IN SOCKINFO * info,
         return;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "Subscription Request: Number of Subscriptions already %d\n "
         "Max Subscriptions allowed: %d\n",
         service->TotalSubscriptions,
@@ -1405,7 +1405,7 @@ gena_process_subscription_request( IN SOCKINFO * info,
         HandleUnlock();
         return;
     }
-    if( return_code == UPNP_E_OUTOF_MEMORY ) {
+    if( return_code == DLNA_E_OUTOF_MEMORY ) {
         error_respond( info, HTTP_INTERNAL_SERVER_ERROR, request );
         freeSubscriptionList( sub );
         HandleUnlock();
@@ -1442,7 +1442,7 @@ gena_process_subscription_request( IN SOCKINFO * info,
     sprintf( sub->sid, "uuid:%s", temp_sid );
 
     // respond OK
-    if( respond_ok( info, time_out, sub, request ) != UPNP_E_SUCCESS ) {
+    if( respond_ok( info, time_out, sub, request ) != DLNA_E_SUCCESS ) {
         freeSubscriptionList( sub );
         HandleUnlock();
         return;
@@ -1468,7 +1468,7 @@ gena_process_subscription_request( IN SOCKINFO * info,
     //that the handle is not unregistered in the middle of a 
     //callback
 
-    callback_fun( UPNP_EVENT_SUBSCRIPTION_REQUEST,
+    callback_fun( DLNA_EVENT_SUBSCRIPTION_REQUEST,
                   &request_struct, cookie );
 }
 
@@ -1491,12 +1491,12 @@ void
 gena_process_subscription_renewal_request( IN SOCKINFO * info,
                                            IN http_message_t * request )
 {
-    Upnp_SID sid;
+    dlna_SID sid;
     subscription *sub;
     int time_out = 1801;
     service_info *service;
     struct Handle_Info *handle_info;
-    UpnpDevice_Handle device_handle;
+    dlnaDevice_Handle device_handle;
     memptr temp_hdr;
     membuffer event_url_path;
     memptr timeout_hdr;
@@ -1545,7 +1545,7 @@ gena_process_subscription_renewal_request( IN SOCKINFO * info,
         return;
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "Renew request: Number of subscriptions already: %d\n "
         "Max Subscriptions allowed:%d\n",
         service->TotalSubscriptions,
@@ -1590,7 +1590,7 @@ gena_process_subscription_renewal_request( IN SOCKINFO * info,
         sub->expireTime = time( NULL ) + time_out;
     }
 
-    if( respond_ok( info, time_out, sub, request ) != UPNP_E_SUCCESS ) {
+    if( respond_ok( info, time_out, sub, request ) != DLNA_E_SUCCESS ) {
         RemoveSubscriptionSID( sub->sid, service );
     }
 
@@ -1616,10 +1616,10 @@ void
 gena_process_unsubscribe_request( IN SOCKINFO * info,
                                   IN http_message_t * request )
 {
-    Upnp_SID sid;
+    dlna_SID sid;
     service_info *service;
     struct Handle_Info *handle_info;
-    UpnpDevice_Handle device_handle;
+    dlnaDevice_Handle device_handle;
 
     memptr temp_hdr;
     membuffer event_url_path;

@@ -120,7 +120,7 @@ str_int_entry Http_Header_Names[NUM_HTTP_HEADER_NAMES] = {
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE void
+static DLNA_INLINE void
 scanner_init( OUT scanner_t * scanner,
               IN membuffer * bufptr )
 {
@@ -141,7 +141,7 @@ scanner_init( OUT scanner_t * scanner,
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE xboolean
+static DLNA_INLINE xboolean
 is_separator_char( IN char c )
 {
     return strchr( " \t()<>@,;:\\\"/[]?={}", c ) != NULL;
@@ -159,7 +159,7 @@ is_separator_char( IN char c )
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE xboolean
+static DLNA_INLINE xboolean
 is_identifier_char( IN char c )
 {
     return ( c >= 32 && c <= 126 ) && !is_separator_char( c );
@@ -177,7 +177,7 @@ is_identifier_char( IN char c )
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE xboolean
+static DLNA_INLINE xboolean
 is_control_char( IN char c )
 {
     return ( ( c >= 0 && c <= 31 ) || ( c == 127 ) );
@@ -195,7 +195,7 @@ is_control_char( IN char c )
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE xboolean
+static DLNA_INLINE xboolean
 is_qdtext_char( IN char cc )
 {
     unsigned char c = ( unsigned char )cc;
@@ -374,7 +374,7 @@ scanner_get_token( INOUT scanner_t * scanner,
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE char *
+static DLNA_INLINE char *
 scanner_get_str( IN scanner_t * scanner )
 {
     return scanner->msg->buf + scanner->cursor;
@@ -590,7 +590,7 @@ httpmsg_find_hdr( IN http_message_t * msg,
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 skip_blank_lines( INOUT scanner_t * scanner )
 {
     memptr token;
@@ -626,7 +626,7 @@ skip_blank_lines( INOUT scanner_t * scanner )
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 skip_lws( INOUT scanner_t * scanner )
 {
     memptr token;
@@ -673,7 +673,7 @@ skip_lws( INOUT scanner_t * scanner )
 *
 * Description :	Match a string without whitespace or CRLF (%S)
 *
-* Return : UPNP_INLINE parse_status_t ;
+* Return : DLNA_INLINE parse_status_t ;
 *	PARSE_OK
 *	PARSE_NO_MATCH
 *	PARSE_FAILURE
@@ -681,7 +681,7 @@ skip_lws( INOUT scanner_t * scanner )
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE parse_status_t
+static DLNA_INLINE parse_status_t
 match_non_ws_string( INOUT scanner_t * scanner,
                      OUT memptr * str )
 {
@@ -747,7 +747,7 @@ match_non_ws_string( INOUT scanner_t * scanner,
 *
 * Note :
 ************************************************************************/
-static UPNP_INLINE parse_status_t
+static DLNA_INLINE parse_status_t
 match_raw_value( INOUT scanner_t * scanner,
                  OUT memptr * raw_value )
 {
@@ -838,7 +838,7 @@ match_raw_value( INOUT scanner_t * scanner,
 *   PARSE_FAILURE		-- bad input
 *   PARSE_INCOMPLETE
 ************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 match_int( INOUT scanner_t * scanner,
            IN int base,
            OUT int *value )
@@ -897,7 +897,7 @@ match_int( INOUT scanner_t * scanner,
 *   PARSE_FAILURE
 *   PARSE_INCOMPLETE
 ************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 read_until_crlf( INOUT scanner_t * scanner,
                  OUT memptr * str )
 {
@@ -942,7 +942,7 @@ read_until_crlf( INOUT scanner_t * scanner,
 *   PARSE_NO_MATCH
 *   PARSE_INCOMPLETE
 ************************************************************************/
-static UPNP_INLINE parse_status_t
+static DLNA_INLINE parse_status_t
 match_char( INOUT scanner_t * scanner,
             IN char c,
             IN xboolean case_sensitive )
@@ -1289,7 +1289,7 @@ matchstr( IN char *str,
 * Returns:
 *	void
 ************************************************************************/
-static UPNP_INLINE void
+static DLNA_INLINE void
 parser_init( OUT http_parser_t * parser )
 {
     memset( parser, 0, sizeof( http_parser_t ) );
@@ -1650,7 +1650,7 @@ parser_parse_headers( INOUT http_parser_t * parser )
 
             //NNS:          ret = dlist_append( &parser->msg.headers, header );
 /** TODO: remove that? */
-            if( ret == UPNP_E_OUTOF_MEMORY ) {
+            if( ret == DLNA_E_OUTOF_MEMORY ) {
                 parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
                 return PARSE_FAILURE;
             }
@@ -1667,7 +1667,7 @@ parser_parse_headers( INOUT http_parser_t * parser )
             ret2 = membuffer_append( &orig_header->value,
                                      hdr_value.buf, hdr_value.length );
 
-            if( ret == UPNP_E_OUTOF_MEMORY || ret2 == UPNP_E_OUTOF_MEMORY ) {
+            if( ret == DLNA_E_OUTOF_MEMORY || ret2 == DLNA_E_OUTOF_MEMORY ) {
                 // not enuf mem
                 parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
                 return PARSE_FAILURE;
@@ -1771,7 +1771,7 @@ parser_parse_headers_old( INOUT http_parser_t * parser )
             header->name_id = header_id;
 
             ret = dlist_append( &parser->msg.headers, header );
-            if( ret == UPNP_E_OUTOF_MEMORY ) {
+            if( ret == DLNA_E_OUTOF_MEMORY ) {
                 parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
                 return PARSE_FAILURE;
             }
@@ -1794,9 +1794,9 @@ parser_parse_headers_old( INOUT http_parser_t * parser )
             ret3 = membuffer_append( &orig_header->multi_hdr_buf,
                                      hdr_value.buf, hdr_value.length );
 
-            if( ret == UPNP_E_OUTOF_MEMORY ||
-                ret2 == UPNP_E_OUTOF_MEMORY ||
-                ret3 == UPNP_E_OUTOF_MEMORY ) {
+            if( ret == DLNA_E_OUTOF_MEMORY ||
+                ret2 == DLNA_E_OUTOF_MEMORY ||
+                ret3 == DLNA_E_OUTOF_MEMORY ) {
                 // not enuf mem
                 parser->http_error_code = HTTP_INTERNAL_SERVER_ERROR;
                 return PARSE_FAILURE;
@@ -1824,7 +1824,7 @@ parser_parse_headers_old( INOUT http_parser_t * parser )
 *	 PARSE_FAILURE -- entity length > content-length value
 *	 PARSE_SUCCESS
 ************************************************************************/
-static UPNP_INLINE parse_status_t
+static DLNA_INLINE parse_status_t
 parser_parse_entity_using_clen( INOUT http_parser_t * parser )
 {
     //int entity_length;
@@ -1871,7 +1871,7 @@ parser_parse_entity_using_clen( INOUT http_parser_t * parser )
 *	 PARSE_FAILURE -- entity length > content-length value
 *	 PARSE_SUCCESS
 ************************************************************************/
-static UPNP_INLINE parse_status_t
+static DLNA_INLINE parse_status_t
 parser_parse_chunky_body( INOUT http_parser_t * parser )
 {
     parse_status_t status;
@@ -1916,7 +1916,7 @@ parser_parse_chunky_body( INOUT http_parser_t * parser )
 *	 PARSE_FAILURE -- entity length > content-length value
 *	 PARSE_SUCCESS
 ************************************************************************/
-static UPNP_INLINE parse_status_t
+static DLNA_INLINE parse_status_t
 parser_parse_chunky_headers( INOUT http_parser_t * parser )
 {
     parse_status_t status;
@@ -1956,7 +1956,7 @@ parser_parse_chunky_headers( INOUT http_parser_t * parser )
 *	 PARSE_SUCCESS
 *	 PARSE_CONTINUE_1
 ************************************************************************/
-static UPNP_INLINE parse_status_t
+static DLNA_INLINE parse_status_t
 parser_parse_chunky_entity( INOUT http_parser_t * parser )
 {
     scanner_t *scanner = &parser->scanner;
@@ -1972,7 +1972,7 @@ parser_parse_chunky_entity( INOUT http_parser_t * parser )
     status = match( scanner, "%x%L%c", &parser->chunk_size, &dummy );
     if( status != PARSE_OK ) {
         scanner->cursor = save_pos;
-        UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
             "CHUNK COULD NOT BE PARSED\n" );
         return status;
     }
@@ -2007,7 +2007,7 @@ parser_parse_chunky_entity( INOUT http_parser_t * parser )
 * Returns:
 *	 PARSE_INCOMPLETE_ENTITY
 ************************************************************************/
-static UPNP_INLINE parse_status_t
+static DLNA_INLINE parse_status_t
 parser_parse_entity_until_close( INOUT http_parser_t * parser )
 {
     size_t cursor;
@@ -2042,7 +2042,7 @@ parser_parse_entity_until_close( INOUT http_parser_t * parser )
 * 	 PARSE_FAILURE
 *	 PARSE_COMPLETE	-- no more reading to do
 ************************************************************************/
-UPNP_INLINE parse_status_t
+DLNA_INLINE parse_status_t
 parser_get_entity_read_method( INOUT http_parser_t * parser )
 {
     http_message_t *hmsg = &parser->msg;
@@ -2100,7 +2100,7 @@ parser_get_entity_read_method( INOUT http_parser_t * parser )
         if( raw_find_str( &hdr_value, "chunked" ) >= 0 ) {
             // read method to use chunked transfer encoding
             parser->ent_position = ENTREAD_USING_CHUNKED;
-            UpnpPrintf( UPNP_INFO, HTTP, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_INFO, HTTP, __FILE__, __LINE__,
                 "Found Chunked Encoding ....\n" );
 
             return PARSE_CONTINUE_1;
@@ -2147,7 +2147,7 @@ parser_get_entity_read_method( INOUT http_parser_t * parser )
 * 	 PARSE_FAILURE
 *	 PARSE_COMPLETE	-- no more reading to do
 ************************************************************************/
-UPNP_INLINE parse_status_t
+DLNA_INLINE parse_status_t
 parser_parse_entity( INOUT http_parser_t * parser )
 {
     parse_status_t status = PARSE_OK;

@@ -48,7 +48,7 @@ extern ithread_mutex_t GlobalClientSubscribeMutex;
 * Function : GenaAutoRenewSubscription
 *
 * Parameters:														
-*	IN void *input: Thread data(upnp_timeout *) needed to send the renewal
+*	IN void *input: Thread data(dlna_timeout *) needed to send the renewal
 *
 * Description:
 *	This is a thread function to send the renewal just before the 
@@ -60,46 +60,46 @@ extern ithread_mutex_t GlobalClientSubscribeMutex;
 static void
 GenaAutoRenewSubscription( IN void *input )
 {
-    upnp_timeout *event = ( upnp_timeout * ) input;
+    dlna_timeout *event = ( dlna_timeout * ) input;
     void *cookie;
-    Upnp_FunPtr callback_fun;
+    dlna_FunPtr callback_fun;
     struct Handle_Info *handle_info;
-    struct Upnp_Event_Subscribe *sub_struct =
-        ( struct Upnp_Event_Subscribe * )
+    struct dlna_Event_Subscribe *sub_struct =
+        ( struct dlna_Event_Subscribe * )
         event->Event;
 
     int send_callback = 0;
     int eventType = 0;
 
     if( AUTO_RENEW_TIME == 0 ) {
-        UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
             "GENA SUB EXPIRED" );
-        sub_struct->ErrCode = UPNP_E_SUCCESS;
+        sub_struct->ErrCode = DLNA_E_SUCCESS;
         send_callback = 1;
-        eventType = UPNP_EVENT_SUBSCRIPTION_EXPIRED;
+        eventType = DLNA_EVENT_SUBSCRIPTION_EXPIRED;
     } else {
-        UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
             "GENA AUTO RENEW" );
         if( ( ( sub_struct->ErrCode = genaRenewSubscription( event->handle,
                                                              sub_struct->
                                                              Sid,
                                                              &sub_struct->
                                                              TimeOut ) ) !=
-              UPNP_E_SUCCESS )
+              DLNA_E_SUCCESS )
             && ( sub_struct->ErrCode != GENA_E_BAD_SID )
             && ( sub_struct->ErrCode != GENA_E_BAD_HANDLE ) ) {
             send_callback = 1;
-            eventType = UPNP_EVENT_AUTORENEWAL_FAILED;
+            eventType = DLNA_EVENT_AUTORENEWAL_FAILED;
         }
     }
     if( send_callback ) {
         HandleReadLock();
         if( GetHandleInfo( event->handle, &handle_info ) != HND_CLIENT ) {
             HandleUnlock();
-            free_upnp_timeout( event );
+            free_dlna_timeout( event );
             return;
         }
-        UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
             "HANDLE IS VALID" );
         callback_fun = handle_info->Callback;
         cookie = handle_info->Cookie;
@@ -109,7 +109,7 @@ GenaAutoRenewSubscription( IN void *input )
         callback_fun( eventType, event->Event, cookie );
     }
 
-    free_upnp_timeout( event );
+    free_dlna_timeout( event );
 }
 
 /************************************************************************
@@ -132,43 +132,43 @@ ScheduleGenaAutoRenew( IN int client_handle,
                        IN int TimeOut,
                        IN client_subscription * sub )
 {
-    struct Upnp_Event_Subscribe *RenewEventStruct = NULL;
-    upnp_timeout *RenewEvent = NULL;
+    struct dlna_Event_Subscribe *RenewEventStruct = NULL;
+    dlna_timeout *RenewEvent = NULL;
     int return_code = GENA_SUCCESS;
     ThreadPoolJob job;
 
-    if( TimeOut == UPNP_INFINITE ) {
+    if( TimeOut == DLNA_INFINITE ) {
         return GENA_SUCCESS;
     }
 
-    RenewEventStruct = ( struct Upnp_Event_Subscribe * )malloc( sizeof
+    RenewEventStruct = ( struct dlna_Event_Subscribe * )malloc( sizeof
                                                                 ( struct
-                                                                  Upnp_Event_Subscribe ) );
+                                                                  dlna_Event_Subscribe ) );
 
     if( RenewEventStruct == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
-    RenewEvent = ( upnp_timeout * ) malloc( sizeof( upnp_timeout ) );
+    RenewEvent = ( dlna_timeout * ) malloc( sizeof( dlna_timeout ) );
 
     if( RenewEvent == NULL ) {
         free( RenewEventStruct );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     //schedule expire event
     strcpy( RenewEventStruct->Sid, sub->sid );
-    RenewEventStruct->ErrCode = UPNP_E_SUCCESS;
+    RenewEventStruct->ErrCode = DLNA_E_SUCCESS;
     strncpy( RenewEventStruct->PublisherUrl, sub->EventURL,
              NAME_SIZE - 1 );
     RenewEventStruct->TimeOut = TimeOut;
 
-    //RenewEvent->EventType=UPNP_EVENT_SUBSCRIPTION_EXPIRE;
+    //RenewEvent->EventType=DLNA_EVENT_SUBSCRIPTION_EXPIRE;
     RenewEvent->handle = client_handle;
     RenewEvent->Event = RenewEventStruct;
 
     TPJobInit( &job, ( start_routine ) GenaAutoRenewSubscription,
                RenewEvent );
-    TPJobSetFreeFunction( &job, ( free_routine ) free_upnp_timeout );
+    TPJobSetFreeFunction( &job, ( free_routine ) free_dlna_timeout );
     TPJobSetPriority( &job, MED_PRIORITY );
 
     //Schedule the job
@@ -177,7 +177,7 @@ ScheduleGenaAutoRenew( IN int client_handle,
                                              REL_SEC, &job, SHORT_TERM,
                                              &( RenewEvent->
                                                 eventId ) ) ) !=
-        UPNP_E_SUCCESS ) {
+        DLNA_E_SUCCESS ) {
         free( RenewEvent );
         free( RenewEventStruct );
         return return_code;
@@ -243,7 +243,7 @@ gena_unsubscribe( IN char *url,
         httpmsg_destroy( &response->msg );
 
     if( return_code == 0 && response->msg.status_code != HTTP_OK ) {
-        return_code = UPNP_E_UNSUBSCRIBE_UNACCEPTED;
+        return_code = DLNA_E_UNSUBSCRIBE_UNACCEPTED;
         httpmsg_destroy( &response->msg );
     }
 
@@ -286,7 +286,7 @@ gena_subscribe( IN char *url,
     // request timeout to string
     if ( timeout == NULL ) {
         timeout = (int *)malloc(sizeof(int));
-        if(timeout == 0) return  UPNP_E_OUTOF_MEMORY;
+        if(timeout == 0) return  DLNA_E_OUTOF_MEMORY;
         sprintf( timeout_str, "%d", CP_MINIMUM_SUBSCRIPTION_TIME );
     } else if( ( *timeout > 0 )&& ( *timeout < CP_MINIMUM_SUBSCRIPTION_TIME ) ) {
         sprintf( timeout_str, "%d", CP_MINIMUM_SUBSCRIPTION_TIME );
@@ -319,7 +319,7 @@ gena_subscribe( IN char *url,
             "q" "sssdsc" "sc" "sscc",
             HTTPMETHOD_SUBSCRIBE, &dest_url,
             "CALLBACK: <http://", LOCAL_HOST, ":", LOCAL_PORT, "/>",
-            "NT: upnp:event",
+            "NT: dlna:event",
 	    "TIMEOUT: Second-", timeout_str );
     }
     if( return_code != 0 ) {
@@ -340,7 +340,7 @@ gena_subscribe( IN char *url,
     }
     if( response.msg.status_code != HTTP_OK ) {
         httpmsg_destroy( &response.msg );
-        return UPNP_E_SUBSCRIBE_UNACCEPTED;
+        return DLNA_E_SUBSCRIBE_UNACCEPTED;
     }
     // get SID and TIMEOUT
     if( httpmsg_find_hdr( &response.msg, HDR_SID, &sid_hdr ) == NULL ||
@@ -349,7 +349,7 @@ gena_subscribe( IN char *url,
                           HDR_TIMEOUT, &timeout_hdr ) == NULL ||
         timeout_hdr.length == 0 ) {
         httpmsg_destroy( &response.msg );
-        return UPNP_E_BAD_RESPONSE;
+        return DLNA_E_BAD_RESPONSE;
     }
     // save timeout
     if( matchstr( timeout_hdr.buf, timeout_hdr.length, "%iSecond-%d%0",
@@ -359,25 +359,25 @@ gena_subscribe( IN char *url,
         *timeout = -1;
     } else {
         httpmsg_destroy( &response.msg );
-        return UPNP_E_BAD_RESPONSE;
+        return DLNA_E_BAD_RESPONSE;
     }
 
     // save SID
     *sid = str_alloc( sid_hdr.buf, sid_hdr.length );
     if( *sid == NULL ) {
         httpmsg_destroy( &response.msg );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     httpmsg_destroy( &response.msg );
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
 * Function : genaUnregisterClient
 *
 * Parameters:
-*	IN UpnpClient_Handle client_handle: Handle containing all the control
+*	IN dlnaClient_Handle client_handle: Handle containing all the control
 *			point related information
 *
 * Description:
@@ -386,13 +386,13 @@ gena_subscribe( IN char *url,
 *	unregisters.
 *
 * Returns: int
-*	return UPNP_E_SUCCESS if successful else returns appropriate error
+*	return DLNA_E_SUCCESS if successful else returns appropriate error
 ***************************************************************************/
 int
-genaUnregisterClient( IN UpnpClient_Handle client_handle )
+genaUnregisterClient( IN dlnaClient_Handle client_handle )
 {
     client_subscription sub_copy;
-    int return_code = UPNP_E_SUCCESS;
+    int return_code = DLNA_E_SUCCESS;
     struct Handle_Info *handle_info = NULL;
     http_parser_t response;
 
@@ -404,7 +404,7 @@ genaUnregisterClient( IN UpnpClient_Handle client_handle )
         }
 
         if( handle_info->ClientSubList == NULL ) {
-            return_code = UPNP_E_SUCCESS;
+            return_code = DLNA_E_SUCCESS;
             break;
         }
 
@@ -437,7 +437,7 @@ genaUnregisterClient( IN UpnpClient_Handle client_handle )
 * Function : genaUnSubscribe
 *
 * Parameters:
-*	IN UpnpClient_Handle client_handle: UPnP client handle
+*	IN dlnaClient_Handle client_handle: UPnP client handle
 *	IN SID in_sid: The subscription ID
 *
 * Description:
@@ -446,13 +446,13 @@ genaUnregisterClient( IN UpnpClient_Handle client_handle )
 *	to service processes request and finally removes the subscription
 *
 * Returns: int
-*	return UPNP_E_SUCCESS if service response is OK else 
+*	return DLNA_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 int
-genaUnSubscribe( IN UpnpClient_Handle client_handle,
-                 IN const Upnp_SID in_sid )
+genaUnSubscribe( IN dlnaClient_Handle client_handle,
+                 IN const dlna_SID in_sid )
 {
     client_subscription *sub;
     int return_code = GENA_SUCCESS;
@@ -508,13 +508,13 @@ genaUnSubscribe( IN UpnpClient_Handle client_handle,
 * Function : genaSubscribe
 *
 * Parameters:
-*	IN UpnpClient_Handle client_handle: 
+*	IN dlnaClient_Handle client_handle: 
 *	IN char * PublisherURL: NULL Terminated, of the form : 
 *						"http://134.134.156.80:4000/RedBulb/Event"
 *	INOUT int * TimeOut: requested Duration, if -1, then "infinite".
 *						in the OUT case: actual Duration granted 
 *						by Service, -1 for infinite
-*	OUT Upnp_SID out_sid:sid of subscription, memory passed in by caller
+*	OUT dlna_SID out_sid:sid of subscription, memory passed in by caller
 *
 * Description:
 *	This function subscribes to a PublisherURL ( also mentioned as EventURL
@@ -523,28 +523,28 @@ genaUnSubscribe( IN UpnpClient_Handle client_handle,
 *	the clients subscription list, if service responds with OK
 *
 * Returns: int
-*	return UPNP_E_SUCCESS if service response is OK else 
+*	return DLNA_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 int
-genaSubscribe( IN UpnpClient_Handle client_handle,
+genaSubscribe( IN dlnaClient_Handle client_handle,
                IN char *PublisherURL,
                INOUT int *TimeOut,
-               OUT Upnp_SID out_sid )
+               OUT dlna_SID out_sid )
 {
     int return_code = GENA_SUCCESS;
     client_subscription *newSubscription = NULL;
-    uuid_upnp uid;
-    Upnp_SID temp_sid;
+    uuid_dlna uid;
+    dlna_SID temp_sid;
     char *ActualSID = NULL;
     struct Handle_Info *handle_info;
     char *EventURL = NULL;
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "GENA SUBSCRIBE BEGIN" );
 
-    memset( out_sid, 0, sizeof( Upnp_SID ) );
+    memset( out_sid, 0, sizeof( dlna_SID ) );
 
     HandleReadLock();
     // validate handle
@@ -559,8 +559,8 @@ genaSubscribe( IN UpnpClient_Handle client_handle,
     return_code =
         gena_subscribe( PublisherURL, TimeOut, NULL, &ActualSID );
     HandleLock();
-    if( return_code != UPNP_E_SUCCESS ) {
-        UpnpPrintf( UPNP_CRITICAL, GENA, __FILE__, __LINE__,
+    if( return_code != DLNA_E_SUCCESS ) {
+        dlnaPrintf( DLNA_CRITICAL, GENA, __FILE__, __LINE__,
             "SUBSCRIBE FAILED in transfer error code: %d returned\n",
             return_code );
         goto error_handler;
@@ -578,7 +578,7 @@ genaSubscribe( IN UpnpClient_Handle client_handle,
     // create event url
     EventURL = ( char * )malloc( strlen( PublisherURL ) + 1 );
     if( EventURL == NULL ) {
-        return_code = UPNP_E_OUTOF_MEMORY;
+        return_code = DLNA_E_OUTOF_MEMORY;
         goto error_handler;
     }
 
@@ -588,7 +588,7 @@ genaSubscribe( IN UpnpClient_Handle client_handle,
     newSubscription =
         ( client_subscription * ) malloc( sizeof( client_subscription ) );
     if( newSubscription == NULL ) {
-        return_code = UPNP_E_OUTOF_MEMORY;
+        return_code = DLNA_E_OUTOF_MEMORY;
         goto error_handler;
     }
     newSubscription->EventURL = EventURL;
@@ -603,7 +603,7 @@ genaSubscribe( IN UpnpClient_Handle client_handle,
                                          newSubscription );
 
   error_handler:
-    if( return_code != UPNP_E_SUCCESS ) {
+    if( return_code != DLNA_E_SUCCESS ) {
         free( ActualSID );
         free( EventURL );
         free( newSubscription );
@@ -618,8 +618,8 @@ genaSubscribe( IN UpnpClient_Handle client_handle,
 * Function : genaRenewSubscription
 *
 * Parameters:
-*	IN UpnpClient_Handle client_handle: Client handle
-*	IN const Upnp_SID in_sid: subscription ID
+*	IN dlnaClient_Handle client_handle: Client handle
+*	IN const dlna_SID in_sid: subscription ID
 *	INOUT int * TimeOut: requested Duration, if -1, then "infinite".
 *						in the OUT case: actual Duration granted 
 *						by Service, -1 for infinite
@@ -631,12 +631,12 @@ genaSubscribe( IN UpnpClient_Handle client_handle,
 *	the response.
 *
 * Returns: int
-*	return UPNP_E_SUCCESS if service response is OK else 
+*	return DLNA_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
 int
-genaRenewSubscription( IN UpnpClient_Handle client_handle,
-                       IN const Upnp_SID in_sid,
+genaRenewSubscription( IN dlnaClient_Handle client_handle,
+                       IN const dlna_SID in_sid,
                        INOUT int *TimeOut )
 {
     int return_code = GENA_SUCCESS;
@@ -664,10 +664,10 @@ genaRenewSubscription( IN UpnpClient_Handle client_handle,
     if( TimerThreadRemove( &gTimerThread, sub->RenewEventId, &tempJob ) ==
         0 ) {
 
-        free_upnp_timeout( ( upnp_timeout * ) tempJob.arg );
+        free_dlna_timeout( ( dlna_timeout * ) tempJob.arg );
     }
 
-    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
         "REMOVED AUTO RENEW  EVENT" );
 
     sub->RenewEventId = -1;
@@ -685,7 +685,7 @@ genaRenewSubscription( IN UpnpClient_Handle client_handle,
 
     if( GetHandleInfo( client_handle, &handle_info ) != HND_CLIENT ) {
         HandleUnlock();
-        if( return_code == UPNP_E_SUCCESS ) {
+        if( return_code == DLNA_E_SUCCESS ) {
             free( ActualSID );
         }
         return GENA_E_BAD_HANDLE;
@@ -693,7 +693,7 @@ genaRenewSubscription( IN UpnpClient_Handle client_handle,
     // we just called GetHandleInfo, so we don't check for return value
     //GetHandleInfo(client_handle, &handle_info);
 
-    if( return_code != UPNP_E_SUCCESS ) {
+    if( return_code != DLNA_E_SUCCESS ) {
         // network failure (remove client sub)
         RemoveClientSubClientSID( &handle_info->ClientSubList, in_sid );
         free_client_subscription( &sub_copy );
@@ -743,15 +743,15 @@ void
 gena_process_notification_event( IN SOCKINFO * info,
                                  IN http_message_t * event )
 {
-    struct Upnp_Event event_struct;
+    struct dlna_Event event_struct;
     int eventKey;
     token sid;
     client_subscription *subscription;
     IXML_Document *ChangedVars;
     struct Handle_Info *handle_info;
     void *cookie;
-    Upnp_FunPtr callback;
-    UpnpClient_Handle client_handle;
+    dlna_FunPtr callback;
+    dlnaClient_Handle client_handle;
 
     memptr sid_hdr;
     memptr nt_hdr,
@@ -783,8 +783,8 @@ gena_process_notification_event( IN SOCKINFO * info,
         return;
     }
     // verify NT and NTS headers
-    if( memptr_cmp( &nt_hdr, "upnp:event" ) != 0 ||
-        memptr_cmp( &nts_hdr, "upnp:propchange" ) != 0 ) {
+    if( memptr_cmp( &nt_hdr, "dlna:event" ) != 0 ||
+        memptr_cmp( &nts_hdr, "dlna:propchange" ) != 0 ) {
         error_respond( info, HTTP_PRECONDITION_FAILED, event );
 
         return;
@@ -874,7 +874,7 @@ gena_process_notification_event( IN SOCKINFO * info,
     // In future, should find a way of mainting
     // that the handle is not unregistered in the middle of a
     // callback
-    callback( UPNP_EVENT_RECEIVED, &event_struct, cookie );
+    callback( DLNA_EVENT_RECEIVED, &event_struct, cookie );
 
     ixmlDocument_free( ChangedVars );
 }

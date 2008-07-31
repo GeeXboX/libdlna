@@ -1,4 +1,4 @@
-/* upnp/inc/upnpconfig.h.  Generated from upnpconfig.h.in by configure.  */
+/* dlna/inc/dlnaconfig.h.  Generated from dlnaconfig.h.in by configure.  */
 // -*- C -*-
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -31,8 +31,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef UPNP_CONFIG_H
-#define UPNP_CONFIG_H 
+#ifndef DLNA_CONFIG_H
+#define DLNA_CONFIG_H 
 
 
 /***************************************************************************
@@ -40,20 +40,20 @@
  ***************************************************************************/ 
 
 /** The library version (string) e.g. "1.6.3" */
-#define UPNP_VERSION_STRING "1.6.3"
+#define DLNA_VERSION_STRING "1.6.3"
 
 /** Major version of the library */
-#define UPNP_VERSION_MAJOR 1
+#define DLNA_VERSION_MAJOR 1
 
 /** Minor version of the library */
-#define UPNP_VERSION_MINOR 6
+#define DLNA_VERSION_MINOR 6
 
 /** Patch version of the library */
-#define UPNP_VERSION_PATCH 3
+#define DLNA_VERSION_PATCH 3
 
 /** The library version (numeric) e.g. 10300 means version 1.3.0 */
-#define UPNP_VERSION	\
-  ((UPNP_VERSION_MAJOR*100 + UPNP_VERSION_MINOR)*100 + UPNP_VERSION_PATCH)
+#define DLNA_VERSION	\
+  ((DLNA_VERSION_MAJOR*100 + DLNA_VERSION_MINOR)*100 + DLNA_VERSION_PATCH)
 
 
 
@@ -68,30 +68,30 @@
 
 
 /** Defined to 1 if the library has been compiled with DEBUG enabled 
- *  (i.e. configure --enable-debug) : <upnp/upnpdebug.h> file is available */
-/* #undef UPNP_HAVE_DEBUG */
+ *  (i.e. configure --enable-debug) : <dlna/dlnadebug.h> file is available */
+/* #undef DLNA_HAVE_DEBUG */
 
 
 /** Defined to 1 if the library has been compiled with client API enabled 
  *  (i.e. configure --enable-client) */
-#define UPNP_HAVE_CLIENT 1
+#define DLNA_HAVE_CLIENT 1
 
 
 /** Defined to 1 if the library has been compiled with device API enabled 
  *  (i.e. configure --enable-device) */
-#define UPNP_HAVE_DEVICE 1
+#define DLNA_HAVE_DEVICE 1
 
 
 /** Defined to 1 if the library has been compiled with integrated web server
  *  (i.e. configure --enable-webserver --enable-device) */
-#define UPNP_HAVE_WEBSERVER 1
+#define DLNA_HAVE_WEBSERVER 1
 
 
 /** Defined to 1 if the library has been compiled with helper API
- *  (i.e. configure --enable-tools) : <upnp/upnptools.h> file is available */
-#define UPNP_HAVE_TOOLS 1
+ *  (i.e. configure --enable-tools) : <dlna/dlnatools.h> file is available */
+#define DLNA_HAVE_TOOLS 1
 
 
-#endif // UPNP_CONFIG_H
+#endif // DLNA_CONFIG_H
 
 

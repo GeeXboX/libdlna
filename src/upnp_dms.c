@@ -26,7 +26,7 @@
 #include "dlna_internals.h"
 #include "upnp_internals.h"
 
-#define UPNP_DMS_DESCRIPTION_HEADER \
+#define DLNA_DMS_DESCRIPTION_HEADER \
 "<?xml version=\"1.0\" encoding=\"utf-8\"?>" \
 "<root xmlns=\"urn:schemas-upnp-org:device-1-0\">" \
 "  <specVersion>" \
@@ -48,12 +48,12 @@
 "    <dlna:X_DLNADOC xmlns:dlna=\"urn:schemas-dlna-org:device-1-0\">DMS-1.00</dlna:X_DLNADOC>" \
 "    <serviceList>"
 
-#define UPNP_DMS_DESCRIPTION_FOOTER \
+#define DLNA_DMS_DESCRIPTION_FOOTER \
 "    </serviceList>" \
 "  </device>" \
 "</root>"
 
-#define UPNP_SERVICE_DESCRIPTION \
+#define DLNA_SERVICE_DESCRIPTION \
 "      <service>" \
 "        <serviceType>%s</serviceType>" \
 "        <serviceId>%s</serviceId>" \
@@ -83,7 +83,7 @@ dlna_dms_description_get (dlna_t *dlna)
 
   b = buffer_new ();
   
-  buffer_appendf (b, UPNP_DMS_DESCRIPTION_HEADER, dlna->friendly_name,
+  buffer_appendf (b, DLNA_DMS_DESCRIPTION_HEADER, dlna->friendly_name,
                   dlna->manufacturer, dlna->manufacturer_url,
                   dlna->model_description, model_name,
                   dlna->model_number, dlna->model_url,
@@ -93,13 +93,13 @@ dlna_dms_description_get (dlna_t *dlna)
   free (model_name);
   
   for (service = dlna->services; service; service = service->hh.next)
-    buffer_appendf (b, UPNP_SERVICE_DESCRIPTION,
+    buffer_appendf (b, DLNA_SERVICE_DESCRIPTION,
                     service->type, service->id,
                     SERVICES_VIRTUAL_DIR, service->scpd_url,
                     SERVICES_VIRTUAL_DIR, service->control_url,
                     SERVICES_VIRTUAL_DIR, service->event_url);
 
-  buffer_append (b, UPNP_DMS_DESCRIPTION_FOOTER);
+  buffer_append (b, DLNA_DMS_DESCRIPTION_FOOTER);
 
   desc = strdup (b->buf);
   buffer_free (b);

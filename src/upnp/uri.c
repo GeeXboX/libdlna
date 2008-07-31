@@ -289,7 +289,7 @@ copy_token( const token * in,
 *
 *	Return : int ;
 *		HTTP_SUCCESS - On Success
-*		UPNP_E_OUTOF_MEMORY - On Failure to allocate memory
+*		DLNA_E_OUTOF_MEMORY - On Failure to allocate memory
 *
 *	Note :
 ************************************************************************/
@@ -309,7 +309,7 @@ copy_URL_list( URL_list * in,
         ( uri_type * ) malloc( sizeof( uri_type ) * in->size );
 
     if( ( out->URLs == NULL ) || ( out->parsedURLs == NULL ) )
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
 
     memcpy( out->URLs, in->URLs, len );
 
@@ -588,7 +588,7 @@ parse_hostport( const char *in,
                                            &in[begin_port],
                                            &out->IPv4address.sin_port ) ) )
         {
-            return UPNP_E_INVALID_URL;
+            return DLNA_E_INVALID_URL;
         }
         hostport_size += begin_port;
     } else
@@ -598,7 +598,7 @@ parse_hostport( const char *in,
     temp_host_name = ( char * )malloc( host_size + 1 );
 
     if( temp_host_name == NULL )
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
 
     memcpy( temp_host_name, in, host_size );
     temp_host_name[host_size] = '\0';
@@ -617,7 +617,7 @@ parse_hostport( const char *in,
             out->IPv4address.sin_family = AF_INET;
             free( temp_host_name );
             temp_host_name = NULL;
-            return UPNP_E_INVALID_URL;
+            return DLNA_E_INVALID_URL;
         }
     } else {
         int errCode = 0;
@@ -695,7 +695,7 @@ parse_hostport( const char *in,
             out->IPv4address.sin_family = AF_INET;
             free( temp_host_name );
             temp_host_name = NULL;
-            return UPNP_E_INVALID_URL;
+            return DLNA_E_INVALID_URL;
         }
     }
 
@@ -773,7 +773,7 @@ parse_scheme( const char *in,
 *		(shortened). Extra characters are replaced with NULL.
 *
 *	Return : int ;
-*		UPNP_E_SUCCESS
+*		DLNA_E_SUCCESS
 *
 *	Note :
 ************************************************************************/
@@ -786,7 +786,7 @@ remove_escaped_chars( INOUT char *in,
     for( i = 0; i < *size; i++ ) {
         replace_escaped( in, i, size );
     }
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -802,19 +802,19 @@ remove_escaped_chars( INOUT char *in,
 *		error is returned. The input IS modified in place.)
 *
 *	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_OUTOF_MEMORY - On failure to allocate memory
-*		UPNP_E_INVALID_URL - Failure to resolve URL
+*		DLNA_E_SUCCESS - On Success
+*		DLNA_E_OUTOF_MEMORY - On failure to allocate memory
+*		DLNA_E_INVALID_URL - Failure to resolve URL
 *
 *	Note :
 *		Examples
 *       char path[30]="/../hello";
-*       remove_dots(path, strlen(path)) -> UPNP_E_INVALID_URL
+*       remove_dots(path, strlen(path)) -> DLNA_E_INVALID_URL
 *       char path[30]="/./hello";
-*       remove_dots(path, strlen(path)) -> UPNP_E_SUCCESS, 
+*       remove_dots(path, strlen(path)) -> DLNA_E_SUCCESS, 
 *       in = "/hello"
 *       char path[30]="/./hello/foo/../goodbye" -> 
-*       UPNP_E_SUCCESS, in = "/hello/goodbye"
+*       DLNA_E_SUCCESS, in = "/hello/goodbye"
 
 ************************************************************************/
 int
@@ -830,10 +830,10 @@ remove_dots( char *in,
     Segments = malloc( sizeof( char * ) * size );
 
     if( Segments == NULL )
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
 
     Segments[0] = NULL;
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
         "REMOVE_DOTS: before: %s\n", in );
     while( ( copyFrom < max ) && ( *copyFrom != '?' )
            && ( *copyFrom != '#' ) ) {
@@ -855,7 +855,7 @@ remove_dots( char *in,
                 } else {
                     free( Segments );
                     //TRACE("ERROR RESOLVING URL, ../ at ROOT");
-                    return UPNP_E_INVALID_URL;
+                    return DLNA_E_INVALID_URL;
                 }
                 continue;
             }
@@ -879,9 +879,9 @@ remove_dots( char *in,
     }
     ( *copyTo ) = 0;
     free( Segments );
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
         "REMOVE_DOTS: after: %s\n", in );
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -993,7 +993,7 @@ resolve_rel_url( char *base_url,
                             strcpy( last_slash, rel_url );
                             if( remove_dots( out_finger,
                                              strlen( out_finger ) ) !=
-                                UPNP_E_SUCCESS ) {
+                                DLNA_E_SUCCESS ) {
                                 free( out );
                                 //free(rel_url);
                                 return NULL;

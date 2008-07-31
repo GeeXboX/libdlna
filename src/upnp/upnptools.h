@@ -44,45 +44,45 @@
 #include "upnp.h"
 
 /* Function declarations only if tools compiled into the library */
-#if UPNP_HAVE_TOOLS
+#if DLNA_HAVE_TOOLS
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** {\bf UpnpResolveURL} combines a base URL and a relative URL into
+/** {\bf dlnaResolveURL} combines a base URL and a relative URL into
  *  a single absolute URL.  The memory for {\bf AbsURL} needs to be
  *  allocated by the caller and must be large enough to hold the
  *  {\bf BaseURL} and {\bf RelURL} combined.
  *
  *  @return [int] An integer representing one of the following:
  *    \begin{itemize}
- *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
- *      \item {\tt UPNP_E_INVALID_PARAM}: {\bf RelURL} is {\tt NULL}.
- *      \item {\tt UPNP_E_INVALID_URL}: The {\bf BaseURL} / {\bf RelURL} 
+ *      \item {\tt DLNA_E_SUCCESS}: The operation completed successfully.
+ *      \item {\tt DLNA_E_INVALID_PARAM}: {\bf RelURL} is {\tt NULL}.
+ *      \item {\tt DLNA_E_INVALID_URL}: The {\bf BaseURL} / {\bf RelURL} 
  *              combination does not form a valid URL.
- *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
+ *      \item {\tt DLNA_E_OUTOF_MEMORY}: Insufficient resources exist to 
  *              complete this operation.
  *    \end{itemize}
  */
 
-EXPORT_SPEC int UpnpResolveURL(
+EXPORT_SPEC int dlnaResolveURL(
     IN const char * BaseURL,  /** The base URL to combine. */
     IN const char * RelURL,   /** The relative URL to {\bf BaseURL}. */
     OUT char * AbsURL   /** A pointer to a buffer to store the 
                             absolute URL. */
     );
 
-/** {\bf UpnpMakeAction} creates an action request packet based on its input 
+/** {\bf dlnaMakeAction} creates an action request packet based on its input 
  *  parameters (status variable name and value pair). Any number of input 
  *  parameters can be passed to this function but every input variable name 
  *  should have a matching value argument. 
  *   
- *  @return [IXML_Document*] The action node of {\bf Upnp_Document} type or 
+ *  @return [IXML_Document*] The action node of {\bf dlna_Document} type or 
  *                      {\tt NULL} if the operation failed.
  */
 
-EXPORT_SPEC IXML_Document* UpnpMakeAction(
+EXPORT_SPEC IXML_Document* dlnaMakeAction(
     IN const char * ActionName, /** The action name. */
     IN const char * ServType,   /** The service type.  */
     IN int NumArg,              /** Number of argument pairs to be passed. */ 
@@ -90,24 +90,24 @@ EXPORT_SPEC IXML_Document* UpnpMakeAction(
     IN ...                   /*  Other status variable name and value pairs. */
     );
 
-/** {\bf UpnpAddToAction} creates an action request packet based on its input 
+/** {\bf dlnaAddToAction} creates an action request packet based on its input 
  *  parameters (status variable name and value pair). This API is specially 
  *  suitable inside a loop to add any number input parameters into an existing
  *  action. If no action document exists in the beginning then a 
- *  {\bf Upnp_Document} variable initialized with {\tt NULL} should be passed 
+ *  {\bf dlna_Document} variable initialized with {\tt NULL} should be passed 
  *  as a parameter.
  *
  *  @return [int] An integer representing one of the following:
  *    \begin{itemize}
- *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
- *      \item {\tt UPNP_E_INVALID_PARAM}: One or more of the parameters 
+ *      \item {\tt DLNA_E_SUCCESS}: The operation completed successfully.
+ *      \item {\tt DLNA_E_INVALID_PARAM}: One or more of the parameters 
  *                                        are invalid.
- *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
+ *      \item {\tt DLNA_E_OUTOF_MEMORY}: Insufficient resources exist to 
  *              complete this operation.
  *    \end{itemize}
  */
 
-EXPORT_SPEC int UpnpAddToAction(
+EXPORT_SPEC int dlnaAddToAction(
         IN OUT IXML_Document ** ActionDoc, 
 	                              /** A pointer to store the action 
 				          document node. */
@@ -117,16 +117,16 @@ EXPORT_SPEC int UpnpAddToAction(
         IN const char * ArgVal        /** The status variable value.  */
         );
 
-/** {\bf UpnpMakeActionResponse} creates an action response packet based 
+/** {\bf dlnaMakeActionResponse} creates an action response packet based 
  *  on its output parameters (status variable name and value pair). Any  
  *  number of input parameters can be passed to this function but every output
  *  variable name should have a matching value argument. 
  *   
- *  @return [IXML_Document*] The action node of {\bf Upnp_Document} type or 
+ *  @return [IXML_Document*] The action node of {\bf dlna_Document} type or 
  *                           {\tt NULL} if the operation failed.
  */
 
-EXPORT_SPEC IXML_Document* UpnpMakeActionResponse(
+EXPORT_SPEC IXML_Document* dlnaMakeActionResponse(
     IN const char * ActionName, /** The action name. */
     IN const char * ServType,   /** The service type.  */
     IN int NumArg,              /** The number of argument pairs passed. */  
@@ -134,25 +134,25 @@ EXPORT_SPEC IXML_Document* UpnpMakeActionResponse(
     IN ...                   /*  Other status variable name and value pairs. */
     );
 
-/** {\bf UpnpAddToActionResponse} creates an action response
+/** {\bf dlnaAddToActionResponse} creates an action response
  *  packet based on its output parameters (status variable name
  *  and value pair). This API is especially suitable inside
  *  a loop to add any number of input parameters into an existing action 
  *  response. If no action document exists in the beginning, a 
- *  {\bf Upnp_Document} variable initialized with {\tt NULL} should be passed 
+ *  {\bf dlna_Document} variable initialized with {\tt NULL} should be passed 
  *  as a parameter.
  *
  *  @return [int] An integer representing one of the following:
  *    \begin{itemize}
- *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
- *      \item {\tt UPNP_E_INVALID_PARAM}: One or more of the parameters 
+ *      \item {\tt DLNA_E_SUCCESS}: The operation completed successfully.
+ *      \item {\tt DLNA_E_INVALID_PARAM}: One or more of the parameters 
  *                                        are invalid.
- *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
+ *      \item {\tt DLNA_E_OUTOF_MEMORY}: Insufficient resources exist to 
  *              complete this operation.
  *    \end{itemize}
  */
 
-EXPORT_SPEC int UpnpAddToActionResponse(
+EXPORT_SPEC int dlnaAddToActionResponse(
         IN OUT IXML_Document ** ActionResponse, 
 	                                   /** Pointer to a document to 
 					       store the action document 
@@ -163,7 +163,7 @@ EXPORT_SPEC int UpnpAddToActionResponse(
         IN const char * ArgVal             /** The status variable value.  */
         );
 
-/** {\bf UpnpAddToPropertySet} can be used when an application needs to 
+/** {\bf dlnaAddToPropertySet} can be used when an application needs to 
  *  transfer the status of many variables at once. It can be used 
  *  (inside a loop) to add some extra status variables into an existing
  *  property set. If the application does not already have a property
@@ -172,16 +172,16 @@ EXPORT_SPEC int UpnpAddToActionResponse(
  *  
  *  @return [int] An integer representing one of the following:
  *    \begin{itemize}
- *      \item {\tt UPNP_E_SUCCESS}: The operation completed successfully.
- *      \item {\tt UPNP_E_INVALID_PARAM}: One or more of the parameters 
+ *      \item {\tt DLNA_E_SUCCESS}: The operation completed successfully.
+ *      \item {\tt DLNA_E_INVALID_PARAM}: One or more of the parameters 
  *                                        are invalid.
- *      \item {\tt UPNP_E_OUTOF_MEMORY}: Insufficient resources exist to 
+ *      \item {\tt DLNA_E_OUTOF_MEMORY}: Insufficient resources exist to 
  *              complete this operation.
  *    \end{itemize}
  *
  */
 
-EXPORT_SPEC int UpnpAddToPropertySet(
+EXPORT_SPEC int dlnaAddToPropertySet(
     IN OUT IXML_Document **PropSet,    
                                   /** A pointer to the document containing 
 				      the property set document node. */
@@ -189,7 +189,7 @@ EXPORT_SPEC int UpnpAddToPropertySet(
     IN const char * ArgVal        /** The status variable value.  */
     );
 
-/** {\bf UpnpCreatePropertySet} creates a property set  
+/** {\bf dlnaCreatePropertySet} creates a property set  
  *  message packet. Any number of input parameters can be passed  
  *  to this function but every input variable name should have 
  *  a matching value input argument.
@@ -199,13 +199,13 @@ EXPORT_SPEC int UpnpAddToPropertySet(
  *
  */
 
-EXPORT_SPEC IXML_Document* UpnpCreatePropertySet(
+EXPORT_SPEC IXML_Document* dlnaCreatePropertySet(
     IN int NumArg,        /** The number of argument pairs passed. */
     IN const char* Arg,   /** The status variable name and value pair. */
     IN ...
     );
 
-/** {\bf UpnpGetErrorMessage} converts an SDK error code into a 
+/** {\bf dlnaGetErrorMessage} converts an SDK error code into a 
  *  string error message suitable for display.  The memory returned
  *  from this function should NOT be freed.
  *
@@ -213,7 +213,7 @@ EXPORT_SPEC IXML_Document* UpnpCreatePropertySet(
  *                  associated with the error code. 
  */
 
-EXPORT_SPEC const char * UpnpGetErrorMessage(
+EXPORT_SPEC const char * dlnaGetErrorMessage(
         int errorcode  /** The SDK error code to convert. */
         );
 

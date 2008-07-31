@@ -50,7 +50,7 @@ extern "C" {
 #ifdef INCLUDE_DEVICE_APIS
 
 typedef struct SUBSCRIPTION {
-  Upnp_SID sid;
+  dlna_SID sid;
   int eventKey;
   int ToSendEventKey;
   time_t expireTime;
@@ -103,41 +103,41 @@ int copy_subscription(subscription *in, subscription *out);
 *	Function :	RemoveSubscriptionSID
 *
 *	Parameters :
-*		Upnp_SID sid ;	subscription ID
+*		dlna_SID sid ;	subscription ID
 *		service_info * service ;	service object providing the list of
 *						subscriptions
 *
 *	Description :	Remove the subscription represented by the
-*		const Upnp_SID sid parameter from the service table and update 
+*		const dlna_SID sid parameter from the service table and update 
 *		the service table.
 *
 *	Return : void ;
 *
 *	Note :
 ************************************************************************/
-void RemoveSubscriptionSID(Upnp_SID sid, service_info * service);
+void RemoveSubscriptionSID(dlna_SID sid, service_info * service);
 
 /************************************************************************
 *	Function :	GetSubscriptionSID
 *
 *	Parameters :
-*		Upnp_SID sid ;	subscription ID
+*		dlna_SID sid ;	subscription ID
 *		service_info * service ;	service object providing the list of
 *						subscriptions
 *
 *	Description :	Return the subscription from the service table 
-*		that matches const Upnp_SID sid value. 
+*		that matches const dlna_SID sid value. 
 *
 *	Return : subscription * - Pointer to the matching subscription 
 *		node;
 *
 *	Note :
 ************************************************************************/
-subscription * GetSubscriptionSID(Upnp_SID sid,service_info * service); 
+subscription * GetSubscriptionSID(dlna_SID sid,service_info * service); 
   
 //returns a pointer to the subscription with the SID, NULL if not found
 
-subscription * CheckSubscriptionSID(Upnp_SID sid,service_info * service);
+subscription * CheckSubscriptionSID(dlna_SID sid,service_info * service);
 
 //returns a pointer to the first subscription
 subscription * GetFirstSubscription(service_info *service);
@@ -254,7 +254,7 @@ service_info * FindServiceControlURLPath( service_table *table,
 *
 *	Parameters :
 *		service_info *service ;Service whose information is to be printed
-*		Upnp_LogLevel level ; Debug level specified to the print function
+*		dlna_LogLevel level ; Debug level specified to the print function
 *		Dbg_Module module ;	Debug module specified to the print function
 *
 *	Description :	For debugging purposes prints information from the 
@@ -267,13 +267,13 @@ service_info * FindServiceControlURLPath( service_table *table,
 #ifdef DEBUG
 void printService(
 	service_info *service,
-	Upnp_LogLevel level,
+	dlna_LogLevel level,
 	Dbg_Module module);
 #else
-static UPNP_INLINE void printService(
-	service_info *service upnp_unused,
-	Upnp_LogLevel level upnp_unused,
-	Dbg_Module module upnp_unused) {}
+static DLNA_INLINE void printService(
+	service_info *service dlna_unused,
+	dlna_LogLevel level dlna_unused,
+	Dbg_Module module dlna_unused) {}
 #endif
 
 /************************************************************************
@@ -281,7 +281,7 @@ static UPNP_INLINE void printService(
 *
 *	Parameters :
 *		service_info *service ;	Service whose information is to be printed
-*		Upnp_LogLevel level ;	Debug level specified to the print function
+*		dlna_LogLevel level ;	Debug level specified to the print function
 *		Dbg_Module module ;	Debug module specified to the print function
 *
 *	Description :	For debugging purposes prints information of each 
@@ -294,13 +294,13 @@ static UPNP_INLINE void printService(
 #ifdef DEBUG
 void printServiceList(
 	service_info *service,
-	Upnp_LogLevel level,
+	dlna_LogLevel level,
 	Dbg_Module module);
 #else
-static UPNP_INLINE void printServiceList(
-	service_info *service upnp_unused,
-	Upnp_LogLevel level upnp_unused,
-	Dbg_Module module upnp_unused) {}
+static DLNA_INLINE void printServiceList(
+	service_info *service dlna_unused,
+	dlna_LogLevel level dlna_unused,
+	Dbg_Module module dlna_unused) {}
 #endif
 
 /************************************************************************
@@ -308,7 +308,7 @@ static UPNP_INLINE void printServiceList(
 *
 *	Parameters :
 *		service_table * table ;	Service table to be printed
-*		Upnp_LogLevel level ;	Debug level specified to the print function
+*		dlna_LogLevel level ;	Debug level specified to the print function
 *		Dbg_Module module ;	Debug module specified to the print function
 *
 *	Description :	For debugging purposes prints the URL base of the table
@@ -322,13 +322,13 @@ static UPNP_INLINE void printServiceList(
 #ifdef DEBUG
 void printServiceTable(
 	service_table *table,
-	Upnp_LogLevel level,
+	dlna_LogLevel level,
 	Dbg_Module module);
 #else
-static UPNP_INLINE void printServiceTable(
-	service_table *table upnp_unused,
-	Upnp_LogLevel level upnp_unused,
-	Dbg_Module module upnp_unused) {}
+static DLNA_INLINE void printServiceTable(
+	service_table *table dlna_unused,
+	dlna_LogLevel level dlna_unused,
+	Dbg_Module module dlna_unused) {}
 #endif
 
 /************************************************************************

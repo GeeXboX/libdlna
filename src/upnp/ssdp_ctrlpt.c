@@ -72,7 +72,7 @@ send_search_result( IN void *data )
 {
     ResultData *temp = ( ResultData * ) data;
 
-    temp->ctrlpt_callback( UPNP_DISCOVERY_SEARCH_RESULT,
+    temp->ctrlpt_callback( DLNA_DISCOVERY_SEARCH_RESULT,
                            &temp->param, temp->cookie );
     free( temp );
 }
@@ -108,14 +108,14 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
     struct Handle_Info *ctrlpt_info = NULL;
     memptr hdr_value;
     xboolean is_byebye;         // byebye or alive
-    struct Upnp_Discovery param;
+    struct dlna_Discovery param;
     SsdpEvent event;
     xboolean nt_found,
       usn_found,
       st_found;
     char save_char;
-    Upnp_EventType event_type;
-    Upnp_FunPtr ctrlpt_callback;
+    dlna_EventType event_type;
+    dlna_FunPtr ctrlpt_callback;
     void *ctrlpt_cookie;
     ListNode *node = NULL;
     SsdpSearchArg *searchArg = NULL;
@@ -138,11 +138,11 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
 
     // search timeout
     if( timeout ) {
-        ctrlpt_callback( UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie );
+        ctrlpt_callback( DLNA_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie );
         return;
     }
 
-    param.ErrCode = UPNP_E_SUCCESS;
+    param.ErrCode = DLNA_E_SUCCESS;
 
     // MAX-AGE
     param.Expires = -1;         // assume error
@@ -235,7 +235,7 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
             if( !nt_found || !usn_found ) {
                 return;         // bad byebye
             }
-            event_type = UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE;
+            event_type = DLNA_DISCOVERY_ADVERTISEMENT_BYEBYE;
         } else {
             // check advertisement      
             // .Expires is valid if positive. This is for testing
@@ -246,7 +246,7 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
                 return;         // bad advertisement
             }
 
-            event_type = UPNP_DISCOVERY_ADVERTISEMENT_ALIVE;
+            event_type = DLNA_DISCOVERY_ADVERTISEMENT_ALIVE;
         }
 
         // call callback
@@ -345,7 +345,7 @@ ssdp_handle_ctrlpt_msg( IN http_message_t * hmsg,
         }
 
         HandleUnlock();
-        //ctrlpt_callback( UPNP_DISCOVERY_SEARCH_RESULT, &param, cookie );
+        //ctrlpt_callback( DLNA_DISCOVERY_SEARCH_RESULT, &param, cookie );
     }
 }
 
@@ -414,7 +414,7 @@ searchExpired( void *arg )
     //remove search Target from list and call client back
     ListNode *node = NULL;
     SsdpSearchArg *item;
-    Upnp_FunPtr ctrlpt_callback;
+    dlna_FunPtr ctrlpt_callback;
     void *cookie = NULL;
     int found = 0;
 
@@ -448,7 +448,7 @@ searchExpired( void *arg )
     HandleUnlock();
 
     if( found ) {
-        ctrlpt_callback( UPNP_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie );
+        ctrlpt_callback( DLNA_DISCOVERY_SEARCH_TIMEOUT, NULL, cookie );
     }
 
     free( id );
@@ -491,14 +491,14 @@ SearchByTarget( IN int Mx,
 
     requestType = ssdp_request_type1( St );
     if( requestType == SSDP_SERROR ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     ReqBuf = ( char * )malloc( BUFSIZE );
     if( ReqBuf == NULL )
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
 
-    UpnpPrintf(UPNP_INFO, SSDP, __FILE__, __LINE__, ">>> SSDP SEND >>>\n");
+    dlnaPrintf(DLNA_INFO, SSDP, __FILE__, __LINE__, ">>> SSDP SEND >>>\n");
 
     timeTillRead = Mx;
 
@@ -523,7 +523,7 @@ SearchByTarget( IN int Mx,
     if( GetClientHandleInfo( &handle, &ctrlpt_info ) != HND_CLIENT ) {
         HandleUnlock();
         free( ReqBuf );
-        return UPNP_E_INTERNAL_ERROR;
+        return DLNA_E_INTERNAL_ERROR;
     }
 
     newArg = ( SsdpSearchArg * ) malloc( sizeof( SsdpSearchArg ) );
@@ -548,27 +548,27 @@ SearchByTarget( IN int Mx,
                 ( char * )&addr, sizeof( addr ) );
 
     if( select( gSsdpReqSocket + 1, NULL, &wrSet, NULL, NULL )
-        == UPNP_SOCKETERROR ) {
+        == DLNA_SOCKETERROR ) {
         if( errno == EBADF ) {
-            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_INFO, SSDP, __FILE__, __LINE__,
                 "SSDP_LIB :RequestHandler:An invalid file descriptor"
                 " was givenin one of the sets. \n" );
         } else if( errno == EINTR ) {
-            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_INFO, SSDP, __FILE__, __LINE__,
                 "SSDP_LIB :RequestHandler:  A non blocked "
                 "signal was caught.    \n" );
         } else if( errno == EINVAL ) {
-            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_INFO, SSDP, __FILE__, __LINE__,
                 "SSDP_LIB :RequestHandler: n is negative.  \n" );
         } else if( errno == ENOMEM ) {
-            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_INFO, SSDP, __FILE__, __LINE__,
                 "SSDP_LIB : RequestHandler:select was unable to "
                 "allocate memory for internal tables.\n" );
         }
 	shutdown( gSsdpReqSocket, SD_BOTH );
-        UpnpCloseSocket( gSsdpReqSocket );
+        dlnaCloseSocket( gSsdpReqSocket );
         free( ReqBuf );
-        return UPNP_E_INTERNAL_ERROR;
+        return DLNA_E_INTERNAL_ERROR;
     } else if( FD_ISSET( gSsdpReqSocket, &wrSet ) ) {
         int NumCopy = 0;
 

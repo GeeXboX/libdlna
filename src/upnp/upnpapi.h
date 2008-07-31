@@ -29,10 +29,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-// File : upnpapi.h
+// File : dlnaapi.h
 
-#ifndef UPNPDK_H
-#define UPNPDK_H
+#ifndef DLNADK_H
+#define DLNADK_H
 
 #include "upnp.h"
 #include "client_table.h"
@@ -60,15 +60,15 @@
 extern size_t g_maxContentLength;
 
 // 30-second timeout
-#define UPNP_TIMEOUT	30
+#define DLNA_TIMEOUT	30
 
-typedef enum {HND_INVALID=-1,HND_CLIENT,HND_DEVICE} Upnp_Handle_Type;
+typedef enum {HND_INVALID=-1,HND_CLIENT,HND_DEVICE} dlna_Handle_Type;
 
 // Data to be stored in handle table for
 struct Handle_Info
 {
-    Upnp_Handle_Type HType;
-    Upnp_FunPtr  Callback; // Callback function pointer.
+    dlna_Handle_Type HType;
+    dlna_FunPtr  Callback; // Callback function pointer.
     char * Cookie;
 
     // Device Only
@@ -99,28 +99,28 @@ struct Handle_Info
 };
 
 extern ithread_rwlock_t GlobalHndRWLock;
-Upnp_Handle_Type GetHandleInfo(int Hnd, struct Handle_Info **HndInfo); 
+dlna_Handle_Type GetHandleInfo(int Hnd, struct Handle_Info **HndInfo); 
 
 #define HandleLock() HandleWriteLock()
 
 #define HandleWriteLock()  \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying a write lock"); \
+	dlnaPrintf(DLNA_INFO, API, __FILE__, __LINE__, "Trying a write lock"); \
 	ithread_rwlock_wrlock(&GlobalHndRWLock); \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Write lock acquired");
+	dlnaPrintf(DLNA_INFO, API, __FILE__, __LINE__, "Write lock acquired");
 
 #define HandleReadLock()  \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Trying a read lock"); \
+	dlnaPrintf(DLNA_INFO, API, __FILE__, __LINE__, "Trying a read lock"); \
 	ithread_rwlock_rdlock(&GlobalHndRWLock); \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Read lock acquired");
+	dlnaPrintf(DLNA_INFO, API, __FILE__, __LINE__, "Read lock acquired");
 
 #define HandleUnlock() \
-	UpnpPrintf(UPNP_INFO, API,__FILE__, __LINE__, "Trying Unlock"); \
+	dlnaPrintf(DLNA_INFO, API,__FILE__, __LINE__, "Trying Unlock"); \
 	ithread_rwlock_unlock(&GlobalHndRWLock); \
-	UpnpPrintf(UPNP_INFO, API, __FILE__, __LINE__, "Unlocked rwlock");
+	dlnaPrintf(DLNA_INFO, API, __FILE__, __LINE__, "Unlocked rwlock");
 
-Upnp_Handle_Type GetClientHandleInfo(int *client_handle_out, 
+dlna_Handle_Type GetClientHandleInfo(int *client_handle_out, 
                                      struct Handle_Info **HndInfo);
-Upnp_Handle_Type GetDeviceHandleInfo(int *device_handle_out, 
+dlna_Handle_Type GetDeviceHandleInfo(int *device_handle_out, 
                                      struct Handle_Info **HndInfo);
 
 
@@ -143,11 +143,11 @@ typedef enum {
     DEVDESCRIPTION,
     SERVDESCRIPTION,
     MINI,
-    RENEW} UpnpFunName;
+    RENEW} dlnaFunName;
 
-struct  UpnpNonblockParam 
+struct  dlnaNonblockParam 
 { 
-    UpnpFunName  FunName;
+    dlnaFunName  FunName;
     int   Handle;
     int   TimeOut;
     char  VarName[NAME_SIZE];
@@ -157,9 +157,9 @@ struct  UpnpNonblockParam
     char  ServiceType[NAME_SIZE];
     char  ServiceVer[NAME_SIZE];
     char  Url[NAME_SIZE];
-    Upnp_SID   SubsId;
+    dlna_SID   SubsId;
     char  *Cookie;
-    Upnp_FunPtr Fun;
+    dlna_FunPtr Fun;
 	IXML_Document *Header;
     IXML_Document *Act;
     struct DevDesc *Devdesc;
@@ -167,7 +167,7 @@ struct  UpnpNonblockParam
 
 
 extern virtualDirList *pVirtualDirList;
-extern struct UpnpVirtualDirCallbacks virtualDirCallback;
+extern struct dlnaVirtualDirCallbacks virtualDirCallback;
 
 
 typedef enum { WEB_SERVER_DISABLED, WEB_SERVER_ENABLED } WebServerState;
@@ -177,7 +177,7 @@ typedef enum { WEB_SERVER_DISABLED, WEB_SERVER_ENABLED } WebServerState;
 void InitHandleList();
 int GetFreeHandle();
 int FreeHandle(int Handle);
-void UpnpThreadDistribution(struct UpnpNonblockParam * Param);
+void dlnaThreadDistribution(struct dlnaNonblockParam * Param);
 
 
 void AutoAdvertise(void *input); 
@@ -189,4 +189,4 @@ extern WebServerState bWebServerState;
 
 
 
-/************************ END OF upnpapi.h **********************/
+/************************ END OF dlnaapi.h **********************/

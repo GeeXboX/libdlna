@@ -63,7 +63,7 @@
 *
 *	Note :
 ************************************************************************/
-static UPNP_INLINE void
+static DLNA_INLINE void
 addrToString( IN const struct sockaddr_in *addr,
               OUT char ipaddr_port[] )
 {
@@ -83,12 +83,12 @@ addrToString( IN const struct sockaddr_in *addr,
 *	Description : Determine alias based urlbase's root path.
 *
 *	Return : int ;
-*		UPNP_E_SUCCESS - On Success.
-*		UPNP_E_OUTOF_MEMORY - On Failure to allocate memory for new alias
+*		DLNA_E_SUCCESS - On Success.
+*		DLNA_E_OUTOF_MEMORY - On Failure to allocate memory for new alias
 *
 *	Note : 'newAlias' should be freed using free()
 ************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 calc_alias( IN const char *alias,
             IN const char *rootPath,
             OUT char **newAlias )
@@ -120,7 +120,7 @@ calc_alias( IN const char *alias,
     new_alias_len = root_len + strlen( temp_str ) + strlen( aliasPtr );
     alias_temp = ( char * )malloc( new_alias_len + 1 );
     if( alias_temp == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     strcpy( alias_temp, rootPath );
@@ -128,7 +128,7 @@ calc_alias( IN const char *alias,
     strcat( alias_temp, aliasPtr );
 
     *newAlias = alias_temp;
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -143,13 +143,13 @@ calc_alias( IN const char *alias,
 *	Description : Determines the description URL
 *
 *	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_URL_TOO_BIG - length of the URL is determined to be to
+*		DLNA_E_SUCCESS - On Success
+*		DLNA_E_URL_TOO_BIG - length of the URL is determined to be to
 *		exceeding the limit.
 *
 *	Note :
 ************************************************************************/
-static UPNP_INLINE int
+static DLNA_INLINE int
 calc_descURL( IN const char *ipPortStr,
               IN const char *alias,
               OUT char descURL[LINE_SIZE] )
@@ -163,16 +163,16 @@ calc_descURL( IN const char *ipPortStr,
     len = strlen( http_scheme ) + strlen( ipPortStr ) + strlen( alias );
 
     if( len > ( LINE_SIZE - 1 ) ) {
-        return UPNP_E_URL_TOO_BIG;
+        return DLNA_E_URL_TOO_BIG;
     }
     strcpy( descURL, http_scheme );
     strcat( descURL, ipPortStr );
     strcat( descURL, alias );
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
         "desc url: %s\n", descURL );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -193,10 +193,10 @@ calc_descURL( IN const char *ipPortStr,
 *		child nodes.
 *
 *	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_OUTOF_MEMORY - Default Error
-*		UPNP_E_INVALID_DESC - Invalid child node		
-*		UPNP_E_INVALID_URL - Invalid node information
+*		DLNA_E_SUCCESS - On Success
+*		DLNA_E_OUTOF_MEMORY - Default Error
+*		DLNA_E_INVALID_DESC - Invalid child node		
+*		DLNA_E_INVALID_URL - Invalid node information
 *
 *	Note :
 ************************************************************************/
@@ -223,7 +223,7 @@ config_description_doc( INOUT IXML_Document * doc,
     membuffer_init( &url_str );
     membuffer_init( &root_path );
 
-    err_code = UPNP_E_OUTOF_MEMORY; // default error
+    err_code = DLNA_E_OUTOF_MEMORY; // default error
 
     baseList = ixmlDocument_getElementsByTagName( doc, urlBaseStr );
     if( baseList == NULL ) {
@@ -243,7 +243,7 @@ config_description_doc( INOUT IXML_Document * doc,
 
         rootNode = ixmlNode_getFirstChild( ( IXML_Node * ) doc );
         if( rootNode == NULL ) {
-            err_code = UPNP_E_INVALID_DESC;
+            err_code = DLNA_E_INVALID_DESC;
             goto error_handler;
         }
 
@@ -272,19 +272,19 @@ config_description_doc( INOUT IXML_Document * doc,
 
         textNode = ixmlNode_getFirstChild( urlbase_node );
         if( textNode == NULL ) {
-            err_code = UPNP_E_INVALID_DESC;
+            err_code = DLNA_E_INVALID_DESC;
             goto error_handler;
         }
 
         domStr = ixmlNode_getNodeValue( textNode );
         if( domStr == NULL ) {
-            err_code = UPNP_E_INVALID_URL;
+            err_code = DLNA_E_INVALID_URL;
             goto error_handler;
         }
 
         len = parse_uri( domStr, strlen( domStr ), &uri );
         if( len < 0 || uri.type != ABSOLUTE ) {
-            err_code = UPNP_E_INVALID_URL;
+            err_code = DLNA_E_INVALID_URL;
             goto error_handler;
         }
 
@@ -324,10 +324,10 @@ config_description_doc( INOUT IXML_Document * doc,
     }
 
     *root_path_str = membuffer_detach( &root_path );    // return path
-    err_code = UPNP_E_SUCCESS;
+    err_code = DLNA_E_SUCCESS;
 
   error_handler:
-    if( err_code != UPNP_E_SUCCESS ) {
+    if( err_code != DLNA_E_SUCCESS ) {
         ixmlElement_free( newElement );
     }
 
@@ -364,8 +364,8 @@ config_description_doc( INOUT IXML_Document * doc,
 *		alias.
 *
 *	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_OUTOF_MEMORY - Default Error
+*		DLNA_E_SUCCESS - On Success
+*		DLNA_E_OUTOF_MEMORY - Default Error
 *
 *	Note :
 ************************************************************************/
@@ -382,24 +382,24 @@ configure_urlbase( INOUT IXML_Document * doc,
     int err_code;
     char ipaddr_port[LINE_SIZE];
 
-    err_code = UPNP_E_OUTOF_MEMORY; // default error
+    err_code = DLNA_E_OUTOF_MEMORY; // default error
 
     // get IP address and port
     addrToString( serverAddr, ipaddr_port );
 
     // config url-base in 'doc'
     err_code = config_description_doc( doc, ipaddr_port, &root_path );
-    if( err_code != UPNP_E_SUCCESS ) {
+    if( err_code != DLNA_E_SUCCESS ) {
         goto error_handler;
     }
     // calc alias
     err_code = calc_alias( alias, root_path, &new_alias );
-    if( err_code != UPNP_E_SUCCESS ) {
+    if( err_code != DLNA_E_SUCCESS ) {
         goto error_handler;
     }
     // calc full url for desc doc
     err_code = calc_descURL( ipaddr_port, new_alias, docURL );
-    if( err_code != UPNP_E_SUCCESS ) {
+    if( err_code != DLNA_E_SUCCESS ) {
         goto error_handler;
     }
     // xml doc to str
@@ -408,9 +408,9 @@ configure_urlbase( INOUT IXML_Document * doc,
         goto error_handler;
     }
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
         "desc url: %s\n", docURL );
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
         "doc = %s\n", xml_str );
     // store in web server
     err_code =
@@ -421,7 +421,7 @@ error_handler:
     free( root_path );
     free( new_alias );
 
-    if( err_code != UPNP_E_SUCCESS ) {
+    if( err_code != DLNA_E_SUCCESS ) {
         ixmlFreeDOMString( xml_str );
     }
     return err_code;

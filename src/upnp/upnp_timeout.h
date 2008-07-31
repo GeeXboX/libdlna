@@ -29,22 +29,22 @@
 //
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef _UPNPTIMEOUTH_
-#define _UPNPTIMEOUTH_
+#ifndef _DLNATIMEOUTH_
+#define _DLNATIMEOUTH_
 
-typedef struct UPNP_TIMEOUT {
+typedef struct DLNA_TIMEOUT {
   int EventType;
   int handle;
   int eventId;
   void *Event;
-} upnp_timeout;
+} dlna_timeout;
 
 
 /************************************************************************
-*	Function :	free_upnp_timeout
+*	Function :	free_dlna_timeout
 *
 *	Parameters :
-*		upnp_timeout *event ;	Event which needs to be freed
+*		dlna_timeout *event ;	Event which needs to be freed
 *
 *	Description : Free memory associated with event and memory for any 
 *		sub-elements 
@@ -53,6 +53,6 @@ typedef struct UPNP_TIMEOUT {
 *
 *	Note :
 ************************************************************************/
-void free_upnp_timeout(upnp_timeout *event);
+void free_dlna_timeout(dlna_timeout *event);
 
 #endif

@@ -68,9 +68,9 @@
 *		descriptor in the SOCKINFO structure.
 *
 *	Return : int;
-*		UPNP_E_SUCCESS	
-*		UPNP_E_OUTOF_MEMORY
-*		UPNP_E_SOCKET_ERROR
+*		DLNA_E_SUCCESS	
+*		DLNA_E_OUTOF_MEMORY
+*		DLNA_E_SOCKET_ERROR
 *
 *	Note :
 ************************************************************************/
@@ -84,7 +84,7 @@ sock_init( OUT SOCKINFO * info,
 
     info->socket = sockfd;
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -101,9 +101,9 @@ sock_init( OUT SOCKINFO * info,
 *		structure.
 *
 *	Return : int;
-*		UPNP_E_SUCCESS	
-*		UPNP_E_OUTOF_MEMORY
-*		UPNP_E_SOCKET_ERROR
+*		DLNA_E_SUCCESS	
+*		DLNA_E_OUTOF_MEMORY
+*		DLNA_E_SOCKET_ERROR
 *
 *	Note :
 ************************************************************************/
@@ -116,14 +116,14 @@ sock_init_with_ip( OUT SOCKINFO * info,
     int ret;
 
     ret = sock_init( info, sockfd );
-    if( ret != UPNP_E_SUCCESS ) {
+    if( ret != DLNA_E_SUCCESS ) {
         return ret;
     }
 
     info->foreign_ip_addr = foreign_ip_addr;
     info->foreign_ip_port = foreign_ip_port;
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -140,8 +140,8 @@ sock_init_with_ip( OUT SOCKINFO * info,
 *		to release system resources used by the socket calls.
 *
 *	Return : int;
-*		UPNP_E_SOCKET_ERROR on failure
-*		UPNP_E_SUCCESS on success
+*		DLNA_E_SOCKET_ERROR on failure
+*		DLNA_E_SUCCESS on success
 *
 *	Note :
 ************************************************************************/
@@ -150,11 +150,11 @@ sock_destroy( INOUT SOCKINFO * info,
               int ShutdownMethod )
 {
     shutdown( info->socket, ShutdownMethod );
-    if( UpnpCloseSocket( info->socket ) == -1 ) {
-        return UPNP_E_SOCKET_ERROR;
+    if( dlnaCloseSocket( info->socket ) == -1 ) {
+        return DLNA_E_SOCKET_ERROR;
     }
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -172,8 +172,8 @@ sock_destroy( INOUT SOCKINFO * info,
 *
 *	Return :int ;
 *		numBytes - On Success, no of bytes received or sent		
-*		UPNP_E_TIMEDOUT - Timeout
-*		UPNP_E_SOCKET_ERROR - Error on socket calls
+*		DLNA_E_TIMEDOUT - Timeout
+*		DLNA_E_SOCKET_ERROR - Error on socket calls
 *
 *	Note :
 ************************************************************************/
@@ -196,7 +196,7 @@ sock_read_write( IN SOCKINFO * info,
       num_written;
 
     if( *timeoutSecs < 0 ) {
-        return UPNP_E_TIMEDOUT;
+        return DLNA_E_TIMEDOUT;
     }
 
     FD_ZERO( &readSet );
@@ -220,12 +220,12 @@ sock_read_write( IN SOCKINFO * info,
         }
 
         if( retCode == 0 ) {
-            return UPNP_E_TIMEDOUT;
+            return DLNA_E_TIMEDOUT;
         }
         if( retCode == -1 ) {
             if( errno == EINTR )
                 continue;
-            return UPNP_E_SOCKET_ERROR; // error
+            return DLNA_E_SOCKET_ERROR; // error
         } else {
             break;              // read or write
         }
@@ -271,7 +271,7 @@ sock_read_write( IN SOCKINFO * info,
 #endif
 
     if( numBytes < 0 ) {
-        return UPNP_E_SOCKET_ERROR;
+        return DLNA_E_SOCKET_ERROR;
     }
     // subtract time used for reading/writing
     if( *timeoutSecs != 0 ) {

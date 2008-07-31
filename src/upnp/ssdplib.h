@@ -132,9 +132,9 @@ typedef Event SsdpEvent ;
 //Structure to contain Discovery response
 typedef struct resultData
 {
-  struct Upnp_Discovery param;
+  struct dlna_Discovery param;
   void *cookie;
-  Upnp_FunPtr ctrlpt_callback;
+  dlna_FunPtr ctrlpt_callback;
 }ResultData;
 
 
@@ -150,7 +150,7 @@ typedef struct TData
 typedef struct ssdpsearchreply
 {
   int MaxAge;
-  UpnpDevice_Handle handle;
+  dlnaDevice_Handle handle;
   struct sockaddr_in dest_addr;
   SsdpEvent event;
   
@@ -276,7 +276,7 @@ int unique_service_name(char * cmd, SsdpEvent * Evt);
 *	for multicast traffic.
 *
 * Returns: int
-*	return UPNP_E_SUCCESS if successful else returns appropriate error
+*	return DLNA_E_SUCCESS if successful else returns appropriate error
 ***************************************************************************/
 int get_ssdp_sockets(MiniServerSockArray *out);
 
@@ -362,7 +362,7 @@ int SearchByTarget(IN int Mx, IN char *St, IN void *Cookie);
 *	the input parameter, and send it to the multicast channel.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int DeviceAdvertisement(
 	IN char *DevType,
@@ -388,7 +388,7 @@ int DeviceAdvertisement(
 *	and sent it to the multicast channel through RequestHandler.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int DeviceShutdown(
 	IN char *DevType, 
@@ -414,7 +414,7 @@ int DeviceShutdown(
 *	and send it to the client address given in its input parameter DestAddr.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int DeviceReply(
 	IN struct sockaddr_in * DestAddr, 
@@ -441,7 +441,7 @@ int DeviceReply(
 *	and send it to the client addesss given in its input parameter DestAddr.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int SendReply(
 	IN struct sockaddr_in * DestAddr, 
@@ -466,7 +466,7 @@ int SendReply(
 *	on the input parameter, and send it to the multicast channel.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int ServiceAdvertisement(
 	IN char *Udn, 
@@ -490,7 +490,7 @@ int ServiceAdvertisement(
 *	on the input parameter, and send it to the multicast channel.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int ServiceReply(
 	IN struct sockaddr_in *DestAddr,  
@@ -513,7 +513,7 @@ int ServiceReply(
 *	and sent it to the multicast channel through RequestHandler.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int ServiceShutdown(
 	IN char *Udn,
@@ -544,7 +544,7 @@ void *advertiseAndReplyThread(IN void * data);
 *	IN int AdFlag: -1 = Send shutdown,
 *			0 = send reply, 
 *			1 = Send Advertisement
-*	IN UpnpDevice_Handle Hnd: Device handle
+*	IN dlnaDevice_Handle Hnd: Device handle
 *	IN enum SsdpSearchType SearchType:Search type for sending replies
 *	IN struct sockaddr_in *DestAddr:Destination address
 *	IN char *DeviceType:Device type
@@ -556,11 +556,11 @@ void *advertiseAndReplyThread(IN void * data);
 *	This function to send SSDP advertisements, replies and shutdown messages.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int AdvertiseAndReply(
 	IN int AdFlag, 
-	IN UpnpDevice_Handle Hnd, 
+	IN dlnaDevice_Handle Hnd, 
 	IN enum SsdpSearchType SearchType, 
 	IN struct sockaddr_in *DestAddr,
 	IN char *DeviceType, 

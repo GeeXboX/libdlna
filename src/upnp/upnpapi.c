@@ -109,7 +109,7 @@ CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
      void *HandleTable[NUM_HANDLE];
 
 //This structure is for virtual directory callbacks
-     struct UpnpVirtualDirCallbacks virtualDirCallback;
+     struct dlnaVirtualDirCallbacks virtualDirCallback;
 
 // a local dir which serves as webserver root
      extern membuffer gDocumentRootDir;
@@ -119,20 +119,20 @@ CLIENTONLY( ithread_mutex_t GlobalClientSubscribeMutex; )
 // (HTTP Error Code) will be returned to the remote end point.
 size_t g_maxContentLength = DEFAULT_SOAP_CONTENT_LENGTH; // in bytes
 
-// Global variable to denote the state of Upnp SDK 
+// Global variable to denote the state of dlna SDK 
 //    = 0 if uninitialized, = 1 if initialized.
-     int UpnpSdkInit = 0;
+     int dlnaSdkInit = 0;
 
-// Global variable to denote the state of Upnp SDK device registration.
+// Global variable to denote the state of dlna SDK device registration.
 // = 0 if unregistered, = 1 if registered.
-     int UpnpSdkDeviceRegistered = 0;
+     int dlnaSdkDeviceRegistered = 0;
 
-// Global variable to denote the state of Upnp SDK client registration.
+// Global variable to denote the state of dlna SDK client registration.
 // = 0 if unregistered, = 1 if registered.
-     int UpnpSdkClientRegistered = 0;
+     int dlnaSdkClientRegistered = 0;
 
 /****************************************************************************
- * Function: UpnpInit
+ * Function: dlnaInit
  *
  * Parameters:		
  *	IN const char * HostIP: Local IP Address
@@ -151,11 +151,11 @@ size_t g_maxContentLength = DEFAULT_SOAP_CONTENT_LENGTH; // in bytes
  *		- Starts the timer thread.
  *
  * Returns:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
- *	UPNP_E_INIT_FAILED if Initialization fails.
- *	UPNP_E_INIT if UPnP is already initialized
+ *	DLNA_E_SUCCESS on success, nonzero on failure.
+ *	DLNA_E_INIT_FAILED if Initialization fails.
+ *	DLNA_E_INIT if UPnP is already initialized
  *****************************************************************************/
-int UpnpInit( IN const char *HostIP,
+int dlnaInit( IN const char *HostIP,
               IN unsigned short DestPort )
 {
     int retVal = 0;
@@ -166,9 +166,9 @@ int UpnpInit( IN const char *HostIP,
 	int err;
 #endif
 
-    if( UpnpSdkInit == 1 ) {
+    if( dlnaSdkInit == 1 ) {
         // already initialized
-        return UPNP_E_INIT;
+        return DLNA_E_INIT;
     }
 
 #ifdef WIN32
@@ -178,7 +178,7 @@ int UpnpInit( IN const char *HostIP,
 	if ( err != 0 ) {
 		/* Tell the user that we could not find a usable */
 		/* WinSock DLL.                                  */
-		return UPNP_E_INIT_FAILED;
+		return DLNA_E_INIT_FAILED;
 	}
 
 	/* Confirm that the WinSock DLL supports 2.2.*/
@@ -192,7 +192,7 @@ int UpnpInit( IN const char *HostIP,
 		/* Tell the user that we could not find a usable */
 		/* WinSock DLL.                                  */
 		WSACleanup( );
-		return UPNP_E_INIT_FAILED; 
+		return DLNA_E_INIT_FAILED; 
 	}
 
 	/* The WinSock DLL is acceptable. Proceed. */
@@ -202,11 +202,11 @@ int UpnpInit( IN const char *HostIP,
 
     srand( time( NULL ) );      // needed by SSDP or other parts
 
-    if( UpnpInitLog() != UPNP_E_SUCCESS ) {
-             return UPNP_E_INIT_FAILED;
+    if( dlnaInitLog() != DLNA_E_SUCCESS ) {
+             return DLNA_E_INIT_FAILED;
     }
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Inside UpnpInit \n" );
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__, "Inside dlnaInit \n" );
     // initialize mutex
 #ifdef __CYGWIN__
         /* On Cygwin, pthread_mutex_init() fails without this memset. */
@@ -214,16 +214,16 @@ int UpnpInit( IN const char *HostIP,
         memset(&GlobalHndRWLock, 0, sizeof(GlobalHndRWLock));
 #endif
     if (ithread_rwlock_init(&GlobalHndRWLock, NULL) != 0) {
-        return UPNP_E_INIT_FAILED;
+        return DLNA_E_INIT_FAILED;
     }
 
     if (ithread_mutex_init(&gUUIDMutex, NULL) != 0) {
-        return UPNP_E_INIT_FAILED;
+        return DLNA_E_INIT_FAILED;
     }
     // initialize subscribe mutex
 #ifdef INCLUDE_CLIENT_APIS
     if (ithread_mutex_init(&GlobalClientSubscribeMutex, NULL) != 0) {
-        return UPNP_E_INIT_FAILED;
+        return DLNA_E_INIT_FAILED;
     }
 #endif
 
@@ -231,15 +231,15 @@ int UpnpInit( IN const char *HostIP,
     if( HostIP != NULL ) {
         strcpy( LOCAL_HOST, HostIP );
     } else {
-        if( getlocalhostname( LOCAL_HOST ) != UPNP_E_SUCCESS ) {
+        if( getlocalhostname( LOCAL_HOST ) != DLNA_E_SUCCESS ) {
             HandleUnlock();
-            return UPNP_E_INIT_FAILED;
+            return DLNA_E_INIT_FAILED;
         }
     }
 
-    if( UpnpSdkInit != 0 ) {
+    if( dlnaSdkInit != 0 ) {
         HandleUnlock();
-        return UPNP_E_INIT;
+        return DLNA_E_INIT;
     }
 
     InitHandleList();
@@ -252,27 +252,27 @@ int UpnpInit( IN const char *HostIP,
     TPAttrSetIdleTime( &attr, THREAD_IDLE_TIME );
     TPAttrSetMaxJobsTotal( &attr, MAX_JOBS_TOTAL );
 
-    if( ThreadPoolInit( &gSendThreadPool, &attr ) != UPNP_E_SUCCESS ) {
-        UpnpSdkInit = 0;
-        UpnpFinish();
-        return UPNP_E_INIT_FAILED;
+    if( ThreadPoolInit( &gSendThreadPool, &attr ) != DLNA_E_SUCCESS ) {
+        dlnaSdkInit = 0;
+        dlnaFinish();
+        return DLNA_E_INIT_FAILED;
     }
 
-    if( ThreadPoolInit( &gRecvThreadPool, &attr ) != UPNP_E_SUCCESS ) {
-        UpnpSdkInit = 0;
-        UpnpFinish();
-        return UPNP_E_INIT_FAILED;
+    if( ThreadPoolInit( &gRecvThreadPool, &attr ) != DLNA_E_SUCCESS ) {
+        dlnaSdkInit = 0;
+        dlnaFinish();
+        return DLNA_E_INIT_FAILED;
     }
 
     TPAttrSetMinThreads( &attr, 4 );
     
-    if( ThreadPoolInit( &gMiniServerThreadPool, &attr ) != UPNP_E_SUCCESS ) {
-        UpnpSdkInit = 0;
-        UpnpFinish();
-        return UPNP_E_INIT_FAILED;
+    if( ThreadPoolInit( &gMiniServerThreadPool, &attr ) != DLNA_E_SUCCESS ) {
+        dlnaSdkInit = 0;
+        dlnaFinish();
+        return DLNA_E_INIT_FAILED;
     }
 
-    UpnpSdkInit = 1;
+    dlnaSdkInit = 1;
 #if EXCLUDE_SOAP == 0
     SetSoapCallback( soap_device_callback );
 #endif
@@ -282,21 +282,21 @@ int UpnpInit( IN const char *HostIP,
 
     if( ( retVal = TimerThreadInit( &gTimerThread,
                                     &gSendThreadPool ) ) !=
-        UPNP_E_SUCCESS ) {
-        UpnpSdkInit = 0;
-        UpnpFinish();
+        DLNA_E_SUCCESS ) {
+        dlnaSdkInit = 0;
+        dlnaFinish();
         return retVal;
     }
 #if EXCLUDE_MINISERVER == 0
     if( ( retVal = StartMiniServer( DestPort ) ) <= 0 ) {
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_CRITICAL, API, __FILE__, __LINE__,
             "Miniserver failed to start" );
-        UpnpFinish();
-        UpnpSdkInit = 0;
+        dlnaFinish();
+        dlnaSdkInit = 0;
         if( retVal != -1 )
             return retVal;
         else                    // if miniserver is already running for unknown reasons!
-            return UPNP_E_INIT_FAILED;
+            return DLNA_E_INIT_FAILED;
     }
 #endif
     DestPort = retVal;
@@ -304,22 +304,22 @@ int UpnpInit( IN const char *HostIP,
 
 #if EXCLUDE_WEB_SERVER == 0
     if( ( retVal =
-          UpnpEnableWebserver( WEB_SERVER_ENABLED ) ) != UPNP_E_SUCCESS ) {
-        UpnpFinish();
-        UpnpSdkInit = 0;
+          dlnaEnableWebserver( WEB_SERVER_ENABLED ) ) != DLNA_E_SUCCESS ) {
+        dlnaFinish();
+        dlnaSdkInit = 0;
         return retVal;
     }
 #endif
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
         "Host Ip: %s Host Port: %d\n", LOCAL_HOST,
         LOCAL_PORT );
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Exiting UpnpInit \n" );
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__, "Exiting dlnaInit \n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
-} /***************** end of UpnpInit ******************/
+} /***************** end of dlnaInit ******************/
 
 #ifdef DEBUG
 static void 
@@ -331,7 +331,7 @@ PrintThreadPoolStats(
 {
 	ThreadPoolStats stats;
 	ThreadPoolGetStats(tp, &stats);
-	UpnpPrintf(UPNP_INFO, API, DbgFileName, DbgLineNo, 
+	dlnaPrintf(DLNA_INFO, API, DbgFileName, DbgLineNo, 
 		"%s \n"
 		"High Jobs pending: %d\n"
 		"Med Jobs Pending: %d\n"
@@ -362,19 +362,19 @@ PrintThreadPoolStats(
 		stats.totalIdleTime);
 }
 #else /* DEBUG */
-static UPNP_INLINE void 
+static DLNA_INLINE void 
 PrintThreadPoolStats(
-	ThreadPool *tp upnp_unused, 
-	const char *DbgFileName upnp_unused,
-	int DbgLineNo upnp_unused,
-	const char *msg upnp_unused)
+	ThreadPool *tp dlna_unused, 
+	const char *DbgFileName dlna_unused,
+	int DbgLineNo dlna_unused,
+	const char *msg dlna_unused)
 {
 }
 #endif /* DEBUG */
 
 
 /****************************************************************************
- * Function: UpnpFinish
+ * Function: dlnaFinish
  *
  * Parameters:	NONE
  *
@@ -388,16 +388,16 @@ PrintThreadPoolStats(
  *		Cleans up mutex objects
  *
  * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
+ *	DLNA_E_SUCCESS on success, nonzero on failure.
  *****************************************************************************/
 int
-UpnpFinish()
+dlnaFinish()
 {
 #ifdef INCLUDE_DEVICE_APIS
-    UpnpDevice_Handle device_handle;
+    dlnaDevice_Handle device_handle;
 #endif
 #ifdef INCLUDE_CLIENT_APIS
-    UpnpClient_Handle client_handle;
+    dlnaClient_Handle client_handle;
 #endif
     struct Handle_Info *temp;
 
@@ -405,15 +405,15 @@ UpnpFinish()
 //	WSACleanup();
 #endif
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit );
-    if( UpnpSdkInit == 1 ) {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "UpnpFinish : UpnpSdkInit is ONE\n" );
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+        "Inside dlnaFinish : dlnaSdkInit is :%d:\n", dlnaSdkInit );
+    if( dlnaSdkInit == 1 ) {
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+            "dlnaFinish : dlnaSdkInit is ONE\n" );
     }
     PrintThreadPoolStats(&gSendThreadPool, __FILE__, __LINE__, "Send Thread Pool");
     PrintThreadPoolStats(&gRecvThreadPool, __FILE__, __LINE__, "Recv Thread Pool");
@@ -421,12 +421,12 @@ UpnpFinish()
 
 #ifdef INCLUDE_DEVICE_APIS
     if( GetDeviceHandleInfo( &device_handle, &temp ) == HND_DEVICE )
-        UpnpUnRegisterRootDevice( device_handle );
+        dlnaUnRegisterRootDevice( device_handle );
 #endif
 
 #ifdef INCLUDE_CLIENT_APIS
     if( GetClientHandleInfo( &client_handle, &temp ) == HND_CLIENT )
-        UpnpUnRegisterClient( client_handle );
+        dlnaUnRegisterClient( client_handle );
 #endif
 
     TimerThreadShutdown( &gTimerThread );
@@ -451,7 +451,7 @@ UpnpFinish()
     ithread_mutex_destroy(&gUUIDMutex);
 
     // remove all virtual dirs
-    UpnpRemoveAllVirtualDirs();
+    dlnaRemoveAllVirtualDirs();
 
     // allow static linking
 #ifdef WIN32
@@ -460,18 +460,18 @@ UpnpFinish()
 #endif
 #endif
 
-    UpnpSdkInit = 0;
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Exiting UpnpFinish : UpnpSdkInit is :%d:\n", UpnpSdkInit);
-    UpnpCloseLog();
+    dlnaSdkInit = 0;
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+        "Exiting dlnaFinish : dlnaSdkInit is :%d:\n", dlnaSdkInit);
+    dlnaCloseLog();
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
 }
-/*************************** End of  UpnpFinish  *****************************/
+/*************************** End of  dlnaFinish  *****************************/
 
 /******************************************************************************
- * Function: UpnpGetServerPort
+ * Function: dlnaGetServerPort
  *
  * Parameters: NONE
  *
@@ -482,17 +482,17 @@ UpnpFinish()
  *	local port on success, zero on failure.
  *****************************************************************************/
 unsigned short
-UpnpGetServerPort( void )
+dlnaGetServerPort( void )
 {
 
-    if( UpnpSdkInit != 1 )
+    if( dlnaSdkInit != 1 )
         return 0;
 
     return LOCAL_PORT;
 }
 
 /***************************************************************************
- * Function: UpnpGetServerIpAddress
+ * Function: dlnaGetServerIpAddress
  *
  * Parameters: NONE
  *
@@ -503,10 +503,10 @@ UpnpGetServerPort( void )
  *	return the IP address string on success else NULL of failure
  ***************************************************************************/
 char *
-UpnpGetServerIpAddress( void )
+dlnaGetServerIpAddress( void )
 {
 
-    if( UpnpSdkInit != 1 )
+    if( dlnaSdkInit != 1 )
         return NULL;
 
     return LOCAL_HOST;
@@ -516,61 +516,61 @@ UpnpGetServerIpAddress( void )
 #if 0
 
 /****************************************************************************
- * Function: UpnpAddRootDevice
+ * Function: dlnaAddRootDevice
  *
  * Parameters:	
  *	IN const char *DescURL: Location of the root device 
  *		description xml file
- *	IN UpnpDevice_Handle Hnd: The device handle
+ *	IN dlnaDevice_Handle Hnd: The device handle
  *
  * Description:
  *	downloads the description file and update the service table of the
  *	device. This function has been deprecated.
  *
  * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
+ *	DLNA_E_SUCCESS on success, nonzero on failure.
  *****************************************************************************/
 int
-UpnpAddRootDevice( IN const char *DescURL,
-                   IN UpnpDevice_Handle Hnd )
+dlnaAddRootDevice( IN const char *DescURL,
+                   IN dlnaDevice_Handle Hnd )
 {
     int retVal = 0;
     struct Handle_Info *HInfo;
     IXML_Document *temp;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
     if( ( retVal =
-          UpnpDownloadXmlDoc( DescURL, &( temp ) ) ) != UPNP_E_SUCCESS ) {
+          dlnaDownloadXmlDoc( DescURL, &( temp ) ) ) != DLNA_E_SUCCESS ) {
         return retVal;
     }
 
     HandleLock();
-    if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
+    if( GetHandleInfo( Hnd, &HInfo ) == DLNA_E_INVALID_HANDLE ) {
         HandleUnlock();
         ixmlDocument_free( temp );
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
 
     if( addServiceTable
         ( ( IXML_Node * ) temp, &HInfo->ServiceTable, DescURL ) ) {
 
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "UpnpAddRootDevice: GENA Service Table \n" );
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+            "dlnaAddRootDevice: GENA Service Table \n" );
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
             "Here are the known services: \n" );
-        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
+        printServiceTable( &HInfo->ServiceTable, DLNA_INFO, API );
     } else {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "\nUpnpAddRootDevice: No Eventing Support Found \n" );
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+            "\ndlnaAddRootDevice: No Eventing Support Found \n" );
     }
 
     ixmlDocument_free( temp );
     HandleUnlock();
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 #endif // 0
 #endif //INCLUDE_DEVICE_APIS
@@ -578,16 +578,16 @@ UpnpAddRootDevice( IN const char *DescURL,
 #ifdef INCLUDE_DEVICE_APIS
 
 /****************************************************************************
- * Function: UpnpRegisterRootDevice
+ * Function: dlnaRegisterRootDevice
  *
  * Parameters:	
  *	IN const char *DescUrl:Pointer to a string containing the 
  *		description URL for this root device instance. 
- *	IN Upnp_FunPtr Callback: Pointer to the callback function for 
+ *	IN dlna_FunPtr Callback: Pointer to the callback function for 
  *		receiving asynchronous events. 
  *	IN const void *Cookie: Pointer to user data returned with the 
  *		callback function when invoked.
- *	OUT UpnpDevice_Handle *Hnd: Pointer to a variable to store the 
+ *	OUT dlnaDevice_Handle *Hnd: Pointer to a variable to store the 
  *		new device handle.
  *
  * Description:
@@ -596,50 +596,50 @@ UpnpAddRootDevice( IN const char *DescURL,
  *	calls until it registers using this function.  
  *
  * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
+ *	DLNA_E_SUCCESS on success, nonzero on failure.
  *****************************************************************************/
 int
-UpnpRegisterRootDevice( IN const char *DescUrl,
-                        IN Upnp_FunPtr Fun,
+dlnaRegisterRootDevice( IN const char *DescUrl,
+                        IN dlna_FunPtr Fun,
                         IN const void *Cookie,
-                        OUT UpnpDevice_Handle * Hnd )
+                        OUT dlnaDevice_Handle * Hnd )
 {
 
     struct Handle_Info *HInfo;
     int retVal = 0;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpRegisterRootDevice\n" );
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+        "Inside dlnaRegisterRootDevice\n" );
     
     HandleLock();
-    if( UpnpSdkDeviceRegistered ) {
+    if( dlnaSdkDeviceRegistered ) {
         HandleUnlock();
-        return UPNP_E_ALREADY_REGISTERED;
+        return DLNA_E_ALREADY_REGISTERED;
     }
 
     if( Hnd == NULL || Fun == NULL ||
         DescUrl == NULL || strlen( DescUrl ) == 0 ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
-    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
+    if( ( *Hnd = GetFreeHandle() ) == DLNA_E_OUTOF_HANDLE ) {
         HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
     if( HInfo == NULL ) {
         HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     HandleTable[*Hnd] = HInfo;
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
         "Root device URL is %s\n", DescUrl );
 
     HInfo->aliasInstalled = 0;
@@ -653,22 +653,22 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
     HInfo->DescDocument = NULL;
     CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL ); )
     CLIENTONLY( HInfo->ClientSubList = NULL; )
-    HInfo->MaxSubscriptions = UPNP_INFINITE;
-    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
+    HInfo->MaxSubscriptions = DLNA_INFINITE;
+    HInfo->MaxSubscriptionTimeOut = DLNA_INFINITE;
 
     if( ( retVal =
-          UpnpDownloadXmlDoc( HInfo->DescURL, &( HInfo->DescDocument ) ) )
-        != UPNP_E_SUCCESS ) {
+          dlnaDownloadXmlDoc( HInfo->DescURL, &( HInfo->DescDocument ) ) )
+        != DLNA_E_SUCCESS ) {
         CLIENTONLY( ListDestroy( &HInfo->SsdpSearchList, 0 ) );
         FreeHandle( *Hnd );
         HandleUnlock();
         return retVal;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "UpnpRegisterRootDevice: Valid Description\n" );
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "UpnpRegisterRootDevice: DescURL : %s\n",
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "dlnaRegisterRootDevice: Valid Description\n" );
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+        "dlnaRegisterRootDevice: DescURL : %s\n",
         HInfo->DescURL );
 
     HInfo->DeviceList =
@@ -678,41 +678,41 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
         ixmlDocument_free( HInfo->DescDocument );
         FreeHandle( *Hnd );
         HandleUnlock();
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice: No devices found for RootDevice\n" );
-        return UPNP_E_INVALID_DESC;
+        dlnaPrintf( DLNA_CRITICAL, API, __FILE__, __LINE__,
+            "dlnaRegisterRootDevice: No devices found for RootDevice\n" );
+        return DLNA_E_INVALID_DESC;
     }
 
     HInfo->ServiceList = ixmlDocument_getElementsByTagName(
         HInfo->DescDocument, "serviceList" );
     if( !HInfo->ServiceList ) {
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice: No services found for RootDevice\n" );
+        dlnaPrintf( DLNA_CRITICAL, API, __FILE__, __LINE__,
+            "dlnaRegisterRootDevice: No services found for RootDevice\n" );
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "UpnpRegisterRootDevice: Gena Check\n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "dlnaRegisterRootDevice: Gena Check\n" );
     //*******************************
     // GENA SET UP
     //*******************************
     if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
             &HInfo->ServiceTable, HInfo->DescURL ) ) {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice: GENA Service Table \n" );
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+            "dlnaRegisterRootDevice: GENA Service Table \n" );
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
             "Here are the known services: \n" );
-        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
+        printServiceTable( &HInfo->ServiceTable, DLNA_INFO, API );
     } else {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "\nUpnpRegisterRootDevice2: Empty service table\n" );
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+            "\ndlnaRegisterRootDevice2: Empty service table\n" );
     }
 
-    UpnpSdkDeviceRegistered = 1;
+    dlnaSdkDeviceRegistered = 1;
     HandleUnlock();
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
         "Exiting RegisterRootDevice Successfully\n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 #endif // INCLUDE_DEVICE_APIS
@@ -721,64 +721,64 @@ UpnpRegisterRootDevice( IN const char *DescUrl,
 #if 0
 
 /****************************************************************************
- * Function: UpnpRemoveRootDevice
+ * Function: dlnaRemoveRootDevice
  *
  * Parameters:	
  *	IN const char *DescURL: Location of the root device 
  *		description xml file
- *	IN UpnpDevice_Handle Hnd: The device handle
+ *	IN dlnaDevice_Handle Hnd: The device handle
  *
  * Description:
  *	downloads the description file and update the service table of the
  *	device. This function has been deprecated.
  *
  * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
+ *	DLNA_E_SUCCESS on success, nonzero on failure.
  *****************************************************************************/
 int
-UpnpRemoveRootDevice( IN const char *DescURL,
-                      IN UpnpDevice_Handle Hnd )
+dlnaRemoveRootDevice( IN const char *DescURL,
+                      IN dlnaDevice_Handle Hnd )
 {
     int retVal = 0;
     struct Handle_Info *HInfo;
 
     IXML_Document *temp;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
     if( ( retVal =
-          UpnpDownloadXmlDoc( DescURL, &( temp ) ) ) != UPNP_E_SUCCESS ) {
+          dlnaDownloadXmlDoc( DescURL, &( temp ) ) ) != DLNA_E_SUCCESS ) {
         return retVal;
     }
 
     HandleLock();
-    if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
+    if( GetHandleInfo( Hnd, &HInfo ) == DLNA_E_INVALID_HANDLE ) {
         HandleUnlock();
         ixmlDocument_free( temp );
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
 
     if( removeServiceTable( ( IXML_Node * ) temp, &HInfo->ServiceTable ) ) {
 
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "UpnpRemoveRootDevice: GENA Service Table \n" );
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+            "dlnaRemoveRootDevice: GENA Service Table \n" );
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
             "Here are the known services: \n" );
-        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
+        printServiceTable( &HInfo->ServiceTable, DLNA_INFO, API );
     } else {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "\nUpnpRemoveRootDevice: No Services Removed\n" );
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+            "\ndlnaRemoveRootDevice: No Services Removed\n" );
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
             "Here are the known services: \n" );
-        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
+        printServiceTable( &HInfo->ServiceTable, DLNA_INFO, API );
     }
 
     HandleUnlock();
 
     ixmlDocument_free( temp );
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 #endif //0
 #endif //INCLUDE_DEVICE_APIS
@@ -786,51 +786,51 @@ UpnpRemoveRootDevice( IN const char *DescURL,
 #ifdef INCLUDE_DEVICE_APIS
 
 /****************************************************************************
- * Function: UpnpUnRegisterRootDevice
+ * Function: dlnaUnRegisterRootDevice
  *
  * Parameters:	
- *	IN UpnpDevice_Handle Hnd: The handle of the device instance 
+ *	IN dlnaDevice_Handle Hnd: The handle of the device instance 
  *		to unregister
  * Description:
  *	This function unregisters a root device registered with 
- *	UpnpRegisterRootDevice} or UpnpRegisterRootDevice2. After this call, the 
- *	UpnpDevice_Handle Hnd is no longer valid. For all advertisements that 
+ *	dlnaRegisterRootDevice} or dlnaRegisterRootDevice2. After this call, the 
+ *	dlnaDevice_Handle Hnd is no longer valid. For all advertisements that 
  *	have not yet expired, the UPnP library sends a device unavailable message 
  *	automatically. 
  *
  * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
+ *	DLNA_E_SUCCESS on success, nonzero on failure.
  *****************************************************************************/
 int
-UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
+dlnaUnRegisterRootDevice( IN dlnaDevice_Handle Hnd )
 {
     int retVal = 0;
     struct Handle_Info *HInfo = NULL;
 
     // struct Handle_Info *info=NULL;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
     HandleLock();
-    if( !UpnpSdkDeviceRegistered ) {
+    if( !dlnaSdkDeviceRegistered ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     HandleUnlock();
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpUnRegisterRootDevice \n" );
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+        "Inside dlnaUnRegisterRootDevice \n" );
 #if EXCLUDE_GENA == 0
-    if( genaUnregisterDevice( Hnd ) != UPNP_E_SUCCESS )
-        return UPNP_E_INVALID_HANDLE;
+    if( genaUnregisterDevice( Hnd ) != DLNA_E_SUCCESS )
+        return DLNA_E_INVALID_HANDLE;
 #endif
 
     HandleLock();
-    if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
+    if( GetHandleInfo( Hnd, &HInfo ) == DLNA_E_INVALID_HANDLE ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     HandleUnlock();
 
@@ -841,9 +841,9 @@ UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
 #endif
 
     HandleLock();
-    if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
+    if( GetHandleInfo( Hnd, &HInfo ) == DLNA_E_INVALID_HANDLE ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     //info = (struct Handle_Info *) HandleTable[Hnd];
     ixmlNodeList_free( HInfo->DeviceList );
@@ -859,15 +859,15 @@ UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
 #endif // INTERNAL_WEB_SERVER
 
     FreeHandle( Hnd );
-    UpnpSdkDeviceRegistered = 0;
+    dlnaSdkDeviceRegistered = 0;
     HandleUnlock();
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Exiting UpnpUnRegisterRootDevice \n" );
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+        "Exiting dlnaUnRegisterRootDevice \n" );
 
     return retVal;
 
-}  /****************** End of UpnpUnRegisterRootDevice *********************/
+}  /****************** End of dlnaUnRegisterRootDevice *********************/
 
 #endif //INCLUDE_DEVICE_APIS
 
@@ -887,7 +887,7 @@ UpnpUnRegisterRootDevice( IN UpnpDevice_Handle Hnd )
  *	or URL.
  *
  * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
+ *	DLNA_E_SUCCESS on success, nonzero on failure.
  ***************************************************************************/
 static int
 GetNameForAlias( IN char *name,
@@ -898,7 +898,7 @@ GetNameForAlias( IN char *name,
 
     ext = strrchr( name, '.' );
     if( ext == NULL || strcasecmp( ext, ".xml" ) != 0 ) {
-        return UPNP_E_EXT_NOT_XML;
+        return DLNA_E_EXT_NOT_XML;
     }
 
     al = strrchr( name, '/' );
@@ -908,7 +908,7 @@ GetNameForAlias( IN char *name,
         *alias = al;
     }
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /**************************************************************************
@@ -939,7 +939,7 @@ get_server_addr( OUT struct sockaddr_in *serverAddr )
  * Function: GetDescDocumentAndURL ( In the case of device)
  *
  * Parameters:	
- *	IN Upnp_DescType descriptionType: pointer to server address
+ *	IN dlna_DescType descriptionType: pointer to server address
  *		structure 
  *	IN char* description:
  *	IN unsigned int bufferLen:
@@ -954,9 +954,9 @@ get_server_addr( OUT struct sockaddr_in *serverAddr )
  *      
  ***************************************************************************/
 static int
-GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
+GetDescDocumentAndURL( IN dlna_DescType descriptionType,
                        IN char *description,
-                       IN unsigned int bufferLen upnp_unused,
+                       IN unsigned int bufferLen dlna_unused,
                        IN int config_baseURL,
                        OUT IXML_Document ** xmlDoc,
                        OUT char descURL[LINE_SIZE] )
@@ -971,80 +971,80 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
     time_t last_modified;
     struct stat file_info;
     struct sockaddr_in serverAddr;
-    int rc = UPNP_E_SUCCESS;
+    int rc = DLNA_E_SUCCESS;
 
     if( description == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     // non-URL description must have configuration specified
-    if( descriptionType != UPNPREG_URL_DESC && ( !config_baseURL ) ) {
-        return UPNP_E_INVALID_PARAM;
+    if( descriptionType != DLNAREG_URL_DESC && ( !config_baseURL ) ) {
+        return DLNA_E_INVALID_PARAM;
     }
     // get XML doc and last modified time
-    if( descriptionType == UPNPREG_URL_DESC ) {
+    if( descriptionType == DLNAREG_URL_DESC ) {
         if( ( retVal =
-              UpnpDownloadXmlDoc( description,
-                                  xmlDoc ) ) != UPNP_E_SUCCESS ) {
+              dlnaDownloadXmlDoc( description,
+                                  xmlDoc ) ) != DLNA_E_SUCCESS ) {
             return retVal;
         }
         last_modified = time( NULL );
-    } else if( descriptionType == UPNPREG_FILENAME_DESC ) {
+    } else if( descriptionType == DLNAREG_FILENAME_DESC ) {
         retVal = stat( description, &file_info );
         if( retVal == -1 ) {
-            return UPNP_E_FILE_NOT_FOUND;
+            return DLNA_E_FILE_NOT_FOUND;
         }
         fileLen = file_info.st_size;
         last_modified = file_info.st_mtime;
 
         if( ( fp = fopen( description, "rb" ) ) == NULL ) {
-            return UPNP_E_FILE_NOT_FOUND;
+            return DLNA_E_FILE_NOT_FOUND;
         }
 
         if( ( membuf = ( char * )malloc( fileLen + 1 ) ) == NULL ) {
             fclose( fp );
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         }
 
         num_read = fread( membuf, 1, fileLen, fp );
         if( num_read != fileLen ) {
             fclose( fp );
             free( membuf );
-            return UPNP_E_FILE_READ_ERROR;
+            return DLNA_E_FILE_READ_ERROR;
         }
 
         membuf[fileLen] = 0;
         fclose( fp );
         rc = ixmlParseBufferEx( membuf, xmlDoc );
         free( membuf );
-    } else if( descriptionType == UPNPREG_BUF_DESC ) {
+    } else if( descriptionType == DLNAREG_BUF_DESC ) {
         last_modified = time( NULL );
         rc = ixmlParseBufferEx( description, xmlDoc );
     } else {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
-    if( rc != IXML_SUCCESS && descriptionType != UPNPREG_URL_DESC ) {
+    if( rc != IXML_SUCCESS && descriptionType != DLNAREG_URL_DESC ) {
         if( rc == IXML_INSUFFICIENT_MEMORY ) {
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         } else {
-            return UPNP_E_INVALID_DESC;
+            return DLNA_E_INVALID_DESC;
         }
     }
     // determine alias
     if( config_baseURL ) {
-        if( descriptionType == UPNPREG_BUF_DESC ) {
+        if( descriptionType == DLNAREG_BUF_DESC ) {
             strcpy( aliasStr, "description.xml" );
         } else                  // URL or filename
         {
             retVal = GetNameForAlias( description, &temp_str );
-            if( retVal != UPNP_E_SUCCESS ) {
+            if( retVal != DLNA_E_SUCCESS ) {
                 ixmlDocument_free( *xmlDoc );
                 return retVal;
             }
             if( strlen( temp_str ) > ( LINE_SIZE - 1 ) ) {
                 ixmlDocument_free( *xmlDoc );
                 free( temp_str );
-                return UPNP_E_URL_TOO_BIG;
+                return DLNA_E_URL_TOO_BIG;
             }
             strcpy( aliasStr, temp_str );
         }
@@ -1054,7 +1054,7 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
         // config
         retVal = configure_urlbase( *xmlDoc, &serverAddr,
                                     aliasStr, last_modified, descURL );
-        if( retVal != UPNP_E_SUCCESS ) {
+        if( retVal != DLNA_E_SUCCESS ) {
             ixmlDocument_free( *xmlDoc );
             return retVal;
         }
@@ -1062,14 +1062,14 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
     {
         if( strlen( description ) > ( LINE_SIZE - 1 ) ) {
             ixmlDocument_free( *xmlDoc );
-            return UPNP_E_URL_TOO_BIG;
+            return DLNA_E_URL_TOO_BIG;
         }
         strcpy( descURL, description );
     }
 
     assert( *xmlDoc != NULL );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 #else // no web server
@@ -1078,7 +1078,7 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
  * Function: GetDescDocumentAndURL ( In the case of control point)
  *
  *  Parameters:	
- *	IN Upnp_DescType descriptionType: pointer to server address
+ *	IN dlna_DescType descriptionType: pointer to server address
  *		structure 
  *	IN char* description:
  *	IN unsigned int bufferLen:
@@ -1093,7 +1093,7 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
  *      
  ***************************************************************************/
 static int
-GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
+GetDescDocumentAndURL( IN dlna_DescType descriptionType,
                        IN char *description,
                        IN unsigned int bufferLen,
                        IN int config_baseURL,
@@ -1102,35 +1102,35 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
 {
     int retVal;
 
-    if( ( descriptionType != UPNPREG_URL_DESC ) || config_baseURL ) {
-        return UPNP_E_NO_WEB_SERVER;
+    if( ( descriptionType != DLNAREG_URL_DESC ) || config_baseURL ) {
+        return DLNA_E_NO_WEB_SERVER;
     }
 
     if( description == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     if( strlen( description ) > ( LINE_SIZE - 1 ) ) {
-        return UPNP_E_URL_TOO_BIG;
+        return DLNA_E_URL_TOO_BIG;
     }
     strcpy( descURL, description );
 
     if( ( retVal =
-          UpnpDownloadXmlDoc( description, xmlDoc ) ) != UPNP_E_SUCCESS ) {
+          dlnaDownloadXmlDoc( description, xmlDoc ) ) != DLNA_E_SUCCESS ) {
         return retVal;
     }
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 #endif // INTERNAL_WEB_SERVER
 // ********************************************************
 
 /****************************************************************************
- * Function: UpnpRegisterRootDevice2
+ * Function: dlnaRegisterRootDevice2
  *
  * Parameters:	
- *	IN Upnp_DescType descriptionType: The type of description document.
+ *	IN dlna_DescType descriptionType: The type of description document.
  *	IN const char* description:  Treated as a URL, file name or 
  *		memory buffer depending on description type. 
  *	IN size_t bufferLen: Length of memory buffer if passing a description
@@ -1138,61 +1138,61 @@ GetDescDocumentAndURL( IN Upnp_DescType descriptionType,
  *	IN int config_baseURL: If nonzero, URLBase of description document is 
  *		configured and the description is served using the internal
  *		web server.
- *	IN Upnp_FunPtr Fun: Pointer to the callback function for 
+ *	IN dlna_FunPtr Fun: Pointer to the callback function for 
  *		receiving asynchronous events. 
  *	IN const void* Cookie: Pointer to user data returned with the 
  *		callback function when invoked. 
- *	OUT UpnpDevice_Handle* Hnd: Pointer to a variable to store 
+ *	OUT dlnaDevice_Handle* Hnd: Pointer to a variable to store 
  *		the new device handle.
  *
  * Description:
- *	This function is similar to  UpnpRegisterRootDevice except that
+ *	This function is similar to  dlnaRegisterRootDevice except that
  *	it also allows the description document to be specified as a file or 
  *	a memory buffer. The description can also be configured to have the
  *	correct IP and port address.
  *
  * Return Values:
- *      UPNP_E_SUCCESS on success, nonzero on failure.
+ *      DLNA_E_SUCCESS on success, nonzero on failure.
  *****************************************************************************/
 int
-UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
+dlnaRegisterRootDevice2( IN dlna_DescType descriptionType,
                          IN const char *description_const,
-                         IN size_t bufferLen,   // ignored unless descType == UPNPREG_BUF_DESC
+                         IN size_t bufferLen,   // ignored unless descType == DLNAREG_BUF_DESC
 
                          IN int config_baseURL,
-                         IN Upnp_FunPtr Fun,
+                         IN dlna_FunPtr Fun,
                          IN const void *Cookie,
-                         OUT UpnpDevice_Handle * Hnd )
+                         OUT dlnaDevice_Handle * Hnd )
 {
     struct Handle_Info *HInfo;
     int retVal = 0;
     char *description = ( char * )description_const;
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-        "Inside UpnpRegisterRootDevice2\n" );
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+        "Inside dlnaRegisterRootDevice2\n" );
 
     if( Hnd == NULL || Fun == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     HandleLock();
-    if( UpnpSdkDeviceRegistered ) {
+    if( dlnaSdkDeviceRegistered ) {
         HandleUnlock();
-        return UPNP_E_ALREADY_REGISTERED;
+        return DLNA_E_ALREADY_REGISTERED;
     }
 
-    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
+    if( ( *Hnd = GetFreeHandle() ) == DLNA_E_OUTOF_HANDLE ) {
         HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
     if( HInfo == NULL ) {
         HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     HandleTable[*Hnd] = HInfo;
 
@@ -1203,7 +1203,7 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
         descriptionType, description, bufferLen,
         config_baseURL, &HInfo->DescDocument, HInfo->DescURL );
 
-    if( retVal != UPNP_E_SUCCESS ) {
+    if( retVal != DLNA_E_SUCCESS ) {
         FreeHandle( *Hnd );
         HandleUnlock();
         return retVal;
@@ -1220,13 +1220,13 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
 
     CLIENTONLY( ListInit( &HInfo->SsdpSearchList, NULL, NULL ); )
     CLIENTONLY( HInfo->ClientSubList = NULL; )
-    HInfo->MaxSubscriptions = UPNP_INFINITE;
-    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
+    HInfo->MaxSubscriptions = DLNA_INFINITE;
+    HInfo->MaxSubscriptionTimeOut = DLNA_INFINITE;
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "UpnpRegisterRootDevice2: Valid Description\n" );
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "UpnpRegisterRootDevice2: DescURL : %s\n",
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "dlnaRegisterRootDevice2: Valid Description\n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "dlnaRegisterRootDevice2: DescURL : %s\n",
         HInfo->DescURL );
 
     HInfo->DeviceList =
@@ -1237,41 +1237,41 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
         ixmlDocument_free( HInfo->DescDocument );
         FreeHandle( *Hnd );
         HandleUnlock();
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice2: No devices found for RootDevice\n" );
-        return UPNP_E_INVALID_DESC;
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+            "dlnaRegisterRootDevice2: No devices found for RootDevice\n" );
+        return DLNA_E_INVALID_DESC;
     }
 
     HInfo->ServiceList = ixmlDocument_getElementsByTagName(
         HInfo->DescDocument, "serviceList" );
     if( !HInfo->ServiceList ) {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice2: No services found for RootDevice\n" );
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+            "dlnaRegisterRootDevice2: No services found for RootDevice\n" );
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "UpnpRegisterRootDevice2: Gena Check\n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "dlnaRegisterRootDevice2: Gena Check\n" );
     //*******************************
     // GENA SET UP
     //*******************************
     if( getServiceTable( ( IXML_Node * ) HInfo->DescDocument,
             &HInfo->ServiceTable, HInfo->DescURL ) ) {
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-            "UpnpRegisterRootDevice2: GENA Service Table\n" );
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+            "dlnaRegisterRootDevice2: GENA Service Table\n" );
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
             "Here are the known services: \n" );
-        printServiceTable( &HInfo->ServiceTable, UPNP_INFO, API );
+        printServiceTable( &HInfo->ServiceTable, DLNA_INFO, API );
     } else {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
-            "\nUpnpRegisterRootDevice2: Empty service table\n" );
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
+            "\ndlnaRegisterRootDevice2: Empty service table\n" );
     }
 
-    UpnpSdkDeviceRegistered = 1;
+    dlnaSdkDeviceRegistered = 1;
     HandleUnlock();
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
         "Exiting RegisterRootDevice2 Successfully\n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 #endif // INCLUDE_DEVICE_APIS
@@ -1279,14 +1279,14 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
 #ifdef INCLUDE_CLIENT_APIS
 
 /**************************************************************************
- * Function: UpnpRegisterClient
+ * Function: dlnaRegisterClient
  *
  * Parameters:	
- *	IN Upnp_FunPtr Fun:  Pointer to a function for receiving 
+ *	IN dlna_FunPtr Fun:  Pointer to a function for receiving 
  *		 asynchronous events.
  *	IN const void * Cookie: Pointer to user data returned with the 
  *		callback function when invoked.
- *	OUT UpnpClient_Handle *Hnd: Pointer to a variable to store 
+ *	OUT dlnaClient_Handle *Hnd: Pointer to a variable to store 
  *		the new control point handle.
  *
  * Description:
@@ -1298,35 +1298,35 @@ UpnpRegisterRootDevice2( IN Upnp_DescType descriptionType,
  *      
  ***************************************************************************/
 int
-UpnpRegisterClient( IN Upnp_FunPtr Fun,
+dlnaRegisterClient( IN dlna_FunPtr Fun,
                     IN const void *Cookie,
-                    OUT UpnpClient_Handle * Hnd )
+                    OUT dlnaClient_Handle * Hnd )
 {
     struct Handle_Info *HInfo;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpRegisterClient \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaRegisterClient \n" );
     if( Fun == NULL || Hnd == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     HandleLock();
 
-    if( UpnpSdkClientRegistered ) {
+    if( dlnaSdkClientRegistered ) {
         HandleUnlock();
-        return UPNP_E_ALREADY_REGISTERED;
+        return DLNA_E_ALREADY_REGISTERED;
     }
-    if( ( *Hnd = GetFreeHandle() ) == UPNP_E_OUTOF_HANDLE ) {
+    if( ( *Hnd = GetFreeHandle() ) == DLNA_E_OUTOF_HANDLE ) {
         HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     HInfo = ( struct Handle_Info * )malloc( sizeof( struct Handle_Info ) );
     if( HInfo == NULL ) {
         HandleUnlock();
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     HInfo->HType = HND_CLIENT;
@@ -1336,68 +1336,68 @@ UpnpRegisterClient( IN Upnp_FunPtr Fun,
     ListInit( &HInfo->SsdpSearchList, NULL, NULL );
 #ifdef INCLUDE_DEVICE_APIS
     HInfo->MaxAge = 0;
-    HInfo->MaxSubscriptions = UPNP_INFINITE;
-    HInfo->MaxSubscriptionTimeOut = UPNP_INFINITE;
+    HInfo->MaxSubscriptions = DLNA_INFINITE;
+    HInfo->MaxSubscriptionTimeOut = DLNA_INFINITE;
 #endif
 
     HandleTable[*Hnd] = HInfo;
-    UpnpSdkClientRegistered = 1;
+    dlnaSdkClientRegistered = 1;
 
     HandleUnlock();
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpRegisterClient \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaRegisterClient \n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
-}  /****************** End of UpnpRegisterClient   *********************/
+}  /****************** End of dlnaRegisterClient   *********************/
 #endif // INCLUDE_CLIENT_APIS
 
 
 /****************************************************************************
- * Function: UpnpUnRegisterClient
+ * Function: dlnaUnRegisterClient
  *
  * Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point instance 
+ *	IN dlnaClient_Handle Hnd: The handle of the control point instance 
  *		to unregister
  * Description:
  *	This function unregisters a client registered with 
- *	UpnpRegisterclient or UpnpRegisterclient2. After this call, the 
- *	UpnpDevice_Handle Hnd is no longer valid. The UPnP Library generates 
+ *	dlnaRegisterclient or dlnaRegisterclient2. After this call, the 
+ *	dlnaDevice_Handle Hnd is no longer valid. The UPnP Library generates 
  *	no more callbacks after this function returns.
  *
  * Return Values:
- *	UPNP_E_SUCCESS on success, nonzero on failure.
+ *	DLNA_E_SUCCESS on success, nonzero on failure.
  *****************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 int
-UpnpUnRegisterClient( IN UpnpClient_Handle Hnd )
+dlnaUnRegisterClient( IN dlnaClient_Handle Hnd )
 {
     struct Handle_Info *HInfo;
     ListNode *node = NULL;
     SsdpSearchArg *searchArg = NULL;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpUnRegisterClient \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaUnRegisterClient \n" );
     HandleLock();
-    if( !UpnpSdkClientRegistered ) {
+    if( !dlnaSdkClientRegistered ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     HandleUnlock();
 
 #if EXCLUDE_GENA == 0
-    if( genaUnregisterClient( Hnd ) != UPNP_E_SUCCESS )
-        return UPNP_E_INVALID_HANDLE;
+    if( genaUnregisterClient( Hnd ) != DLNA_E_SUCCESS )
+        return DLNA_E_INVALID_HANDLE;
 #endif
     HandleLock();
-    if( GetHandleInfo( Hnd, &HInfo ) == UPNP_E_INVALID_HANDLE ) {
+    if( GetHandleInfo( Hnd, &HInfo ) == DLNA_E_INVALID_HANDLE ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     //clean up search list
     node = ListHead( &HInfo->SsdpSearchList );
@@ -1413,13 +1413,13 @@ UpnpUnRegisterClient( IN UpnpClient_Handle Hnd )
 
     ListDestroy( &HInfo->SsdpSearchList, 0 );
     FreeHandle( Hnd );
-    UpnpSdkClientRegistered = 0;
+    dlnaSdkClientRegistered = 0;
     HandleUnlock();
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpUnRegisterClient \n" );
-    return UPNP_E_SUCCESS;
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaUnRegisterClient \n" );
+    return DLNA_E_SUCCESS;
 
-}  /****************** End of UpnpUnRegisterClient *********************/
+}  /****************** End of dlnaUnRegisterClient *********************/
 #endif // INCLUDE_CLIENT_APIS
 
 //-----------------------------------------------------------------------------
@@ -1432,10 +1432,10 @@ UpnpUnRegisterClient( IN UpnpClient_Handle Hnd )
 #if EXCLUDE_SSDP == 0
 
 /**************************************************************************
- * Function: UpnpSendAdvertisement 
+ * Function: dlnaSendAdvertisement 
  *
  * Parameters:	
- *	IN UpnpDevice_Handle Hnd: handle of the device instance
+ *	IN dlnaDevice_Handle Hnd: handle of the device instance
  *	IN int Exp : Timer for resending the advertisement
  *
  * Description:
@@ -1443,29 +1443,29 @@ UpnpUnRegisterClient( IN UpnpClient_Handle Hnd )
  *	job for the next advertisement after "Exp" time.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpSendAdvertisement( IN UpnpDevice_Handle Hnd,
+dlnaSendAdvertisement( IN dlnaDevice_Handle Hnd,
                        IN int Exp )
 {
     struct Handle_Info *SInfo = NULL;
     int retVal = 0,
      *ptrMx;
-    upnp_timeout *adEvent;
+    dlna_timeout *adEvent;
     ThreadPoolJob job;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpSendAdvertisement \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaSendAdvertisement \n" );
 
     HandleLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     if( Exp < 1 )
         Exp = DEFAULT_MAXAGE;
@@ -1475,16 +1475,16 @@ UpnpSendAdvertisement( IN UpnpDevice_Handle Hnd,
                                 ( char * )NULL, ( char * )NULL,
                                 ( char * )NULL, Exp );
 
-    if( retVal != UPNP_E_SUCCESS )
+    if( retVal != DLNA_E_SUCCESS )
         return retVal;
     ptrMx = ( int * )malloc( sizeof( int ) );
     if( ptrMx == NULL )
-        return UPNP_E_OUTOF_MEMORY;
-    adEvent = ( upnp_timeout * ) malloc( sizeof( upnp_timeout ) );
+        return DLNA_E_OUTOF_MEMORY;
+    adEvent = ( dlna_timeout * ) malloc( sizeof( dlna_timeout ) );
 
     if( adEvent == NULL ) {
         free( ptrMx );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     *ptrMx = Exp;
     adEvent->handle = Hnd;
@@ -1495,18 +1495,18 @@ UpnpSendAdvertisement( IN UpnpDevice_Handle Hnd,
         HandleUnlock();
         free( adEvent );
         free( ptrMx );
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
 #ifdef SSDP_PACKET_DISTRIBUTE
     TPJobInit( &job, ( start_routine ) AutoAdvertise, adEvent );
-    TPJobSetFreeFunction( &job, ( free_routine ) free_upnp_timeout );
+    TPJobSetFreeFunction( &job, ( free_routine ) free_dlna_timeout );
     TPJobSetPriority( &job, MED_PRIORITY );
     if( ( retVal = TimerThreadSchedule( &gTimerThread,
                                         ( ( Exp / 2 ) -
                                           ( AUTO_ADVERTISEMENT_TIME ) ),
                                         REL_SEC, &job, SHORT_TERM,
                                         &( adEvent->eventId ) ) )
-        != UPNP_E_SUCCESS ) {
+        != DLNA_E_SUCCESS ) {
         HandleUnlock();
         free( adEvent );
         free( ptrMx );
@@ -1514,13 +1514,13 @@ UpnpSendAdvertisement( IN UpnpDevice_Handle Hnd,
     }
 #else
     TPJobInit( &job, ( start_routine ) AutoAdvertise, adEvent );
-    TPJobSetFreeFunction( &job, ( free_routine ) free_upnp_timeout );
+    TPJobSetFreeFunction( &job, ( free_routine ) free_dlna_timeout );
     TPJobSetPriority( &job, MED_PRIORITY );
     if( ( retVal = TimerThreadSchedule( &gTimerThread,
                                         Exp - AUTO_ADVERTISEMENT_TIME,
                                         REL_SEC, &job, SHORT_TERM,
                                         &( adEvent->eventId ) ) )
-        != UPNP_E_SUCCESS ) {
+        != DLNA_E_SUCCESS ) {
         HandleUnlock();
         free( adEvent );
         free( ptrMx );
@@ -1529,22 +1529,22 @@ UpnpSendAdvertisement( IN UpnpDevice_Handle Hnd,
 #endif
 
     HandleUnlock();
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSendAdvertisement \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaSendAdvertisement \n" );
 
     return retVal;
 
-}  /****************** End of UpnpSendAdvertisement *********************/
+}  /****************** End of dlnaSendAdvertisement *********************/
 #endif // INCLUDE_DEVICE_APIS
 #endif
 #if EXCLUDE_SSDP == 0
 #ifdef INCLUDE_CLIENT_APIS
 
 /**************************************************************************
- * Function: UpnpSearchAsync 
+ * Function: dlnaSearchAsync 
  *
  * Parameters:	
- *	IN UpnpClient_Handle Hnd: handle of the control point instance
+ *	IN dlnaClient_Handle Hnd: handle of the control point instance
  *	IN int Mx : Maximum time to wait for the search reply
  *	IN const char *Target_const: 
  *	IN const void *Cookie_const:
@@ -1555,10 +1555,10 @@ UpnpSendAdvertisement( IN UpnpDevice_Handle Hnd,
  *	client is notified about the search results after search timer.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpSearchAsync( IN UpnpClient_Handle Hnd,
+dlnaSearchAsync( IN dlnaClient_Handle Hnd,
                  IN int Mx,
                  IN const char *Target_const,
                  IN const void *Cookie_const )
@@ -1566,24 +1566,24 @@ UpnpSearchAsync( IN UpnpClient_Handle Hnd,
     struct Handle_Info *SInfo = NULL;
     char *Target = ( char * )Target_const;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpSearchAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaSearchAsync \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     if( Mx < 1 )
         Mx = DEFAULT_MX;
 
     if( Target == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     HandleUnlock();
@@ -1591,12 +1591,12 @@ UpnpSearchAsync( IN UpnpClient_Handle Hnd,
 
     //HandleUnlock();
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSearchAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaSearchAsync \n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
-}  /****************** End of UpnpSearchAsync *********************/
+}  /****************** End of dlnaSearchAsync *********************/
 #endif // INCLUDE_CLIENT_APIS
 #endif
 //-----------------------------------------------------------------------------
@@ -1609,10 +1609,10 @@ UpnpSearchAsync( IN UpnpClient_Handle Hnd,
 #ifdef INCLUDE_DEVICE_APIS
 
 /**************************************************************************
- * Function: UpnpSetMaxSubscriptions 
+ * Function: dlnaSetMaxSubscriptions 
  *
  * Parameters:	
- *	IN UpnpDevice_Handle Hnd: The handle of the device for which
+ *	IN dlnaDevice_Handle Hnd: The handle of the device for which
  *		the maximum subscriptions is being set.
  *	IN int MaxSubscriptions: The maximum number of subscriptions to be
  *		allowed per service.
@@ -1620,46 +1620,46 @@ UpnpSearchAsync( IN UpnpClient_Handle Hnd,
  * Description:
  *	This function sets the maximum subscriptions of the control points
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpSetMaxSubscriptions( IN UpnpDevice_Handle Hnd,
+dlnaSetMaxSubscriptions( IN dlnaDevice_Handle Hnd,
                          IN int MaxSubscriptions )
 {
     struct Handle_Info *SInfo = NULL;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpSetMaxSubscriptions \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaSetMaxSubscriptions \n" );
 
     HandleLock();
-    if( ( ( MaxSubscriptions != UPNP_INFINITE )
+    if( ( ( MaxSubscriptions != DLNA_INFINITE )
           && ( MaxSubscriptions < 0 ) )
         || ( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     SInfo->MaxSubscriptions = MaxSubscriptions;
     HandleUnlock();
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSetMaxSubscriptions \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaSetMaxSubscriptions \n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
-}  /***************** End of UpnpSetMaxSubscriptions ********************/
+}  /***************** End of dlnaSetMaxSubscriptions ********************/
 #endif // INCLUDE_DEVICE_APIS
 
 #ifdef INCLUDE_DEVICE_APIS
 
 /**************************************************************************
- * Function: UpnpSetMaxSubscriptionTimeOut 
+ * Function: dlnaSetMaxSubscriptionTimeOut 
  *
  * Parameters:	
- *	IN UpnpDevice_Handle Hnd: The handle of the device for which the
+ *	IN dlnaDevice_Handle Hnd: The handle of the device for which the
  *		maximum subscription time-out is being set.
  *	IN int MaxSubscriptionTimeOut:The maximum subscription time-out 
  *		to be accepted
@@ -1669,109 +1669,109 @@ UpnpSetMaxSubscriptions( IN UpnpDevice_Handle Hnd,
  *	will require to send the subscription request before timeout.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpSetMaxSubscriptionTimeOut( IN UpnpDevice_Handle Hnd,
+dlnaSetMaxSubscriptionTimeOut( IN dlnaDevice_Handle Hnd,
                                IN int MaxSubscriptionTimeOut )
 {
     struct Handle_Info *SInfo = NULL;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpSetMaxSubscriptionTimeOut \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaSetMaxSubscriptionTimeOut \n" );
 
     HandleLock();
 
-    if( ( ( MaxSubscriptionTimeOut != UPNP_INFINITE )
+    if( ( ( MaxSubscriptionTimeOut != DLNA_INFINITE )
           && ( MaxSubscriptionTimeOut < 0 ) )
         || ( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
 
     SInfo->MaxSubscriptionTimeOut = MaxSubscriptionTimeOut;
     HandleUnlock();
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSetMaxSubscriptionTimeOut \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaSetMaxSubscriptionTimeOut \n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
-}  /****************** End of UpnpSetMaxSubscriptionTimeOut ******************/
+}  /****************** End of dlnaSetMaxSubscriptionTimeOut ******************/
 #endif // INCLUDE_DEVICE_APIS
 
 #ifdef INCLUDE_CLIENT_APIS
 
 /**************************************************************************
- * Function: UpnpSubscribeAsync 
+ * Function: dlnaSubscribeAsync 
  *
  * Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point for which 
+ *	IN dlnaClient_Handle Hnd: The handle of the control point for which 
  *		the subscription request is to be sent.
  *	IN const char * EvtUrl_const: URL that control point wants to 
  *		subscribe
  *	IN int TimeOut: The requested subscription time.  Upon 
  *		return, it contains the actual subscription time 
  *		returned from the service
- *	IN Upnp_FunPtr Fun : callback function to tell result of the 
+ *	IN dlna_FunPtr Fun : callback function to tell result of the 
  *		subscription request
  *	IN const void * Cookie_const: cookie passed by client to give back 
  *		in the callback function.
  *
  * Description:
- *	This function performs the same operation as UpnpSubscribeAsync
+ *	This function performs the same operation as dlnaSubscribeAsync
  *	but returns immediately and calls the registered callback function 
  *	when the operation is complete.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpSubscribeAsync( IN UpnpClient_Handle Hnd,
+dlnaSubscribeAsync( IN dlnaClient_Handle Hnd,
                     IN const char *EvtUrl_const,
                     IN int TimeOut,
-                    IN Upnp_FunPtr Fun,
+                    IN dlna_FunPtr Fun,
                     IN const void *Cookie_const )
 {
     struct Handle_Info *SInfo = NULL;
-    struct UpnpNonblockParam *Param;
+    struct dlnaNonblockParam *Param;
     char *EvtUrl = ( char * )EvtUrl_const;
     ThreadPoolJob job;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpSubscribeAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaSubscribeAsync \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     if( EvtUrl == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
-    if( TimeOut != UPNP_INFINITE && TimeOut < 1 ) {
+    if( TimeOut != DLNA_INFINITE && TimeOut < 1 ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( Fun == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     HandleUnlock();
 
-    Param = (struct UpnpNonblockParam *)
-        malloc(sizeof (struct UpnpNonblockParam));
+    Param = (struct dlnaNonblockParam *)
+        malloc(sizeof (struct dlnaNonblockParam));
     if( Param == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     Param->FunName = SUBSCRIBE;
@@ -1781,31 +1781,31 @@ UpnpSubscribeAsync( IN UpnpClient_Handle Hnd,
     Param->Fun = Fun;
     Param->Cookie = ( void * )Cookie_const;
 
-    TPJobInit( &job, ( start_routine ) UpnpThreadDistribution, Param );
+    TPJobInit( &job, ( start_routine ) dlnaThreadDistribution, Param );
     TPJobSetFreeFunction( &job, ( free_routine ) free );
     TPJobSetPriority( &job, MED_PRIORITY );
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSubscribeAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaSubscribeAsync \n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
-}  /****************** End of UpnpSubscribeAsync *********************/
+}  /****************** End of dlnaSubscribeAsync *********************/
 #endif // INCLUDE_CLIENT_APIS
 
 #ifdef INCLUDE_CLIENT_APIS
 
 /**************************************************************************
- * Function: UpnpSubscribe 
+ * Function: dlnaSubscribe 
  *
  * Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point.
+ *	IN dlnaClient_Handle Hnd: The handle of the control point.
  *	IN const char *PublisherUrl: The URL of the service to subscribe to.
  *	INOUT int *TimeOut: Pointer to a variable containing the requested 
  *		subscription time.  Upon return, it contains the
  *		actual subscription time returned from the service.
- *	OUT Upnp_SID SubsId: Pointer to a variable to receive the 
+ *	OUT dlna_SID SubsId: Pointer to a variable to receive the 
  *		subscription ID (SID). 
  *
  * Description:
@@ -1813,255 +1813,255 @@ UpnpSubscribeAsync( IN UpnpClient_Handle Hnd,
  *	notifications from another device.  This operation is synchronous
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpSubscribe( IN UpnpClient_Handle Hnd,
+dlnaSubscribe( IN dlnaClient_Handle Hnd,
                IN const char *EvtUrl_const,
                INOUT int *TimeOut,
-               OUT Upnp_SID SubsId )
+               OUT dlna_SID SubsId )
 {
     struct Handle_Info *SInfo = NULL;
     int RetVal;
     char *EvtUrl = ( char * )EvtUrl_const;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpSubscribe \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaSubscribe \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     if( EvtUrl == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( TimeOut == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( SubsId == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     HandleUnlock();
     RetVal = genaSubscribe( Hnd, EvtUrl, TimeOut, SubsId );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSubscribe \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaSubscribe \n" );
 
     return RetVal;
 
-}  /****************** End of UpnpSubscribe  *********************/
+}  /****************** End of dlnaSubscribe  *********************/
 #endif // INCLUDE_CLIENT_APIS
 
 #ifdef INCLUDE_CLIENT_APIS
 
 /**************************************************************************
- * Function: UpnpUnSubscribe 
+ * Function: dlnaUnSubscribe 
  *
  *  Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point.
- *	IN Upnp_SID SubsId: The ID returned when the control point 
+ *	IN dlnaClient_Handle Hnd: The handle of the control point.
+ *	IN dlna_SID SubsId: The ID returned when the control point 
  *		subscribed to the service.
  *
  * Description:
  *	This function removes the subscription of  a control point from a 
- *	service previously subscribed to using UpnpSubscribe or 
- *	UpnpSubscribeAsync. This is a synchronous call.
+ *	service previously subscribed to using dlnaSubscribe or 
+ *	dlnaSubscribeAsync. This is a synchronous call.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpUnSubscribe( IN UpnpClient_Handle Hnd,
-                 IN Upnp_SID SubsId )
+dlnaUnSubscribe( IN dlnaClient_Handle Hnd,
+                 IN dlna_SID SubsId )
 {
     struct Handle_Info *SInfo = NULL;
     int RetVal;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpUnSubscribe \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaUnSubscribe \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     if( SubsId == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     HandleUnlock();
     RetVal = genaUnSubscribe( Hnd, SubsId );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpUnSubscribe \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaUnSubscribe \n" );
 
     return RetVal;
 
-}  /****************** End of UpnpUnSubscribe  *********************/
+}  /****************** End of dlnaUnSubscribe  *********************/
 #endif // INCLUDE_CLIENT_APIS
 
 #ifdef INCLUDE_CLIENT_APIS
 
 /**************************************************************************
- * Function: UpnpUnSubscribeAsync 
+ * Function: dlnaUnSubscribeAsync 
  *
  *  Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the subscribed control point. 
- *	IN Upnp_SID SubsId: The ID returned when the control point 
+ *	IN dlnaClient_Handle Hnd: The handle of the subscribed control point. 
+ *	IN dlna_SID SubsId: The ID returned when the control point 
  *		subscribed to the service.
- *	IN Upnp_FunPtr Fun: Pointer to a callback function to be called
+ *	IN dlna_FunPtr Fun: Pointer to a callback function to be called
  *		when the operation is complete. 
  *	IN const void *Cookie:Pointer to user data to pass to the
  *		callback function when invoked.
  *
  *  Description:
  *      This function removes a subscription of a control point
- *  from a service previously subscribed to using UpnpSubscribe or
- *	UpnpSubscribeAsync,generating a callback when the operation is complete.
+ *  from a service previously subscribed to using dlnaSubscribe or
+ *	dlnaSubscribeAsync,generating a callback when the operation is complete.
  *
  *  Return Values: int
- *      UPNP_E_SUCCESS if successful else sends appropriate error.
+ *      DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpUnSubscribeAsync( IN UpnpClient_Handle Hnd,
-                      IN Upnp_SID SubsId,
-                      IN Upnp_FunPtr Fun,
+dlnaUnSubscribeAsync( IN dlnaClient_Handle Hnd,
+                      IN dlna_SID SubsId,
+                      IN dlna_FunPtr Fun,
                       IN const void *Cookie_const )
 {
     ThreadPoolJob job;
     struct Handle_Info *SInfo = NULL;
-    struct UpnpNonblockParam *Param;
+    struct dlnaNonblockParam *Param;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpUnSubscribeAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaUnSubscribeAsync \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     if( SubsId == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( Fun == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     HandleUnlock();
     Param =
-        ( struct UpnpNonblockParam * )
-        malloc( sizeof( struct UpnpNonblockParam ) );
+        ( struct dlnaNonblockParam * )
+        malloc( sizeof( struct dlnaNonblockParam ) );
     if( Param == NULL )
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
 
     Param->FunName = UNSUBSCRIBE;
     Param->Handle = Hnd;
     strcpy( Param->SubsId, SubsId );
     Param->Fun = Fun;
     Param->Cookie = ( void * )Cookie_const;
-    TPJobInit( &job, ( start_routine ) UpnpThreadDistribution, Param );
+    TPJobInit( &job, ( start_routine ) dlnaThreadDistribution, Param );
     TPJobSetFreeFunction( &job, ( free_routine ) free );
     TPJobSetPriority( &job, MED_PRIORITY );
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpUnSubscribeAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaUnSubscribeAsync \n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
-}  /****************** End of UpnpUnSubscribeAsync  *********************/
+}  /****************** End of dlnaUnSubscribeAsync  *********************/
 #endif // INCLUDE_CLIENT_APIS
 
 #ifdef INCLUDE_CLIENT_APIS
 
 /**************************************************************************
- * Function: UpnpRenewSubscription 
+ * Function: dlnaRenewSubscription 
  *
  * Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point that 
+ *	IN dlnaClient_Handle Hnd: The handle of the control point that 
  *		is renewing the subscription.
  *	INOUT int *TimeOut: Pointer to a variable containing the 
  *		requested subscription time.  Upon return, 
  *		it contains the actual renewal time. 
- *	IN Upnp_SID SubsId: The ID for the subscription to renew. 
+ *	IN dlna_SID SubsId: The ID for the subscription to renew. 
  *
  * Description:
  *	This function renews a subscription that is about to 
  *	expire.  This function is synchronous.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpRenewSubscription( IN UpnpClient_Handle Hnd,
+dlnaRenewSubscription( IN dlnaClient_Handle Hnd,
                        INOUT int *TimeOut,
-                       IN Upnp_SID SubsId )
+                       IN dlna_SID SubsId )
 {
     struct Handle_Info *SInfo = NULL;
     int RetVal;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpRenewSubscription \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaRenewSubscription \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     if( TimeOut == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( SubsId == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     HandleUnlock();
     RetVal = genaRenewSubscription( Hnd, SubsId, TimeOut );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpRenewSubscription \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaRenewSubscription \n" );
 
     return RetVal;
 
-}  /****************** End of UpnpRenewSubscription  *********************/
+}  /****************** End of dlnaRenewSubscription  *********************/
 #endif // INCLUDE_CLIENT_APIS
 
 #ifdef INCLUDE_CLIENT_APIS
 
 /**************************************************************************
- * Function: UpnpRenewSubscriptionAsync 
+ * Function: dlnaRenewSubscriptionAsync 
  *
  * Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point that 
+ *	IN dlnaClient_Handle Hnd: The handle of the control point that 
  *		is renewing the subscription. 
  *	IN int TimeOut: The requested subscription time.  The 
  *		actual timeout value is returned when 
  *		the callback function is called. 
- *	IN Upnp_SID SubsId: The ID for the subscription to renew. 
- *	IN Upnp_FunPtr Fun: Pointer to a callback function to be 
+ *	IN dlna_SID SubsId: The ID for the subscription to renew. 
+ *	IN dlna_FunPtr Fun: Pointer to a callback function to be 
  *		invoked when the renewal is complete. 
  *	IN const void *Cookie  : Pointer to user data passed 
  *		to the callback function when invoked.
@@ -2071,49 +2071,49 @@ UpnpRenewSubscription( IN UpnpClient_Handle Hnd,
  *	to expire, generating a callback when the operation is complete.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpRenewSubscriptionAsync( IN UpnpClient_Handle Hnd,
+dlnaRenewSubscriptionAsync( IN dlnaClient_Handle Hnd,
                             INOUT int TimeOut,
-                            IN Upnp_SID SubsId,
-                            IN Upnp_FunPtr Fun,
+                            IN dlna_SID SubsId,
+                            IN dlna_FunPtr Fun,
                             IN const void *Cookie_const )
 {
     ThreadPoolJob job;
     struct Handle_Info *SInfo = NULL;
-    struct UpnpNonblockParam *Param;
+    struct dlnaNonblockParam *Param;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpRenewSubscriptionAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaRenewSubscriptionAsync \n" );
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
-    if( TimeOut != UPNP_INFINITE && TimeOut < 1 ) {
+    if( TimeOut != DLNA_INFINITE && TimeOut < 1 ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( SubsId == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( Fun == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     HandleUnlock();
 
     Param =
-        ( struct UpnpNonblockParam * )
-        malloc( sizeof( struct UpnpNonblockParam ) );
+        ( struct dlnaNonblockParam * )
+        malloc( sizeof( struct dlnaNonblockParam ) );
     if( Param == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     Param->FunName = RENEW;
@@ -2123,26 +2123,26 @@ UpnpRenewSubscriptionAsync( IN UpnpClient_Handle Hnd,
     Param->Cookie = ( void * )Cookie_const;
     Param->TimeOut = TimeOut;
 
-    TPJobInit( &job, ( start_routine ) UpnpThreadDistribution, Param );
+    TPJobInit( &job, ( start_routine ) dlnaThreadDistribution, Param );
     TPJobSetFreeFunction( &job, ( free_routine ) free );
     TPJobSetPriority( &job, MED_PRIORITY );
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpRenewSubscriptionAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaRenewSubscriptionAsync \n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
-}  /****************** End of UpnpRenewSubscriptionAsync *******************/
+}  /****************** End of dlnaRenewSubscriptionAsync *******************/
 #endif // INCLUDE_CLIENT_APIS
 
 #ifdef INCLUDE_DEVICE_APIS
 
 /**************************************************************************
- * Function: UpnpNotify 
+ * Function: dlnaNotify 
  *
  *  Parameters:	
- *	IN UpnpDevice_Handle: The handle to the device sending the event.
+ *	IN dlnaDevice_Handle: The handle to the device sending the event.
  *	IN const char *DevID: The device ID of the subdevice of the 
  *		service generating the event. 
  *	IN const char *ServID: The unique identifier of the service 
@@ -2160,10 +2160,10 @@ UpnpRenewSubscriptionAsync( IN UpnpClient_Handle Hnd,
  *	synchronous and generates no callbacks.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpNotify( IN UpnpDevice_Handle Hnd,
+dlnaNotify( IN dlnaDevice_Handle Hnd,
             IN const char *DevID_const,
             IN const char *ServName_const,
             IN const char **VarName_const,
@@ -2178,47 +2178,47 @@ UpnpNotify( IN UpnpDevice_Handle Hnd,
     char **VarName = ( char ** )VarName_const;
     char **NewVal = ( char ** )NewVal_const;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpNotify \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaNotify \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     if( DevID == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( ServName == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( VarName == NULL || NewVal == NULL || cVariables < 0 ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     HandleUnlock();
     retVal =
         genaNotifyAll( Hnd, DevID, ServName, VarName, NewVal, cVariables );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpNotify \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaNotify \n" );
 
     return retVal;
 
-} /****************** End of UpnpNotify *********************/
+} /****************** End of dlnaNotify *********************/
 
 /**************************************************************************
- * Function: UpnpNotifyExt 
+ * Function: dlnaNotifyExt 
  *
  * Parameters:	
- *	IN UpnpDevice_Handle: The handle to the device sending the 
+ *	IN dlnaDevice_Handle: The handle to the device sending the 
  *		event.
  *	IN const char *DevID: The device ID of the subdevice of the 
  *		service generating the event.
@@ -2230,15 +2230,15 @@ UpnpNotify( IN UpnpDevice_Handle Hnd,
  *		Device Architecture specification. 
  *
  * Description:
- *	This function is similar to UpnpNotify except that it takes
+ *	This function is similar to dlnaNotify except that it takes
  *	a DOM document for the event rather than an array of strings. This 
  *	function is synchronous and generates no callbacks.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpNotifyExt( IN UpnpDevice_Handle Hnd,
+dlnaNotifyExt( IN dlnaDevice_Handle Hnd,
                IN const char *DevID_const,
                IN const char *ServName_const,
                IN IXML_Document * PropSet )
@@ -2249,46 +2249,46 @@ UpnpNotifyExt( IN UpnpDevice_Handle Hnd,
     char *DevID = ( char * )DevID_const;
     char *ServName = ( char * )ServName_const;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpNotify \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaNotify \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     if( DevID == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( ServName == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     HandleUnlock();
     retVal = genaNotifyAllExt( Hnd, DevID, ServName, PropSet );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpNotify \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaNotify \n" );
 
     return retVal;
 
-}  /****************** End of UpnpNotify *********************/
+}  /****************** End of dlnaNotify *********************/
 
 #endif // INCLUDE_DEVICE_APIS
 
 #ifdef INCLUDE_DEVICE_APIS
 
 /**************************************************************************
- * Function: UpnpAcceptSubscription 
+ * Function: dlnaAcceptSubscription 
  *
  * Parameters:	
- *	IN UpnpDevice_Handle Hnd: The handle of the device. 
+ *	IN dlnaDevice_Handle Hnd: The handle of the device. 
  *	IN const char *DevID: The device ID of the subdevice of the 
  *		service generating the event. 
  *	IN const char *ServID: The unique service identifier of the 
@@ -2297,27 +2297,27 @@ UpnpNotifyExt( IN UpnpDevice_Handle Hnd,
  *	IN const char **NewVal: Pointer to an array of values for 
  *		the event variables.
  *	IN int cVariables: The number of event variables in VarName. 
- *	IN Upnp_SID SubsId: The subscription ID of the newly 
+ *	IN dlna_SID SubsId: The subscription ID of the newly 
  *		registered control point. 
  *
  * Description:
  *	This function accepts a subscription request and sends
  *	out the current state of the eventable variables for a service.  
  *	The device application should call this function when it receives a 
- *	UPNP_EVENT_SUBSCRIPTION_REQUEST callback. This function is sychronous
+ *	DLNA_EVENT_SUBSCRIPTION_REQUEST callback. This function is sychronous
  *	and generates no callbacks.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpAcceptSubscription( IN UpnpDevice_Handle Hnd,
+dlnaAcceptSubscription( IN dlnaDevice_Handle Hnd,
                         IN const char *DevID_const,
                         IN const char *ServName_const,
                         IN const char **VarName_const,
                         IN const char **NewVal_const,
                         int cVariables,
-                        IN Upnp_SID SubsId )
+                        IN dlna_SID SubsId )
 {
     struct Handle_Info *SInfo = NULL;
     int retVal;
@@ -2326,33 +2326,33 @@ UpnpAcceptSubscription( IN UpnpDevice_Handle Hnd,
     char **VarName = ( char ** )VarName_const;
     char **NewVal = ( char ** )NewVal_const;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpAcceptSubscription \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaAcceptSubscription \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     if( DevID == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( ServName == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( SubsId == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( VarName == NULL || NewVal == NULL || cVariables < 0 ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     HandleUnlock();
@@ -2360,17 +2360,17 @@ UpnpAcceptSubscription( IN UpnpDevice_Handle Hnd,
         genaInitNotify( Hnd, DevID, ServName, VarName, NewVal, cVariables,
                         SubsId );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpAcceptSubscription \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaAcceptSubscription \n" );
     return retVal;
 
-}  /***************** End of UpnpAcceptSubscription *********************/
+}  /***************** End of dlnaAcceptSubscription *********************/
 
 /**************************************************************************
- * Function: UpnpAcceptSubscriptionExt 
+ * Function: dlnaAcceptSubscriptionExt 
  *
  * Parameters:	
- * 	IN UpnpDevice_Handle Hnd: The handle of the device. 
+ * 	IN dlnaDevice_Handle Hnd: The handle of the device. 
  * 	IN const char *DevID: The device ID of the subdevice of the 
  *		service generating the event. 
  *	IN const char *ServID: The unique service identifier of the service 
@@ -2379,68 +2379,68 @@ UpnpAcceptSubscription( IN UpnpDevice_Handle Hnd,
  *		Property set documents must conform to the XML schema
  *		defined in section 4.3 of the Universal Plug and Play
  *		Device Architecture specification. 
- *	IN Upnp_SID SubsId: The subscription ID of the newly
+ *	IN dlna_SID SubsId: The subscription ID of the newly
  *		registered control point. 
  *
  * Description:
- *	This function is similar to UpnpAcceptSubscription except that it
+ *	This function is similar to dlnaAcceptSubscription except that it
  *	takes a DOM document for the variables to event rather than an array
  *	of strings. This function is sychronous and generates no callbacks.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpAcceptSubscriptionExt( IN UpnpDevice_Handle Hnd,
+dlnaAcceptSubscriptionExt( IN dlnaDevice_Handle Hnd,
                            IN const char *DevID_const,
                            IN const char *ServName_const,
                            IN IXML_Document * PropSet,
-                           IN Upnp_SID SubsId )
+                           IN dlna_SID SubsId )
 {
     struct Handle_Info *SInfo = NULL;
     int retVal;
     char *DevID = ( char * )DevID_const;
     char *ServName = ( char * )ServName_const;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpAcceptSubscription \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaAcceptSubscription \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_DEVICE ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     if( DevID == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( ServName == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( SubsId == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     if( PropSet == NULL ) {
         HandleUnlock();
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     HandleUnlock();
     retVal = genaInitNotifyExt( Hnd, DevID, ServName, PropSet, SubsId );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpAcceptSubscription \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaAcceptSubscription \n" );
 
     return retVal;
 
-}  /****************** End of UpnpAcceptSubscription *********************/
+}  /****************** End of dlnaAcceptSubscription *********************/
 
 #endif // INCLUDE_DEVICE_APIS
 #endif // EXCLUDE_GENA == 0
@@ -2454,10 +2454,10 @@ UpnpAcceptSubscriptionExt( IN UpnpDevice_Handle Hnd,
 #ifdef INCLUDE_CLIENT_APIS
 
 /**************************************************************************
- * Function: UpnpSendAction 
+ * Function: dlnaSendAction 
  *
  * Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point 
+ *	IN dlnaClient_Handle Hnd: The handle of the control point 
  *		sending the action. 
  *	IN const char *ActionURL: The action URL of the service. 
  *	IN const char *ServiceType: The type of the service. 
@@ -2477,10 +2477,10 @@ UpnpAcceptSubscriptionExt( IN UpnpDevice_Handle Hnd,
  *	A negative return value indicates a UPnP Library error.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpSendAction( IN UpnpClient_Handle Hnd,
+dlnaSendAction( IN dlnaClient_Handle Hnd,
                 IN const char *ActionURL_const,
                 IN const char *ServiceType_const,
                 IN const char *DevUDN_const,
@@ -2494,48 +2494,48 @@ UpnpSendAction( IN UpnpClient_Handle Hnd,
 
     //char *DevUDN = (char *)DevUDN_const;  // udn not used?
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpSendAction \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaSendAction \n" );
     if(DevUDN_const !=NULL) {
-	UpnpPrintf(UPNP_ALL,API,__FILE__,__LINE__,"non NULL DevUDN is ignored\n");
+	dlnaPrintf(DLNA_ALL,API,__FILE__,__LINE__,"non NULL DevUDN is ignored\n");
     }
     DevUDN_const = NULL;
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     HandleUnlock();
 
     if( ActionURL == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     if( ServiceType == NULL || Action == NULL || RespNodePtr == NULL
         || DevUDN_const != NULL ) {
 
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     retVal = SoapSendAction( ActionURL, ServiceType, Action, RespNodePtr );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSendAction \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaSendAction \n" );
 
     return retVal;
 
-}  /****************** End of UpnpSendAction *********************/
+}  /****************** End of dlnaSendAction *********************/
 
 /**************************************************************************
- * Function: UpnpSendActionEx 
+ * Function: dlnaSendActionEx 
  *
  * Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point sending
+ *	IN dlnaClient_Handle Hnd: The handle of the control point sending
  *		the action. 
  *	IN const char *ActionURL_const: The action URL of the service. 
  *	IN const char *ServiceType_const: The type of the service. 
@@ -2557,10 +2557,10 @@ UpnpSendAction( IN UpnpClient_Handle Hnd,
  *	A negative return value indicates a UPnP Library error.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpSendActionEx( IN UpnpClient_Handle Hnd,
+dlnaSendActionEx( IN dlnaClient_Handle Hnd,
                   IN const char *ActionURL_const,
                   IN const char *ServiceType_const,
                   IN const char *DevUDN_const,
@@ -2576,15 +2576,15 @@ UpnpSendActionEx( IN UpnpClient_Handle Hnd,
 
     //char *DevUDN = (char *)DevUDN_const;  // udn not used?
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpSendActionEx \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaSendActionEx \n" );
 
     if( Header == NULL ) {
-        retVal = UpnpSendAction( Hnd, ActionURL_const, ServiceType_const,
+        retVal = dlnaSendAction( Hnd, ActionURL_const, ServiceType_const,
                                  DevUDN_const, Action, RespNodePtr );
         return retVal;
     }
@@ -2592,39 +2592,39 @@ UpnpSendActionEx( IN UpnpClient_Handle Hnd,
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     HandleUnlock();
 
     if( ActionURL == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( ServiceType == NULL || Action == NULL || RespNodePtr == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     retVal = SoapSendActionEx( ActionURL, ServiceType, Header,
                                Action, RespNodePtr );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSendAction \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaSendAction \n" );
 
     return retVal;
 
-}  /****************** End of UpnpSendActionEx *********************/
+}  /****************** End of dlnaSendActionEx *********************/
 
 /**************************************************************************
- * Function: UpnpSendActionAsync 
+ * Function: dlnaSendActionAsync 
  *
  *  Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point 
+ *	IN dlnaClient_Handle Hnd: The handle of the control point 
  *		sending the action. 
  *	IN const char *ActionURL: The action URL of the service. 
  *	IN const char *ServiceType: The type of the service. 
  *	IN const char *DevUDN: This parameter is ignored. 
  *	IN IXML_Document *Action: The DOM document for the action to 
  *		perform on this device. 
- *	IN Upnp_FunPtr Fun: Pointer to a callback function to 
+ *	IN dlna_FunPtr Fun: Pointer to a callback function to 
  *		be invoked when the operation completes
  *	IN const void *Cookie: Pointer to user data that to be 
  *		passed to the callback when invoked.
@@ -2632,25 +2632,25 @@ UpnpSendActionEx( IN UpnpClient_Handle Hnd,
  * Description:
  *	this function sends a message to change a state variable
  *	in a service, generating a callback when the operation is complete.
- *	See UpnpSendAction for comments on positive return values. These 
+ *	See dlnaSendAction for comments on positive return values. These 
  *	positive return values are sent in the event struct associated with the
- *	UPNP_CONTROL_ACTION_COMPLETE event.
+ *	DLNA_CONTROL_ACTION_COMPLETE event.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpSendActionAsync( IN UpnpClient_Handle Hnd,
+dlnaSendActionAsync( IN dlnaClient_Handle Hnd,
                      IN const char *ActionURL_const,
                      IN const char *ServiceType_const,
                      IN const char *DevUDN_const,
                      IN IXML_Document * Act,
-                     IN Upnp_FunPtr Fun,
+                     IN dlna_FunPtr Fun,
                      IN const void *Cookie_const )
 {
     ThreadPoolJob job;
     struct Handle_Info *SInfo = NULL;
-    struct UpnpNonblockParam *Param;
+    struct dlnaNonblockParam *Param;
     DOMString tmpStr;
     char *ActionURL = ( char * )ActionURL_const;
     char *ServiceType = ( char * )ServiceType_const;
@@ -2658,38 +2658,38 @@ UpnpSendActionAsync( IN UpnpClient_Handle Hnd,
     //char *DevUDN = (char *)DevUDN_const;
     int rc;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpSendActionAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaSendActionAsync \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     HandleUnlock();
 
     if( ActionURL == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( ServiceType == NULL ||
         Act == NULL || Fun == NULL || DevUDN_const != NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     tmpStr = ixmlPrintNode( ( IXML_Node * ) Act );
     if( tmpStr == NULL ) {
-        return UPNP_E_INVALID_ACTION;
+        return DLNA_E_INVALID_ACTION;
     }
 
     Param =
-        ( struct UpnpNonblockParam * )
-        malloc( sizeof( struct UpnpNonblockParam ) );
+        ( struct dlnaNonblockParam * )
+        malloc( sizeof( struct dlnaNonblockParam ) );
 
     if( Param == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     Param->FunName = ACTION;
@@ -2702,33 +2702,33 @@ UpnpSendActionAsync( IN UpnpClient_Handle Hnd,
         free( Param );
         ixmlFreeDOMString( tmpStr );
         if( rc == IXML_INSUFFICIENT_MEMORY ) {
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         } else {
-            return UPNP_E_INVALID_ACTION;
+            return DLNA_E_INVALID_ACTION;
         }
     }
     ixmlFreeDOMString( tmpStr );
     Param->Cookie = ( void * )Cookie_const;
     Param->Fun = Fun;
 
-    TPJobInit( &job, ( start_routine ) UpnpThreadDistribution, Param );
+    TPJobInit( &job, ( start_routine ) dlnaThreadDistribution, Param );
     TPJobSetFreeFunction( &job, ( free_routine ) free );
 
     TPJobSetPriority( &job, MED_PRIORITY );
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSendActionAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaSendActionAsync \n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
-}  /****************** End of UpnpSendActionAsync *********************/
+}  /****************** End of dlnaSendActionAsync *********************/
 
 /*************************************************************************
- * Function: UpnpSendActionExAsync 
+ * Function: dlnaSendActionExAsync 
  *
  * Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point 
+ *	IN dlnaClient_Handle Hnd: The handle of the control point 
  *		sending the action. 
  *	IN const char *ActionURL_const: The action URL of the service. 
  *	IN const char *ServiceType_const: The type of the service. 
@@ -2737,7 +2737,7 @@ UpnpSendActionAsync( IN UpnpClient_Handle Hnd,
  *		This may be NULL if the header is not required. 
  *	IN IXML_Document *Act: The DOM document for the action to 
  *		perform on this device. 
- *	IN Upnp_FunPtr Fun: Pointer to a callback function to be invoked
+ *	IN dlna_FunPtr Fun: Pointer to a callback function to be invoked
  *		when the operation completes. 
  *	IN const void *Cookie_const: Pointer to user data that to be
  *		passed to the callback when invoked. 
@@ -2745,25 +2745,25 @@ UpnpSendActionAsync( IN UpnpClient_Handle Hnd,
  * Description:
  *	this function sends sends a message to change a state variable
  *	in a service, generating a callback when the operation is complete.
- *	See UpnpSendAction for comments on positive return values. These 
+ *	See dlnaSendAction for comments on positive return values. These 
  *	positive return values are sent in the event struct associated with 
- *	the UPNP_CONTROL_ACTION_COMPLETE event.
+ *	the DLNA_CONTROL_ACTION_COMPLETE event.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpSendActionExAsync( IN UpnpClient_Handle Hnd,
+dlnaSendActionExAsync( IN dlnaClient_Handle Hnd,
                        IN const char *ActionURL_const,
                        IN const char *ServiceType_const,
                        IN const char *DevUDN_const,
                        IN IXML_Document * Header,
                        IN IXML_Document * Act,
-                       IN Upnp_FunPtr Fun,
+                       IN dlna_FunPtr Fun,
                        IN const void *Cookie_const )
 {
     struct Handle_Info *SInfo = NULL;
-    struct UpnpNonblockParam *Param;
+    struct dlnaNonblockParam *Param;
     DOMString tmpStr;
     DOMString headerStr = NULL;
     char *ActionURL = ( char * )ActionURL_const;
@@ -2771,15 +2771,15 @@ UpnpSendActionExAsync( IN UpnpClient_Handle Hnd,
     ThreadPoolJob job;
     int retVal = 0;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpSendActionExAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaSendActionExAsync \n" );
 
     if( Header == NULL ) {
-        retVal = UpnpSendActionAsync( Hnd, ActionURL_const,
+        retVal = dlnaSendActionAsync( Hnd, ActionURL_const,
                                       ServiceType_const, DevUDN_const, Act,
                                       Fun, Cookie_const );
         return retVal;
@@ -2788,29 +2788,29 @@ UpnpSendActionExAsync( IN UpnpClient_Handle Hnd,
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     HandleUnlock();
 
     if( ActionURL == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( ServiceType == NULL || Act == NULL || Fun == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     headerStr = ixmlPrintNode( ( IXML_Node * ) Header );
 
     tmpStr = ixmlPrintNode( ( IXML_Node * ) Act );
     if( tmpStr == NULL ) {
-        return UPNP_E_INVALID_ACTION;
+        return DLNA_E_INVALID_ACTION;
     }
 
     Param =
-        ( struct UpnpNonblockParam * )
-        malloc( sizeof( struct UpnpNonblockParam ) );
+        ( struct dlnaNonblockParam * )
+        malloc( sizeof( struct dlnaNonblockParam ) );
     if( Param == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     Param->FunName = ACTION;
@@ -2822,9 +2822,9 @@ UpnpSendActionExAsync( IN UpnpClient_Handle Hnd,
         ixmlFreeDOMString( tmpStr );
         ixmlFreeDOMString( headerStr );
         if( retVal == IXML_INSUFFICIENT_MEMORY ) {
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         } else {
-            return UPNP_E_INVALID_ACTION;
+            return DLNA_E_INVALID_ACTION;
         }
     }
 
@@ -2834,9 +2834,9 @@ UpnpSendActionExAsync( IN UpnpClient_Handle Hnd,
         ixmlFreeDOMString( headerStr );
         ixmlDocument_free( Param->Header );
         if( retVal == IXML_INSUFFICIENT_MEMORY ) {
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         } else {
-            return UPNP_E_INVALID_ACTION;
+            return DLNA_E_INVALID_ACTION;
         }
 
     }
@@ -2847,27 +2847,27 @@ UpnpSendActionExAsync( IN UpnpClient_Handle Hnd,
     Param->Cookie = ( void * )Cookie_const;
     Param->Fun = Fun;
 
-    TPJobInit( &job, ( start_routine ) UpnpThreadDistribution, Param );
+    TPJobInit( &job, ( start_routine ) dlnaThreadDistribution, Param );
     TPJobSetFreeFunction( &job, ( free_routine ) free );
 
     TPJobSetPriority( &job, MED_PRIORITY );
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpSendActionAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaSendActionAsync \n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
-}  /****************** End of UpnpSendActionExAsync *********************/
+}  /****************** End of dlnaSendActionExAsync *********************/
 
 /*************************************************************************
- * Function: UpnpGetServiceVarStatusAsync 
+ * Function: dlnaGetServiceVarStatusAsync 
  *
  * Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point. 
+ *	IN dlnaClient_Handle Hnd: The handle of the control point. 
  *	IN const char *ActionURL: The URL of the service. 
  *	IN const char *VarName: The name of the variable to query. 
- *	IN Upnp_FunPtr Fun: Pointer to a callback function to 
+ *	IN dlna_FunPtr Fun: Pointer to a callback function to 
  *		be invoked when the operation is complete. 
  *	IN const void *Cookie: Pointer to user data to pass to the 
  *		callback function when invoked. 
@@ -2877,46 +2877,46 @@ UpnpSendActionExAsync( IN UpnpClient_Handle Hnd,
  *  service, generating a callback when the operation is complete.
  *
  *  Return Values: int
- *      UPNP_E_SUCCESS if successful else sends appropriate error.
+ *      DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpGetServiceVarStatusAsync( IN UpnpClient_Handle Hnd,
+dlnaGetServiceVarStatusAsync( IN dlnaClient_Handle Hnd,
                               IN const char *ActionURL_const,
                               IN const char *VarName_const,
-                              IN Upnp_FunPtr Fun,
+                              IN dlna_FunPtr Fun,
                               IN const void *Cookie_const )
 {
     ThreadPoolJob job;
     struct Handle_Info *SInfo = NULL;
-    struct UpnpNonblockParam *Param;
+    struct dlnaNonblockParam *Param;
     char *ActionURL = ( char * )ActionURL_const;
     char *VarName = ( char * )VarName_const;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpGetServiceVarStatusAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaGetServiceVarStatusAsync \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     HandleUnlock();
 
     if( ActionURL == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( VarName == NULL || Fun == NULL )
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
 
     Param =
-        ( struct UpnpNonblockParam * )
-        malloc( sizeof( struct UpnpNonblockParam ) );
+        ( struct dlnaNonblockParam * )
+        malloc( sizeof( struct dlnaNonblockParam ) );
     if( Param == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     Param->FunName = STATUS;
@@ -2926,25 +2926,25 @@ UpnpGetServiceVarStatusAsync( IN UpnpClient_Handle Hnd,
     Param->Fun = Fun;
     Param->Cookie = ( void * )Cookie_const;
 
-    TPJobInit( &job, ( start_routine ) UpnpThreadDistribution, Param );
+    TPJobInit( &job, ( start_routine ) dlnaThreadDistribution, Param );
     TPJobSetFreeFunction( &job, ( free_routine ) free );
 
     TPJobSetPriority( &job, MED_PRIORITY );
 
     ThreadPoolAdd( &gSendThreadPool, &job, NULL );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpGetServiceVarStatusAsync \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaGetServiceVarStatusAsync \n" );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
-}  /****************** End of UpnpGetServiceVarStatusAsync ****************/
+}  /****************** End of dlnaGetServiceVarStatusAsync ****************/
 
 /**************************************************************************
- * Function: UpnpGetServiceVarStatus 
+ * Function: dlnaGetServiceVarStatus 
  *
  * Parameters:	
- *	IN UpnpClient_Handle Hnd: The handle of the control point.
+ *	IN dlnaClient_Handle Hnd: The handle of the control point.
  *	IN const char *ActionURL: The URL of the service. 
  *	IN const char *VarName: The name of the variable to query. 
  *	OUT DOMString *StVarVal: The pointer to store the value 
@@ -2958,10 +2958,10 @@ UpnpGetServiceVarStatusAsync( IN UpnpClient_Handle Hnd,
  *	a UPnP SDK error code.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpGetServiceVarStatus( IN UpnpClient_Handle Hnd,
+dlnaGetServiceVarStatus( IN dlnaClient_Handle Hnd,
                          IN const char *ActionURL_const,
                          IN const char *VarName_const,
                          OUT DOMString * StVar )
@@ -2972,37 +2972,37 @@ UpnpGetServiceVarStatus( IN UpnpClient_Handle Hnd,
     char *ActionURL = ( char * )ActionURL_const;
     char *VarName = ( char * )VarName_const;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpGetServiceVarStatus \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside dlnaGetServiceVarStatus \n" );
 
     HandleReadLock();
     if( GetHandleInfo( Hnd, &SInfo ) != HND_CLIENT ) {
         HandleUnlock();
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
 
     HandleUnlock();
 
     if( ActionURL == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     if( VarName == NULL || StVar == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     retVal = SoapGetServiceVarStatus( ActionURL, VarName, &StVarPtr );
     *StVar = StVarPtr;
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpGetServiceVarStatus \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting dlnaGetServiceVarStatus \n" );
 
     return retVal;
 
-}  /****************** End of UpnpGetServiceVarStatus *********************/
+}  /****************** End of dlnaGetServiceVarStatus *********************/
 #endif // INCLUDE_CLIENT_APIS
 #endif // EXCLUDE_SOAP
 
@@ -3013,18 +3013,18 @@ UpnpGetServiceVarStatus( IN UpnpClient_Handle Hnd,
 //---------------------------------------------------------------------------
 
 /**************************************************************************
- * Function: UpnpOpenHttpPost 
+ * Function: dlnaOpenHttpPost 
  *
  * Parameters:	
  *  
  * Description:
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 
 int
-UpnpOpenHttpPost( IN const char *url,
+dlnaOpenHttpPost( IN const char *url,
                   IN OUT void **handle,
                   IN const char *contentType,
                   IN int contentLength,
@@ -3035,17 +3035,17 @@ UpnpOpenHttpPost( IN const char *url,
 }
 
 /**************************************************************************
- * Function: UpnpWriteHttpPost 
+ * Function: dlnaWriteHttpPost 
  *
  * Parameters:	
  *  
  * Description:
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpWriteHttpPost( IN void *handle,
+dlnaWriteHttpPost( IN void *handle,
                    IN char *buf,
                    IN unsigned int *size,
                    IN int timeout )
@@ -3054,17 +3054,17 @@ UpnpWriteHttpPost( IN void *handle,
 }
 
 /**************************************************************************
- * Function: UpnpCloseHttpPost 
+ * Function: dlnaCloseHttpPost 
  *
  * Parameters:	
  *  
  * Description:
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpCloseHttpPost( IN void *handle,
+dlnaCloseHttpPost( IN void *handle,
                    IN OUT int *httpStatus,
                    int timeout )
 {
@@ -3072,17 +3072,17 @@ UpnpCloseHttpPost( IN void *handle,
 }
 
 /**************************************************************************
- * Function: UpnpOpenHttpGet 
+ * Function: dlnaOpenHttpGet 
  *
  * Parameters:	
  *  
  * Description:
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpOpenHttpGet( IN const char *url_str,
+dlnaOpenHttpGet( IN const char *url_str,
                  IN OUT void **Handle,
                  IN OUT char **contentType,
                  OUT int *contentLength,
@@ -3096,17 +3096,17 @@ UpnpOpenHttpGet( IN const char *url_str,
 
 
 /**************************************************************************
- * Function: UpnpOpenHttpGetProxy
+ * Function: dlnaOpenHttpGetProxy
  *
  * Parameters:	
  *  
  * Description:
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpOpenHttpGetProxy( IN const char *url_str,
+dlnaOpenHttpGetProxy( IN const char *url_str,
                  IN const char *proxy_str,
                  IN OUT void **Handle,
                  IN OUT char **contentType,
@@ -3119,17 +3119,17 @@ UpnpOpenHttpGetProxy( IN const char *url_str,
 }
 
 /**************************************************************************
- * Function: UpnpOpenHttpGetEx
+ * Function: dlnaOpenHttpGetEx
  *
  * Parameters:	
  *  
  * Description:
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpOpenHttpGetEx( IN const char *url_str,
+dlnaOpenHttpGetEx( IN const char *url_str,
                    IN OUT void **Handle,
                    IN OUT char **contentType,
                    OUT int *contentLength,
@@ -3148,49 +3148,49 @@ UpnpOpenHttpGetEx( IN const char *url_str,
 
 
 /**************************************************************************
- * Function: UpnpCancelHttpGet 
+ * Function: dlnaCancelHttpGet 
  *
  * Parameters:	
  *  
  * Description:
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpCancelHttpGet( IN void *Handle )
+dlnaCancelHttpGet( IN void *Handle )
 {
     return http_CancelHttpGet( Handle );
 }
 
 /**************************************************************************
- * Function: UpnpCloseHttpGet 
+ * Function: dlnaCloseHttpGet 
  *
  * Parameters:	
  *  
  * Description:
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpCloseHttpGet( IN void *Handle )
+dlnaCloseHttpGet( IN void *Handle )
 {
     return http_CloseHttpGet( Handle );
 }
 
 /**************************************************************************
- * Function: UpnpReadHttpGet 
+ * Function: dlnaReadHttpGet 
  *
  * Parameters:	
  *  
  * Description:
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpReadHttpGet( IN void *Handle,
+dlnaReadHttpGet( IN void *Handle,
                  IN OUT char *buf,
                  IN OUT unsigned int *size,
                  IN int timeout )
@@ -3201,18 +3201,18 @@ UpnpReadHttpGet( IN void *Handle,
 
 
 /**************************************************************************
- * Function: UpnpHttpGetProgress 
+ * Function: dlnaHttpGetProgress 
  *
  * Parameters:	
  *  
  * Description:
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful.
- *	UPNP_E_INVALID_PARAM if the provided pointers were invalid.
+ *	DLNA_E_SUCCESS if successful.
+ *	DLNA_E_INVALID_PARAM if the provided pointers were invalid.
  ***************************************************************************/
 int
-UpnpHttpGetProgress( IN void *Handle, 
+dlnaHttpGetProgress( IN void *Handle, 
                      OUT unsigned int *length,
                      OUT unsigned int *total )
 {
@@ -3220,17 +3220,17 @@ UpnpHttpGetProgress( IN void *Handle,
 }
 
 /**************************************************************************
- * Function: UpnpDownloadUrlItem 
+ * Function: dlnaDownloadUrlItem 
  *
  * Parameters:	
  *  
  * Description:
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpDownloadUrlItem( const char *url,
+dlnaDownloadUrlItem( const char *url,
                      char **outBuf,
                      char *contentType )
 {
@@ -3238,31 +3238,31 @@ UpnpDownloadUrlItem( const char *url,
     int dummy;
 
     if( url == NULL || outBuf == NULL || contentType == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     ret_code = http_Download( url, HTTP_DEFAULT_TIMEOUT, outBuf, &dummy,
                               contentType );
     if( ret_code > 0 ) {
         // error reply was received
-        ret_code = UPNP_E_INVALID_URL;
+        ret_code = DLNA_E_INVALID_URL;
     }
 
     return ret_code;
 }
 
 /**************************************************************************
- * Function: UpnpDownloadXmlDoc 
+ * Function: dlnaDownloadXmlDoc 
  *
  * Parameters:	
  *  
  * Description:
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else sends appropriate error.
+ *	DLNA_E_SUCCESS if successful else sends appropriate error.
  ***************************************************************************/
 int
-UpnpDownloadXmlDoc( const char *url,
+dlnaDownloadXmlDoc( const char *url,
                     IXML_Document ** xmlDoc )
 {
     int ret_code;
@@ -3270,26 +3270,26 @@ UpnpDownloadXmlDoc( const char *url,
     char content_type[LINE_SIZE];
 
     if( url == NULL || xmlDoc == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
-    ret_code = UpnpDownloadUrlItem( url, &xml_buf, content_type );
-    if( ret_code != UPNP_E_SUCCESS ) {
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+    ret_code = dlnaDownloadUrlItem( url, &xml_buf, content_type );
+    if( ret_code != DLNA_E_SUCCESS ) {
+        dlnaPrintf( DLNA_CRITICAL, API, __FILE__, __LINE__,
             "retCode: %d\n", ret_code );
         return ret_code;
     }
 
     if( strncasecmp( content_type, "text/xml", strlen( "text/xml" ) ) ) {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__, "Not text/xml\n" );
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__, "Not text/xml\n" );
         // Linksys WRT54G router returns 
         // "CONTENT-TYPE: application/octet-stream".
         // Let's be nice to Linksys and try to parse document anyway.
         // If the data sended is not a xml file, ixmlParseBufferEx
-        // will fail and the function will return UPNP_E_INVALID_DESC too.
+        // will fail and the function will return DLNA_E_INVALID_DESC too.
 #if 0
         free( xml_buf );
-        return UPNP_E_INVALID_DESC;
+        return DLNA_E_INVALID_DESC;
 #endif
     }
 
@@ -3297,37 +3297,37 @@ UpnpDownloadXmlDoc( const char *url,
     free( xml_buf );
 
     if( ret_code != IXML_SUCCESS ) {
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_CRITICAL, API, __FILE__, __LINE__,
             "Invalid desc\n" );
         if( ret_code == IXML_INSUFFICIENT_MEMORY ) {
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         } else {
-            return UPNP_E_INVALID_DESC;
+            return DLNA_E_INVALID_DESC;
         }
     } else {
 #ifdef DEBUG
         xml_buf = ixmlPrintNode( ( IXML_Node * ) * xmlDoc );
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
             "Printing the Parsed xml document \n %s\n", xml_buf );
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
             "****************** END OF Parsed XML Doc *****************\n" );
         ixmlFreeDOMString( xml_buf );
 #endif
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-            "Exiting UpnpDownloadXmlDoc\n" );
-        return UPNP_E_SUCCESS;
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+            "Exiting dlnaDownloadXmlDoc\n" );
+        return DLNA_E_SUCCESS;
     }
 }
 
 //----------------------------------------------------------------------------
 //
-//                          UPNP-API  Internal function implementation
+//                          DLNA-API  Internal function implementation
 //
 //----------------------------------------------------------------------------
 
 
 /**************************************************************************
- * Function: UpnpThreadDistribution 
+ * Function: upnp.hreadDistribution 
  *
  * Parameters:	
  *  
@@ -3339,48 +3339,48 @@ UpnpDownloadXmlDoc( const char *url,
  ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 void
-UpnpThreadDistribution( struct UpnpNonblockParam *Param )
+dlnaThreadDistribution( struct dlnaNonblockParam *Param )
 {
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Inside UpnpThreadDistribution \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Inside upnp.hreadDistribution \n" );
 
     switch ( Param->FunName ) {
 #if EXCLUDE_GENA == 0
         case SUBSCRIBE: {
-            struct Upnp_Event_Subscribe Evt;
+            struct dlna_Event_Subscribe Evt;
             Evt.ErrCode = genaSubscribe(
                 Param->Handle, Param->Url,
                 ( int * )&( Param->TimeOut ),
                 ( char * )Evt.Sid );
             strcpy( Evt.PublisherUrl, Param->Url );
             Evt.TimeOut = Param->TimeOut;
-            Param->Fun( UPNP_EVENT_SUBSCRIBE_COMPLETE, &Evt, Param->Cookie );
+            Param->Fun( DLNA_EVENT_SUBSCRIBE_COMPLETE, &Evt, Param->Cookie );
             free( Param );
             break;
         }
         case UNSUBSCRIBE: {
-	    struct Upnp_Event_Subscribe Evt;
+	    struct dlna_Event_Subscribe Evt;
 	    Evt.ErrCode =
 	    genaUnSubscribe( Param->Handle,
 			     Param->SubsId );
 	    strcpy( ( char * )Evt.Sid, Param->SubsId );
 	    strcpy( Evt.PublisherUrl, "" );
 	    Evt.TimeOut = 0;
-	    Param->Fun( UPNP_EVENT_UNSUBSCRIBE_COMPLETE,
+	    Param->Fun( DLNA_EVENT_UNSUBSCRIBE_COMPLETE,
 			&Evt, Param->Cookie );
 	    free( Param );
             break;
         }
         case RENEW: {
-	    struct Upnp_Event_Subscribe Evt;
+	    struct dlna_Event_Subscribe Evt;
 	    Evt.ErrCode =
 	    genaRenewSubscription( Param->Handle,
 				   Param->SubsId,
 				   &( Param->TimeOut ) );
 	    Evt.TimeOut = Param->TimeOut;
 	    strcpy( ( char * )Evt.Sid, Param->SubsId );
-	    Param->Fun( UPNP_EVENT_RENEWAL_COMPLETE, &Evt,
+	    Param->Fun( DLNA_EVENT_RENEWAL_COMPLETE, &Evt,
 			Param->Cookie );
             free( Param );
 	    break;
@@ -3388,14 +3388,14 @@ UpnpThreadDistribution( struct UpnpNonblockParam *Param )
 #endif // EXCLUDE_GENA == 0
 #if EXCLUDE_SOAP == 0
         case ACTION: {
-            struct Upnp_Action_Complete Evt;
+            struct dlna_Action_Complete Evt;
             Evt.ActionResult = NULL;
                 Evt.ErrCode =
                     SoapSendAction( Param->Url, Param->ServiceType,
                                     Param->Act, &Evt.ActionResult );
                 Evt.ActionRequest = Param->Act;
                 strcpy( Evt.CtrlUrl, Param->Url );
-                Param->Fun( UPNP_CONTROL_ACTION_COMPLETE, &Evt,
+                Param->Fun( DLNA_CONTROL_ACTION_COMPLETE, &Evt,
                             Param->Cookie );
                 ixmlDocument_free( Evt.ActionRequest );
                 ixmlDocument_free( Evt.ActionResult );
@@ -3403,12 +3403,12 @@ UpnpThreadDistribution( struct UpnpNonblockParam *Param )
                 break;
         }
         case STATUS: {
-                struct Upnp_State_Var_Complete Evt;
+                struct dlna_State_Var_Complete Evt;
                 Evt.ErrCode = SoapGetServiceVarStatus(
                     Param->Url, Param->VarName, &( Evt.CurrentVal ) );
                 strcpy( Evt.StateVarName, Param->VarName );
                 strcpy( Evt.CtrlUrl, Param->Url );
-                Param->Fun( UPNP_CONTROL_GET_VAR_COMPLETE, &Evt,
+                Param->Fun( DLNA_CONTROL_GET_VAR_COMPLETE, &Evt,
                             Param->Cookie );
                 free( Evt.CurrentVal );
                 free( Param );
@@ -3419,10 +3419,10 @@ UpnpThreadDistribution( struct UpnpNonblockParam *Param )
             break;
     } // end of switch(Param->FunName)
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
-        "Exiting UpnpThreadDistribution \n" );
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
+        "Exiting upnp.hreadDistribution \n" );
 
-}  /****************** End of UpnpThreadDistribution  *********************/
+}  /****************** End of upnp.hreadDistribution  *********************/
 #endif // INCLUDE_CLIENT_APIS
 
 /**************************************************************************
@@ -3433,11 +3433,11 @@ UpnpThreadDistribution( struct UpnpNonblockParam *Param )
  * Description:
  *	This function is to get callback function ptr from a handle
  *
- * Return Values: Upnp_FunPtr
+ * Return Values: dlna_FunPtr
  *      
  ***************************************************************************/
-Upnp_FunPtr
-GetCallBackFn( UpnpClient_Handle Hnd )
+dlna_FunPtr
+GetCallBackFn( dlnaClient_Handle Hnd )
 {
     return ( ( struct Handle_Info * )HandleTable[Hnd] )->Callback;
 
@@ -3489,7 +3489,7 @@ GetFreeHandle()
     }
 
     if( i == NUM_HANDLE )
-        return UPNP_E_OUTOF_HANDLE; //Error
+        return DLNA_E_OUTOF_HANDLE; //Error
     else
         return --i;
 
@@ -3499,7 +3499,7 @@ GetFreeHandle()
  * Function: GetClientHandleInfo 
  *
  * Parameters:	
- *	IN UpnpClient_Handle *client_handle_out: client handle pointer ( key 
+ *	IN dlnaClient_Handle *client_handle_out: client handle pointer ( key 
  *		for the client handle structure).
  *	OUT struct Handle_Info **HndInfo: Client handle structure passed by 
  *		this function.
@@ -3511,8 +3511,8 @@ GetFreeHandle()
  *      
  ***************************************************************************/
 //Assumes at most one client
-Upnp_Handle_Type
-GetClientHandleInfo( IN UpnpClient_Handle * client_handle_out,
+dlna_Handle_Type
+GetClientHandleInfo( IN dlnaClient_Handle * client_handle_out,
                      OUT struct Handle_Info ** HndInfo )
 {
     ( *client_handle_out ) = 1;
@@ -3532,7 +3532,7 @@ GetClientHandleInfo( IN UpnpClient_Handle * client_handle_out,
  * Function: GetDeviceHandleInfo 
  *
  * Parameters:	
- * 	IN UpnpDevice_Handle * device_handle_out: device handle pointer
+ * 	IN dlnaDevice_Handle * device_handle_out: device handle pointer
  * 		(key for the client handle structure).
  *	OUT struct Handle_Info **HndInfo: Device handle structure passed by
  *		this function.
@@ -3543,8 +3543,8 @@ GetClientHandleInfo( IN UpnpClient_Handle * client_handle_out,
  *  Return Values: HND_DEVICE
  *      
  ***************************************************************************/
-Upnp_Handle_Type
-GetDeviceHandleInfo( UpnpDevice_Handle * device_handle_out,
+dlna_Handle_Type
+GetDeviceHandleInfo( dlnaDevice_Handle * device_handle_out,
                      struct Handle_Info ** HndInfo )
 {
     ( *device_handle_out ) = 1;
@@ -3564,7 +3564,7 @@ GetDeviceHandleInfo( UpnpDevice_Handle * device_handle_out,
  * Function: GetDeviceHandleInfo 
  *
  * Parameters:	
- * 	IN UpnpClient_Handle * device_handle_out: handle pointer
+ * 	IN dlnaClient_Handle * device_handle_out: handle pointer
  * 		(key for the client handle structure).
  *	OUT struct Handle_Info **HndInfo: handle structure passed by
  *		this function.
@@ -3575,27 +3575,27 @@ GetDeviceHandleInfo( UpnpDevice_Handle * device_handle_out,
  * Return Values: HND_DEVICE
  *      
  ***************************************************************************/
-Upnp_Handle_Type
-GetHandleInfo( UpnpClient_Handle Hnd,
+dlna_Handle_Type
+GetHandleInfo( dlnaClient_Handle Hnd,
                struct Handle_Info ** HndInfo )
 {
 
-    UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
         "GetHandleInfo: Handle is %d\n", Hnd );
 
     if( Hnd < 1 || Hnd >= NUM_HANDLE ) {
-        UpnpPrintf( UPNP_INFO, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, API, __FILE__, __LINE__,
             "GetHandleInfo : Handle out of range\n" );
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
     if( HandleTable[Hnd] != NULL ) {
         *HndInfo = ( struct Handle_Info * )HandleTable[Hnd];
         return ( ( struct Handle_Info * )*HndInfo )->HType;
     }
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
         "GetHandleInfo : exiting\n" );
 
-    return UPNP_E_INVALID_HANDLE;
+    return DLNA_E_INVALID_HANDLE;
 
 }  /****************** End of GetHandleInfo *********************/
 
@@ -3603,29 +3603,29 @@ GetHandleInfo( UpnpClient_Handle Hnd,
  * Function: FreeHandle 
  *
  * Parameters:	
- * 	IN int Upnp_Handle: handle index 
+ * 	IN int dlna_Handle: handle index 
  *  
  * Description:
  *	This function is to to free handle info.
  *	
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else return appropriate error
+ *	DLNA_E_SUCCESS if successful else return appropriate error
  ***************************************************************************/
 int
-FreeHandle( int Upnp_Handle )
+FreeHandle( int dlna_Handle )
 {
-    if( Upnp_Handle < 1 || Upnp_Handle >= NUM_HANDLE ) {
-        UpnpPrintf( UPNP_CRITICAL, API, __FILE__, __LINE__,
+    if( dlna_Handle < 1 || dlna_Handle >= NUM_HANDLE ) {
+        dlnaPrintf( DLNA_CRITICAL, API, __FILE__, __LINE__,
             "FreeHandleInfo : Handle out of range\n" );
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
 
-    if( HandleTable[Upnp_Handle] == NULL ) {
-        return UPNP_E_INVALID_HANDLE;
+    if( HandleTable[dlna_Handle] == NULL ) {
+        return DLNA_E_INVALID_HANDLE;
     }
-    free( HandleTable[Upnp_Handle] );
-    HandleTable[Upnp_Handle] = NULL;
-    return UPNP_E_SUCCESS;
+    free( HandleTable[dlna_Handle] );
+    HandleTable[dlna_Handle] = NULL;
+    return DLNA_E_SUCCESS;
 
 }  /****************** End of FreeHandle *********************/
 
@@ -3634,33 +3634,33 @@ FreeHandle( int Upnp_Handle )
  * Function: PrintHandleInfo 
  *
  * Parameters:	
- *	IN UpnpClient_Handle Hnd: handle index 
+ *	IN dlnaClient_Handle Hnd: handle index 
  *  
  * Description:
  *	This function is to print handle info.
  *	
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else return appropriate error
+ *	DLNA_E_SUCCESS if successful else return appropriate error
  ***************************************************************************/
-int PrintHandleInfo( IN UpnpClient_Handle Hnd )
+int PrintHandleInfo( IN dlnaClient_Handle Hnd )
 {
     struct Handle_Info * HndInfo;
     if (HandleTable[Hnd] != NULL) {
         HndInfo = HandleTable[Hnd];
-            UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+            dlnaPrintf(DLNA_ALL, API, __FILE__, __LINE__,
                 "Printing information for Handle_%d\n", Hnd);
-            UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+            dlnaPrintf(DLNA_ALL, API, __FILE__, __LINE__,
                 "HType_%d\n", HndInfo->HType);
 #ifdef INCLUDE_DEVICE_APIS
                 if(HndInfo->HType != HND_CLIENT)
-                    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+                    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
                         "DescURL_%s\n", HndInfo->DescURL );
 #endif
     } else {
-        return UPNP_E_INVALID_HANDLE;
+        return DLNA_E_INVALID_HANDLE;
     }
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
    /****************** End of PrintHandleInfo *********************/
@@ -3684,7 +3684,7 @@ void printNodes( IXML_Node * tmpRoot, int depth )
         NodeType = ixmlNode_getNodeType(ChildNode1);
         NodeValue = ixmlNode_getNodeValue(ChildNode1);
         NodeName = ixmlNode_getNodeName(ChildNode1);
-        UpnpPrintf(UPNP_ALL, API, __FILE__, __LINE__,
+        dlnaPrintf(DLNA_ALL, API, __FILE__, __LINE__,
             "DEPTH-%2d-IXML_Node Type %d, "
             "IXML_Node Name: %s, IXML_Node Value: %s\n",
             depth, NodeType, NodeName, NodeValue);
@@ -3699,11 +3699,11 @@ void printNodes( IXML_Node * tmpRoot, int depth )
     //*               Gets the ip address for the DEFAULT_INTERFACE 
     //*               interface which is up and not a loopback
     //*               assumes at most MAX_INTERFACES interfaces
-    //* Called by:    UpnpInit
+    //* Called by:    dlnaInit
     //* In:           char *out
     //* Out:          Ip address
-    //* Return codes: UPNP_E_SUCCESS
-    //* Error codes:  UPNP_E_INIT
+    //* Return codes: DLNA_E_SUCCESS
+    //* Error codes:  DLNA_E_INIT
     //********************************************************
 
  /**************************************************************************
@@ -3718,7 +3718,7 @@ void printNodes( IXML_Node * tmpRoot, int depth )
  *	assumes at most MAX_INTERFACES interfaces
  *
  *  Return Values: int
- *	UPNP_E_SUCCESS if successful else return appropriate error
+ *	DLNA_E_SUCCESS if successful else return appropriate error
  ***************************************************************************/
     int getlocalhostname( OUT char *out ) {
 
@@ -3732,14 +3732,14 @@ void printNodes( IXML_Node * tmpRoot, int depth )
  			memcpy(&LocalAddr.sin_addr,h->h_addr_list[0],4);
  			strcpy( out, inet_ntoa(LocalAddr.sin_addr));
  		}
- 		return UPNP_E_SUCCESS;
+ 		return DLNA_E_SUCCESS;
 #elif (defined(BSD) && BSD >= 199306)
     struct ifaddrs *ifap, *ifa;
 
     if (getifaddrs(&ifap) != 0) {
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
             "DiscoverInterfaces: getifaddrs() returned error\n" );
-        return UPNP_E_INIT;
+        return DLNA_E_INIT;
     }
 
     // cycle through available interfaces
@@ -3761,7 +3761,7 @@ void printNodes( IXML_Node * tmpRoot, int depth )
             strncpy( out, inet_ntoa( ((struct sockaddr_in *)(ifa->ifa_addr))->
                 sin_addr ), LINE_SIZE );
             out[LINE_SIZE-1] = '\0';
-            UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
                 "Inside getlocalhostname : after strncpy %s\n",
                 out );
             break;
@@ -3769,7 +3769,7 @@ void printNodes( IXML_Node * tmpRoot, int depth )
     }
     freeifaddrs(ifap);
 
-    return ifa ? UPNP_E_SUCCESS : UPNP_E_INIT;
+    return ifa ? DLNA_E_SUCCESS : DLNA_E_INIT;
 #else
     char szBuffer[MAX_INTERFACES * sizeof( struct ifreq )];
     struct ifconf ifConf;
@@ -3782,9 +3782,9 @@ void printNodes( IXML_Node * tmpRoot, int depth )
 
     // Create an unbound datagram socket to do the SIOCGIFADDR ioctl on. 
     if( ( LocalSock = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP ) ) < 0 ) {
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
             "Can't create addrlist socket\n" );
-        return UPNP_E_INIT;
+        return DLNA_E_INIT;
     }
     // Get the interface configuration information... 
     ifConf.ifc_len = sizeof szBuffer;
@@ -3792,10 +3792,10 @@ void printNodes( IXML_Node * tmpRoot, int depth )
     nResult = ioctl( LocalSock, SIOCGIFCONF, &ifConf );
 
     if( nResult < 0 ) {
-        UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
             "DiscoverInterfaces: SIOCGIFCONF returned error\n" );
 
-        return UPNP_E_INIT;
+        return DLNA_E_INIT;
     }
     // Cycle through the list of interfaces looking for IP addresses. 
 
@@ -3807,7 +3807,7 @@ void printNodes( IXML_Node * tmpRoot, int depth )
         // See if this is the sort of interface we want to deal with.
         strcpy( ifReq.ifr_name, pifReq->ifr_name );
         if( ioctl( LocalSock, SIOCGIFFLAGS, &ifReq ) < 0 ) {
-            UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
                 "Can't get interface flags for %s:\n",
                 ifReq.ifr_name );
         }
@@ -3838,10 +3838,10 @@ void printNodes( IXML_Node * tmpRoot, int depth )
 
     strncpy( out, inet_ntoa( LocalAddr.sin_addr ), LINE_SIZE );
 
-    UpnpPrintf( UPNP_ALL, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_ALL, API, __FILE__, __LINE__,
         "Inside getlocalhostname : after strncpy %s\n",
         out );
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 #endif
     }
 
@@ -3855,7 +3855,7 @@ void printNodes( IXML_Node * tmpRoot, int depth )
  * 	IN void *input: information provided to the thread.
  *  
  * Description:
- *	This function is a timer thread scheduled by UpnpSendAdvertisement 
+ *	This function is a timer thread scheduled by dlnaSendAdvertisement 
  *	to the send advetisement again. 
  *
  * Return Values: VOID
@@ -3864,10 +3864,10 @@ void printNodes( IXML_Node * tmpRoot, int depth )
 void
 AutoAdvertise( void *input )
 {
-    upnp_timeout *event = ( upnp_timeout * ) input;
+    dlna_timeout *event = ( dlna_timeout * ) input;
 
-    UpnpSendAdvertisement( event->handle, *( ( int * )event->Event ) );
-    free_upnp_timeout( event );
+    dlnaSendAdvertisement( event->handle, *( ( int * )event->Event ) );
+    free_dlna_timeout( event );
 }
 #endif //INCLUDE_DEVICE_APIS
 #endif
@@ -3877,7 +3877,7 @@ AutoAdvertise( void *input )
 #ifdef INTERNAL_WEB_SERVER
 
  /**************************************************************************
- * Function: UpnpSetWebServerRootDir 
+ * Function: dlnaSetWebServerRootDir 
  *
  * Parameters:	
  *	IN const char* rootDir:Path of the root directory of the web server. 
@@ -3894,15 +3894,15 @@ AutoAdvertise( void *input )
  *	compiled into the UPnP Library.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else returns appropriate error
+ *	DLNA_E_SUCCESS if successful else returns appropriate error
  ***************************************************************************/
 int
-UpnpSetWebServerRootDir( IN const char *rootDir )
+dlnaSetWebServerRootDir( IN const char *rootDir )
 {
-    if( UpnpSdkInit == 0 )
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit == 0 )
+        return DLNA_E_FINISH;
     if( ( rootDir == NULL ) || ( strlen( rootDir ) == 0 ) ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     membuffer_destroy( &gDocumentRootDir );
@@ -3914,7 +3914,7 @@ UpnpSetWebServerRootDir( IN const char *rootDir )
  *************************** */
 
  /**************************************************************************
- * Function: UpnpAddVirtualDir 
+ * Function: dlnaAddVirtualDir 
  *
  * Parameters:	
  *	IN const char *newDirName:The name of the new directory mapping to add.
@@ -3923,17 +3923,17 @@ UpnpSetWebServerRootDir( IN const char *rootDir )
  *	This function adds a virtual directory mapping.
  *
  *	All webserver requests containing the given directory are read using
- *	functions contained in a UpnpVirtualDirCallbacks structure registered
- *	via UpnpSetVirtualDirCallbacks.
+ *	functions contained in a dlnaVirtualDirCallbacks structure registered
+ *	via dlnaSetVirtualDirCallbacks.
  *  
  *	Note that this function is not available when the web server is not
  *	compiled into the UPnP Library.
  *
  *  Return Values: int
- *     UPNP_E_SUCCESS if successful else returns appropriate error
+ *     DLNA_E_SUCCESS if successful else returns appropriate error
  ***************************************************************************/
 int
-UpnpAddVirtualDir( IN const char *newDirName )
+dlnaAddVirtualDir( IN const char *newDirName )
 {
 
     virtualDirList *pNewVirtualDir,
@@ -3941,13 +3941,13 @@ UpnpAddVirtualDir( IN const char *newDirName )
     virtualDirList *pCurVirtualDir;
     char dirName[NAME_SIZE];
 
-    if( UpnpSdkInit != 1 ) {
+    if( dlnaSdkInit != 1 ) {
         // SDK is not initialized
-        return UPNP_E_FINISH;
+        return DLNA_E_FINISH;
     }
 
     if( ( newDirName == NULL ) || ( strlen( newDirName ) == 0 ) ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     if( *newDirName != '/' ) {
@@ -3961,7 +3961,7 @@ UpnpAddVirtualDir( IN const char *newDirName )
     while( pCurVirtualDir != NULL ) {
         // already has this entry
         if( strcmp( pCurVirtualDir->dirName, dirName ) == 0 ) {
-            return UPNP_E_SUCCESS;
+            return DLNA_E_SUCCESS;
         }
 
         pCurVirtualDir = pCurVirtualDir->next;
@@ -3970,7 +3970,7 @@ UpnpAddVirtualDir( IN const char *newDirName )
     pNewVirtualDir =
         ( virtualDirList * ) malloc( sizeof( virtualDirList ) );
     if( pNewVirtualDir == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     pNewVirtualDir->next = NULL;
     strcpy( pNewVirtualDir->dirName, dirName );
@@ -3986,11 +3986,11 @@ UpnpAddVirtualDir( IN const char *newDirName )
         pLast->next = pNewVirtualDir;
     }
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
  /**************************************************************************
- * Function: UpnpRemoveVirtualDir 
+ * Function: dlnaRemoveVirtualDir 
  *
  * Parameters:	
  * 	IN const char *newDirName:The name of the directory mapping to remove.
@@ -3999,26 +3999,26 @@ UpnpAddVirtualDir( IN const char *newDirName )
  *	This function removes a virtual directory mapping.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else returns appropriate error
+ *	DLNA_E_SUCCESS if successful else returns appropriate error
  ***************************************************************************/
 int
-UpnpRemoveVirtualDir( IN const char *dirName )
+dlnaRemoveVirtualDir( IN const char *dirName )
 {
 
     virtualDirList *pPrev;
     virtualDirList *pCur;
     int found = 0;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
     if( dirName == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     if( pVirtualDirList == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
     //
     // Handle the special case where the directory that we are
@@ -4029,7 +4029,7 @@ UpnpRemoveVirtualDir( IN const char *dirName )
         ( strcmp( pVirtualDirList->dirName, dirName ) == 0 ) ) {
         free( pVirtualDirList );
         pVirtualDirList = NULL;
-        return UPNP_E_SUCCESS;
+        return DLNA_E_SUCCESS;
     }
 
     pCur = pVirtualDirList;
@@ -4048,14 +4048,14 @@ UpnpRemoveVirtualDir( IN const char *dirName )
     }
 
     if( found == 1 )
-        return UPNP_E_SUCCESS;
+        return DLNA_E_SUCCESS;
     else
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
 
 }
 
  /**************************************************************************
- * Function: UpnpRemoveAllVirtualDirs 
+ * Function: dlnaRemoveAllVirtualDirs 
  *
  * Parameters: VOID
  *  
@@ -4066,13 +4066,13 @@ UpnpRemoveVirtualDir( IN const char *dirName )
  *     
  ***************************************************************************/
 void
-UpnpRemoveAllVirtualDirs()
+dlnaRemoveAllVirtualDirs()
 {
 
     virtualDirList *pCur;
     virtualDirList *pNext;
 
-    if( UpnpSdkInit != 1 ) {
+    if( dlnaSdkInit != 1 ) {
         return;
     }
 
@@ -4090,7 +4090,7 @@ UpnpRemoveAllVirtualDirs()
 }
 
  /**************************************************************************
- * Function: UpnpEnableWebserver 
+ * Function: dlnaEnableWebserver 
  *
  * Parameters:	
  *	IN int enable: TRUE to enable, FALSE to disable.
@@ -4100,21 +4100,21 @@ UpnpRemoveAllVirtualDirs()
  *	TRUE enables the webserver, FALSE disables it.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS if successful else returns appropriate error
+ *	DLNA_E_SUCCESS if successful else returns appropriate error
  ***************************************************************************/
 int
-UpnpEnableWebserver( IN int enable )
+dlnaEnableWebserver( IN int enable )
 {
     int retVal;
 
-    if( UpnpSdkInit != 1 ) {
-        return UPNP_E_FINISH;
+    if( dlnaSdkInit != 1 ) {
+        return DLNA_E_FINISH;
     }
 
     switch ( enable ) {
 #ifdef INTERNAL_WEB_SERVER
         case TRUE:
-            if( ( retVal = web_server_init() ) != UPNP_E_SUCCESS ) {
+            if( ( retVal = web_server_init() ) != DLNA_E_SUCCESS ) {
                 return retVal;
             }
             bWebServerState = WEB_SERVER_ENABLED;
@@ -4128,14 +4128,14 @@ UpnpEnableWebserver( IN int enable )
             break;
 #endif
         default:
-            return UPNP_E_INVALID_PARAM;
+            return DLNA_E_INVALID_PARAM;
     }
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
  /**************************************************************************
- * Function: UpnpIsWebserverEnabled 
+ * Function: dlnaIsWebserverEnabled 
  *
  * Parameters: VOID
  *  
@@ -4147,9 +4147,9 @@ UpnpEnableWebserver( IN int enable )
  *	0, if webserver disabled
  ***************************************************************************/
 int
-UpnpIsWebserverEnabled()
+dlnaIsWebserverEnabled()
 {
-    if( UpnpSdkInit != 1 ) {
+    if( dlnaSdkInit != 1 ) {
         return 0;
     }
 
@@ -4157,10 +4157,10 @@ UpnpIsWebserverEnabled()
 }
 
  /**************************************************************************
- * Function: UpnpSetVirtualDirCallbacks 
+ * Function: dlnaSetVirtualDirCallbacks 
  *
  * Parameters:	
- *	IN struct UpnpVirtualDirCallbacks *callbacks:a structure that 
+ *	IN struct dlnaVirtualDirCallbacks *callbacks:a structure that 
  *		contains the callback functions.
  *	
  * Description:
@@ -4168,22 +4168,22 @@ UpnpIsWebserverEnabled()
  *	access a virtual directory.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS on success, or UPNP_E_INVALID_PARAM
+ *	DLNA_E_SUCCESS on success, or DLNA_E_INVALID_PARAM
  ***************************************************************************/
 int
-UpnpSetVirtualDirCallbacks( IN struct UpnpVirtualDirCallbacks *callbacks, IN void *cookie )
+dlnaSetVirtualDirCallbacks( IN struct dlnaVirtualDirCallbacks *callbacks, IN void *cookie )
 {
-    struct UpnpVirtualDirCallbacks *pCallback;
+    struct dlnaVirtualDirCallbacks *pCallback;
 
-    if( UpnpSdkInit != 1 ) {
+    if( dlnaSdkInit != 1 ) {
         // SDK is not initialized
-        return UPNP_E_FINISH;
+        return DLNA_E_FINISH;
     }
 
     pCallback = &virtualDirCallback;
 
     if( callbacks == NULL )
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
 
     pCallback->cookie = cookie;
     pCallback->get_info = callbacks->get_info;
@@ -4193,11 +4193,11 @@ UpnpSetVirtualDirCallbacks( IN struct UpnpVirtualDirCallbacks *callbacks, IN voi
     pCallback->write = callbacks->write;
     pCallback->seek = callbacks->seek;
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
  /**************************************************************************
- * Function: UpnpFree 
+ * Function: dlnaFree 
  *
  * Parameters:	
  *	IN void *item:The item to free.
@@ -4209,7 +4209,7 @@ UpnpSetVirtualDirCallbacks( IN struct UpnpVirtualDirCallbacks *callbacks, IN voi
  *		
  ***************************************************************************/
 void
-UpnpFree( IN void *item )
+dlnaFree( IN void *item )
 {
     if( item )
         free( item );
@@ -4217,11 +4217,11 @@ UpnpFree( IN void *item )
 
 
 /**************************************************************************
- * Function: UpnpSetContentLength
- * OBSOLETE METHOD : use {\bf UpnpSetMaxContentLength} instead.
+ * Function: dlnaSetContentLength
+ * OBSOLETE METHOD : use {\bf dlnaSetMaxContentLength} instead.
  ***************************************************************************/
 int
-UpnpSetContentLength( IN UpnpClient_Handle Hnd,
+dlnaSetContentLength( IN dlnaClient_Handle Hnd,
                                /** The handle of the device instance
                                   for which the coincoming content length needs
                                   to be set. */
@@ -4230,12 +4230,12 @@ UpnpSetContentLength( IN UpnpClient_Handle Hnd,
                                /** Permissible content length  */
      )
 {
-    int errCode = UPNP_E_SUCCESS;
+    int errCode = DLNA_E_SUCCESS;
     struct Handle_Info *HInfo = NULL;
 
     do {
-        if( UpnpSdkInit != 1 ) {
-            errCode = UPNP_E_FINISH;
+        if( dlnaSdkInit != 1 ) {
+            errCode = DLNA_E_FINISH;
             break;
         }
 
@@ -4244,12 +4244,12 @@ UpnpSetContentLength( IN UpnpClient_Handle Hnd,
         errCode = GetHandleInfo( Hnd, &HInfo );
 
         if( errCode != HND_DEVICE ) {
-            errCode = UPNP_E_INVALID_HANDLE;
+            errCode = DLNA_E_INVALID_HANDLE;
             break;
         }
 
         if( contentLength > MAX_SOAP_CONTENT_LENGTH ) {
-            errCode = UPNP_E_OUTOF_BOUNDS;
+            errCode = DLNA_E_OUTOF_BOUNDS;
             break;
         }
 
@@ -4264,7 +4264,7 @@ UpnpSetContentLength( IN UpnpClient_Handle Hnd,
 
 
 /**************************************************************************
- * Function: UpnpSetMaxContentLength
+ * Function: dlnaSetMaxContentLength
  *
  * Parameters:	
  *	IN int contentLength: The maximum size to be set 
@@ -4278,20 +4278,20 @@ UpnpSetContentLength( IN UpnpClient_Handle Hnd,
  *	= 16K bytes.
  *
  * Return Values: int
- *	UPNP_E_SUCCESS: The operation completed successfully.
+ *	DLNA_E_SUCCESS: The operation completed successfully.
  *		
  ***************************************************************************/
 int
-UpnpSetMaxContentLength (
+dlnaSetMaxContentLength (
                       IN size_t contentLength
                                /** Permissible content length, in bytes  */
      )
 {
-    int errCode = UPNP_E_SUCCESS;
+    int errCode = DLNA_E_SUCCESS;
 
     do {
-        if( UpnpSdkInit != 1 ) {
-            errCode = UPNP_E_FINISH;
+        if( dlnaSdkInit != 1 ) {
+            errCode = DLNA_E_FINISH;
             break;
         }
 
@@ -4303,4 +4303,4 @@ UpnpSetMaxContentLength (
 
 }
 
-/*********************** END OF FILE upnpapi.c :) ************************/
+/*********************** END OF FILE dlnaapi.c :) ************************/

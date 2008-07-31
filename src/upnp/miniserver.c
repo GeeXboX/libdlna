@@ -171,7 +171,7 @@ dispatch_request( IN SOCKINFO * info,
         case HTTPMETHOD_NOTIFY:
         case HTTPMETHOD_SUBSCRIBE:
         case HTTPMETHOD_UNSUBSCRIBE:
-            UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_INFO, MSERV, __FILE__, __LINE__,
                 "miniserver %d: got GENA msg\n", info->socket );
             callback = gGenaCallback;
             break;
@@ -210,7 +210,7 @@ dispatch_request( IN SOCKINFO * info,
  *
  * Return: void
  ************************************************************************/
-static UPNP_INLINE void
+static DLNA_INLINE void
 handle_error( IN SOCKINFO * info,
               int http_error_code,
               int major,
@@ -237,7 +237,7 @@ free_handle_request_arg( void *args )
     struct mserv_request_t *request = ( struct mserv_request_t * )args;
 
     shutdown( request->connfd, SD_BOTH );
-    UpnpCloseSocket( request->connfd );
+    dlnaCloseSocket( request->connfd );
     free( request );
 }
 
@@ -266,13 +266,13 @@ handle_request( void *args )
     struct mserv_request_t *request = ( struct mserv_request_t * )args;
     int connfd = request->connfd;
 
-    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, MSERV, __FILE__, __LINE__,
         "miniserver %d: READING\n", connfd );
     //parser_request_init( &parser ); ////LEAK_FIX_MK
     hmsg = &parser.msg;
 
     if( sock_init_with_ip( &info, connfd, request->foreign_ip_addr,
-                           request->foreign_ip_port ) != UPNP_E_SUCCESS ) {
+                           request->foreign_ip_port ) != DLNA_E_SUCCESS ) {
         free( request );
         httpmsg_destroy( hmsg );
         return;
@@ -284,7 +284,7 @@ handle_request( void *args )
         goto error_handler;
     }
 
-    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, MSERV, __FILE__, __LINE__,
         "miniserver %d: PROCESSING...\n", connfd );
     // dispatch
     http_error_code = dispatch_request( &info, &parser );
@@ -303,7 +303,7 @@ handle_request( void *args )
         handle_error( &info, http_error_code, major, minor );
     }
 
-    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, MSERV, __FILE__, __LINE__,
         "miniserver %d: COMPLETE\n", connfd );
     sock_destroy( &info, SD_BOTH ); //should shutdown completely
 
@@ -324,7 +324,7 @@ handle_request( void *args )
  *
  * Return: void
  ************************************************************************/
-static UPNP_INLINE void
+static DLNA_INLINE void
 schedule_request_job( IN int connfd,
                       IN struct sockaddr_in *clientAddr )
 {
@@ -335,10 +335,10 @@ schedule_request_job( IN int connfd,
         ( struct mserv_request_t * )
         malloc( sizeof( struct mserv_request_t ) );
     if( request == NULL ) {
-        UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, MSERV, __FILE__, __LINE__,
             "mserv %d: out of memory\n", connfd );
         shutdown( request->connfd, SD_BOTH );
-        UpnpCloseSocket( connfd );
+        dlnaCloseSocket( connfd );
         return;
     }
 
@@ -351,11 +351,11 @@ schedule_request_job( IN int connfd,
     TPJobSetPriority( &job, MED_PRIORITY );
 
     if( ThreadPoolAdd( &gMiniServerThreadPool, &job, NULL ) != 0 ) {
-        UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, MSERV, __FILE__, __LINE__,
             "mserv %d: cannot schedule request\n", connfd );
             free( request );
         shutdown( connfd, SD_BOTH );
-        UpnpCloseSocket( connfd );
+        dlnaCloseSocket( connfd );
         return;
     }
 
@@ -415,8 +415,8 @@ RunMiniServer( MiniServerSockArray * miniSock )
 #endif
 
         if( select( maxMiniSock, &rdSet, NULL, &expSet, NULL ) ==
-            UPNP_SOCKETERROR ) {
-            UpnpPrintf( UPNP_CRITICAL, SSDP, __FILE__, __LINE__,
+            DLNA_SOCKETERROR ) {
+            dlnaPrintf( DLNA_CRITICAL, SSDP, __FILE__, __LINE__,
                 "Error in select call!\n" );
 	    /* Avoid 100% CPU in case of repeated error in select() */
 	    isleep( 1 );
@@ -426,8 +426,8 @@ RunMiniServer( MiniServerSockArray * miniSock )
                 clientLen = sizeof( struct sockaddr_in );
                 connectHnd = accept( miniServSock,
                     ( struct sockaddr * )&clientAddr, &clientLen );
-                if( connectHnd == UPNP_INVALID_SOCKET ) {
-                    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+                if( connectHnd == DLNA_INVALID_SOCKET ) {
+                    dlnaPrintf( DLNA_INFO, MSERV, __FILE__, __LINE__,
                         "miniserver: Error in accepting connection\n" );
                     continue;
                 }
@@ -452,10 +452,10 @@ RunMiniServer( MiniServerSockArray * miniSock )
                               &clientLen );
                 if( byteReceived > 0 ) {
                     requestBuf[byteReceived] = '\0';
-                    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+                    dlnaPrintf( DLNA_INFO, MSERV, __FILE__, __LINE__,
                         "Received response !!!  %s From host %s \n",
                         requestBuf, inet_ntoa( clientAddr.sin_addr ) );
-                    UpnpPrintf( UPNP_PACKET, MSERV, __FILE__, __LINE__,
+                    dlnaPrintf( DLNA_PACKET, MSERV, __FILE__, __LINE__,
                         "Received multicast packet: \n %s\n",
                         requestBuf );
                     if( NULL != strstr( requestBuf, "ShutDown" ) ) {
@@ -467,14 +467,14 @@ RunMiniServer( MiniServerSockArray * miniSock )
     }
 
     shutdown( miniServSock, SD_BOTH );
-    UpnpCloseSocket( miniServSock );
+    dlnaCloseSocket( miniServSock );
     shutdown( miniServStopSock, SD_BOTH );
-    UpnpCloseSocket( miniServStopSock );
+    dlnaCloseSocket( miniServStopSock );
     shutdown( ssdpSock, SD_BOTH );
-    UpnpCloseSocket( ssdpSock );
+    dlnaCloseSocket( ssdpSock );
 #ifdef INCLUDE_CLIENT_APIS
     shutdown( ssdpReqSock, SD_BOTH );
-    UpnpCloseSocket( ssdpReqSock );
+    dlnaCloseSocket( ssdpReqSock );
 #endif
 
     free( miniSock );
@@ -511,7 +511,7 @@ get_port( int sockfd )
     }
 
     port = ntohs( sockinfo.sin_port );
-    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, MSERV, __FILE__, __LINE__,
         "sockfd = %d, .... port = %d\n", sockfd, port );
 
     return port;
@@ -534,11 +534,11 @@ get_port( int sockfd )
  *	returns the port allocated by the socket sub-system.
  *
  * Return: int 
- *	UPNP_E_OUTOF_SOCKET - Failed to create a socket
- *	UPNP_E_SOCKET_BIND - Bind() failed
- *	UPNP_E_LISTEN	- Listen() failed	
- *	UPNP_E_INTERNAL_ERROR - Port returned by the socket layer is < 0
- *	UPNP_E_SUCCESS	- Success
+ *	DLNA_E_OUTOF_SOCKET - Failed to create a socket
+ *	DLNA_E_SOCKET_BIND - Bind() failed
+ *	DLNA_E_LISTEN	- Listen() failed	
+ *	DLNA_E_INTERNAL_ERROR - Port returned by the socket layer is < 0
+ *	DLNA_E_SUCCESS	- Success
  ************************************************************************/
 int
 get_miniserver_sockets( MiniServerSockArray * out,
@@ -549,13 +549,13 @@ get_miniserver_sockets( MiniServerSockArray * out,
     int success;
     unsigned short actual_port;
     int reuseaddr_on = 0;
-    int sockError = UPNP_E_SUCCESS;
+    int sockError = DLNA_E_SUCCESS;
     int errCode = 0;
     int miniServerStopSock;
 
     listenfd = socket( AF_INET, SOCK_STREAM, 0 );
     if( listenfd < 0 ) {
-        return UPNP_E_OUTOF_SOCKET; // error creating socket
+        return DLNA_E_OUTOF_SOCKET; // error creating socket
     }
     // As per the IANA specifications for the use of ports by applications
     // override the listen port passed in with the first available 
@@ -577,14 +577,14 @@ get_miniserver_sockets( MiniServerSockArray * out,
         //THIS MAY CAUSE TCP TO BECOME LESS RELIABLE
         //HOWEVER IT HAS BEEN SUGESTED FOR TCP SERVERS
 
-        UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+        dlnaPrintf( DLNA_INFO, MSERV, __FILE__, __LINE__,
             "mserv start: resuseaddr set\n" );
         sockError = setsockopt( listenfd, SOL_SOCKET, SO_REUSEADDR,
             ( const char * )&reuseaddr_on, sizeof( int ));
-        if( sockError == UPNP_SOCKETERROR ) {
+        if( sockError == DLNA_SOCKETERROR ) {
             shutdown( listenfd, SD_BOTH );
-            UpnpCloseSocket( listenfd );
-            return UPNP_E_SOCKET_BIND;
+            dlnaCloseSocket( listenfd );
+            return DLNA_E_SOCKET_BIND;
         }
 
         sockError = bind( listenfd,
@@ -598,7 +598,7 @@ get_miniserver_sockets( MiniServerSockArray * out,
                               ( struct sockaddr * )&serverAddr,
                               sizeof( struct sockaddr_in )
                  );
-            if( sockError == UPNP_SOCKETERROR ) {
+            if( sockError == DLNA_SOCKETERROR ) {
 #ifdef WIN32
                 errCode = WSAGetLastError();
 #else
@@ -612,40 +612,40 @@ get_miniserver_sockets( MiniServerSockArray * out,
         } while( errCode != 0 );
     }
 
-    if( sockError == UPNP_SOCKETERROR ) {
+    if( sockError == DLNA_SOCKETERROR ) {
         perror( "mserv start: bind failed" );
         shutdown( listenfd, SD_BOTH );
-        UpnpCloseSocket( listenfd );
-        return UPNP_E_SOCKET_BIND;  // bind failed
+        dlnaCloseSocket( listenfd );
+        return DLNA_E_SOCKET_BIND;  // bind failed
     }
 
-    UpnpPrintf( UPNP_INFO, MSERV, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, MSERV, __FILE__, __LINE__,
         "mserv start: bind success\n" );
 
     success = listen( listenfd, SOMAXCONN );
-    if( success == UPNP_SOCKETERROR ) {
+    if( success == DLNA_SOCKETERROR ) {
         shutdown( listenfd, SD_BOTH );
-        UpnpCloseSocket( listenfd );
-        return UPNP_E_LISTEN;   // listen failed
+        dlnaCloseSocket( listenfd );
+        return DLNA_E_LISTEN;   // listen failed
     }
 
     actual_port = get_port( listenfd );
     if( actual_port <= 0 ) {
         shutdown( listenfd, SD_BOTH );
-        UpnpCloseSocket( listenfd );
-        return UPNP_E_INTERNAL_ERROR;
+        dlnaCloseSocket( listenfd );
+        return DLNA_E_INTERNAL_ERROR;
     }
 
     out->miniServerPort = actual_port;
 
     if( ( miniServerStopSock = socket( AF_INET, SOCK_DGRAM, 0 ) ) ==
-        UPNP_INVALID_SOCKET ) {
-        UpnpPrintf( UPNP_CRITICAL,
+        DLNA_INVALID_SOCKET ) {
+        dlnaPrintf( DLNA_CRITICAL,
             MSERV, __FILE__, __LINE__,
             "Error in socket operation !!!\n" );
         shutdown( listenfd, SD_BOTH );
-        UpnpCloseSocket( listenfd );
-        return UPNP_E_OUTOF_SOCKET;
+        dlnaCloseSocket( listenfd );
+        return DLNA_E_OUTOF_SOCKET;
     }
 
     // bind to local socket
@@ -654,25 +654,25 @@ get_miniserver_sockets( MiniServerSockArray * out,
     serverAddr.sin_addr.s_addr = inet_addr( "127.0.0.1" );
 
     if( bind( miniServerStopSock, ( struct sockaddr * )&serverAddr,
-              sizeof( serverAddr ) ) == UPNP_SOCKETERROR ) {
+              sizeof( serverAddr ) ) == DLNA_SOCKETERROR ) {
 
-        UpnpPrintf( UPNP_CRITICAL,
+        dlnaPrintf( DLNA_CRITICAL,
             MSERV, __FILE__, __LINE__,
             "Error in binding localhost!!!\n" );
         shutdown( listenfd, SD_BOTH );
-        UpnpCloseSocket( listenfd );
+        dlnaCloseSocket( listenfd );
         shutdown( miniServerStopSock, SD_BOTH );
-        UpnpCloseSocket( miniServerStopSock );
-        return UPNP_E_SOCKET_BIND;
+        dlnaCloseSocket( miniServerStopSock );
+        return DLNA_E_SOCKET_BIND;
     }
 
     miniStopSockPort = get_port( miniServerStopSock );
     if( miniStopSockPort <= 0 ) {
         shutdown( miniServerStopSock, SD_BOTH );
-        UpnpCloseSocket( miniServerStopSock );
+        dlnaCloseSocket( miniServerStopSock );
         shutdown( listenfd, SD_BOTH );
-        UpnpCloseSocket( listenfd );
-        return UPNP_E_INTERNAL_ERROR;
+        dlnaCloseSocket( listenfd );
+        return DLNA_E_INTERNAL_ERROR;
     }
 
     out->stopPort = miniStopSockPort;
@@ -680,7 +680,7 @@ get_miniserver_sockets( MiniServerSockArray * out,
     out->miniServerSock = listenfd;
     out->miniServerStopSock = miniServerStopSock;
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
 }
 
@@ -702,7 +702,7 @@ get_miniserver_sockets( MiniServerSockArray * out,
  *
  * Return: int
  *	Actual port socket is bound to - On Success
- *	A negative number UPNP_E_XXX - On Error
+ *	A negative number DLNA_E_XXX - On Error
  ************************************************************************/
 int
 StartMiniServer( unsigned short listen_port )
@@ -715,25 +715,25 @@ StartMiniServer( unsigned short listen_port )
     ThreadPoolJob job;
 
     if( gMServState != MSERV_IDLE ) {
-        return UPNP_E_INTERNAL_ERROR;   // miniserver running
+        return DLNA_E_INTERNAL_ERROR;   // miniserver running
     }
 
     miniSocket =
         ( MiniServerSockArray * ) malloc( sizeof( MiniServerSockArray ) );
     if( miniSocket == NULL )
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
 
     if( ( success = get_miniserver_sockets( miniSocket, listen_port ) )
-        != UPNP_E_SUCCESS ) {
+        != DLNA_E_SUCCESS ) {
         free( miniSocket );
         return success;
     }
 
-    if( ( success = get_ssdp_sockets( miniSocket ) ) != UPNP_E_SUCCESS ) {
+    if( ( success = get_ssdp_sockets( miniSocket ) ) != DLNA_E_SUCCESS ) {
         shutdown( miniSocket->miniServerSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->miniServerSock );
+        dlnaCloseSocket( miniSocket->miniServerSock );
         shutdown( miniSocket->miniServerStopSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->miniServerStopSock );
+        dlnaCloseSocket( miniSocket->miniServerStopSock );
         free( miniSocket );
 
         return success;
@@ -749,17 +749,17 @@ StartMiniServer( unsigned short listen_port )
 
     if( success < 0 ) {
         shutdown( miniSocket->miniServerSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->miniServerSock );
+        dlnaCloseSocket( miniSocket->miniServerSock );
         shutdown( miniSocket->miniServerStopSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->miniServerStopSock );
+        dlnaCloseSocket( miniSocket->miniServerStopSock );
         shutdown( miniSocket->ssdpSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->ssdpSock );
+        dlnaCloseSocket( miniSocket->ssdpSock );
 #ifdef INCLUDE_CLIENT_APIS
         shutdown( miniSocket->ssdpReqSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->ssdpReqSock );
+        dlnaCloseSocket( miniSocket->ssdpReqSock );
 #endif
 
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     // wait for miniserver to start
     count = 0;
@@ -771,17 +771,17 @@ StartMiniServer( unsigned short listen_port )
     // taking too long to start that thread
     if( count >= max_count ) {
         shutdown( miniSocket->miniServerSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->miniServerSock );
+        dlnaCloseSocket( miniSocket->miniServerSock );
         shutdown( miniSocket->miniServerStopSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->miniServerStopSock );
+        dlnaCloseSocket( miniSocket->miniServerStopSock );
         shutdown( miniSocket->ssdpSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->ssdpSock );
+        dlnaCloseSocket( miniSocket->ssdpSock );
 #ifdef INCLUDE_CLIENT_APIS
         shutdown( miniSocket->ssdpReqSock, SD_BOTH );
-        UpnpCloseSocket( miniSocket->ssdpReqSock );
+        dlnaCloseSocket( miniSocket->ssdpReqSock );
 #endif
 
-        return UPNP_E_INTERNAL_ERROR;
+        return DLNA_E_INTERNAL_ERROR;
     }
 
     return miniSocket->miniServerPort;
@@ -817,8 +817,8 @@ StopMiniServer( void )
     }
 
     sock = socket( AF_INET, SOCK_DGRAM, 0 );
-    if( sock == UPNP_INVALID_SOCKET ) {
-        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+    if( sock == DLNA_INVALID_SOCKET ) {
+        dlnaPrintf( DLNA_INFO, SSDP, __FILE__, __LINE__,
             "SSDP_SERVER:StopSSDPServer: Error in socket operation !!!\n" );
         return 0;
     }
@@ -835,7 +835,7 @@ StopMiniServer( void )
         isleep( 1 );
     }
     shutdown( sock, SD_BOTH );
-    UpnpCloseSocket( sock );
+    dlnaCloseSocket( sock );
     return 0;
 }
 

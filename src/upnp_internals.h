@@ -30,18 +30,18 @@
 #include "msr.h"
 
 #define SERVICE_CONTENT_TYPE "text/xml"
-#define UPNP_MAX_CONTENT_LENGTH 4096
+#define DLNA_MAX_CONTENT_LENGTH 4096
 #define VIRTUAL_DIR "/web"
 #define SERVICES_VIRTUAL_DIR "/services"
 #define XBOX_MODEL_NAME "Windows Media Connect Compatible"
 
-struct UpnpVirtualDirCallbacks virtual_dir_callbacks;
+struct dlnaVirtualDirCallbacks virtual_dir_callbacks;
 
 int upnp_init (dlna_t *dlna, dlna_device_type_t type);
 int upnp_uninit (dlna_t *dlna);
 
 int upnp_add_response (upnp_action_event_t *ev, char *key, const char *value);
-char *upnp_get_string (struct Upnp_Action_Request *ar, const char *key);
-int upnp_get_ui4 (struct Upnp_Action_Request *ar, const char *key);
+char *upnp_get_string (struct dlna_Action_Request *ar, const char *key);
+int upnp_get_ui4 (struct dlna_Action_Request *ar, const char *key);
 
 #endif /* UPNP_INTERNALS_H */

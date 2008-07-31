@@ -54,7 +54,7 @@
 
 #define XML_VERSION "<?xml version='1.0' encoding='ISO-8859-1' ?>\n"
 #define XML_PROPERTYSET_HEADER \
-		"<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n"
+		"<e:propertyset xmlns:e=\"urn:schemas-dlna-org:event-1-0\">\n"
 
 #define UNABLE_MEMORY "HTTP/1.1 500 Internal Server Error\r\n\r\n"
 #define UNABLE_SERVICE_UNKNOWN "HTTP/1.1 404 Not Found\r\n\r\n"
@@ -74,17 +74,17 @@
 #define MAX_SECONDS 10
 #define MAX_EVENTS 20
 #define MAX_PORT_SIZE 10
-#define GENA_E_BAD_RESPONSE UPNP_E_BAD_RESPONSE
-#define GENA_E_BAD_SERVICE UPNP_E_INVALID_SERVICE
-#define GENA_E_SUBSCRIPTION_UNACCEPTED UPNP_E_SUBSCRIBE_UNACCEPTED
-#define GENA_E_BAD_SID UPNP_E_INVALID_SID
-#define GENA_E_UNSUBSCRIBE_UNACCEPTED UPNP_E_UNSUBSCRIBE_UNACCEPTED
-#define GENA_E_NOTIFY_UNACCEPTED UPNP_E_NOTIFY_UNACCEPTED
+#define GENA_E_BAD_RESPONSE DLNA_E_BAD_RESPONSE
+#define GENA_E_BAD_SERVICE DLNA_E_INVALID_SERVICE
+#define GENA_E_SUBSCRIPTION_UNACCEPTED DLNA_E_SUBSCRIBE_UNACCEPTED
+#define GENA_E_BAD_SID DLNA_E_INVALID_SID
+#define GENA_E_UNSUBSCRIBE_UNACCEPTED DLNA_E_UNSUBSCRIBE_UNACCEPTED
+#define GENA_E_NOTIFY_UNACCEPTED DLNA_E_NOTIFY_UNACCEPTED
 #define GENA_E_NOTIFY_UNACCEPTED_REMOVE_SUB -9
-#define GENA_E_BAD_HANDLE UPNP_E_INVALID_HANDLE
+#define GENA_E_BAD_HANDLE DLNA_E_INVALID_HANDLE
 #define XML_ERROR -5
-#define XML_SUCCESS UPNP_E_SUCCESS
-#define GENA_SUCCESS UPNP_E_SUCCESS
+#define XML_SUCCESS DLNA_E_SUCCESS
+#define GENA_SUCCESS DLNA_E_SUCCESS
 #define CALLBACK_SUCCESS 0
 #define DEFAULT_TIMEOUT 1801
 
@@ -93,18 +93,18 @@ extern ithread_mutex_t GlobalClientSubscribeMutex;
 
 // Lock the subscription
 #define SubscribeLock() \
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
+	dlnaPrintf(DLNA_INFO, GENA, __FILE__, __LINE__, \
 		"Trying Subscribe Lock");  \
 	ithread_mutex_lock(&GlobalClientSubscribeMutex); \
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
+	dlnaPrintf(DLNA_INFO, GENA, __FILE__, __LINE__, \
 		"Subscribe Lock");
 
 // Unlock the subscription
 #define SubscribeUnlock() \
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
+	dlnaPrintf(DLNA_INFO, GENA, __FILE__, __LINE__, \
 		"Trying Subscribe UnLock"); \
 	ithread_mutex_unlock(&GlobalClientSubscribeMutex); \
-	UpnpPrintf(UPNP_INFO, GENA, __FILE__, __LINE__, \
+	dlnaPrintf(DLNA_INFO, GENA, __FILE__, __LINE__, \
 		"Subscribe UnLock");
 
 
@@ -114,10 +114,10 @@ typedef struct NOTIFY_THREAD_STRUCT {
   DOMString propertySet;
   char * servId;
   char * UDN;
-  Upnp_SID sid;
+  dlna_SID sid;
   int eventKey;
   int *reference_count;
-  UpnpDevice_Handle device_handle;
+  dlnaDevice_Handle device_handle;
 } notify_thread_struct;
 
 
@@ -134,7 +134,7 @@ typedef struct NOTIFY_THREAD_STRUCT {
 *	incoming GENA requests. 
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 EXTERN_C void genaCallback (IN http_parser_t *parser, 
 							IN http_message_t* request, 
@@ -144,13 +144,13 @@ EXTERN_C void genaCallback (IN http_parser_t *parser,
 * Function : genaSubscribe
 *																	
 * Parameters:														
-*	IN UpnpClient_Handle client_handle: 
+*	IN dlnaClient_Handle client_handle: 
 *	IN char * PublisherURL: NULL Terminated, of the form : 
 *						"http://134.134.156.80:4000/RedBulb/Event"
 *	INOUT int * TimeOut: requested Duration, if -1, then "infinite".
 *						in the OUT case: actual Duration granted 
 *						by Service, -1 for infinite
-*	OUT Upnp_SID out_sid:sid of subscription, memory passed in by caller
+*	OUT dlna_SID out_sid:sid of subscription, memory passed in by caller
 *
 * Description:														
 *	This function subscribes to a PublisherURL ( also mentioned as EventURL
@@ -159,15 +159,15 @@ EXTERN_C void genaCallback (IN http_parser_t *parser,
 *	the clients subscription list, if service responds with OK
 *
 * Returns: int
-*	return UPNP_E_SUCCESS if service response is OK else 
+*	return DLNA_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaSubscribe(
-	UpnpClient_Handle client_handle,
+	dlnaClient_Handle client_handle,
 	char * PublisherURL,
 	int * TimeOut, 
-	Upnp_SID  out_sid );
+	dlna_SID  out_sid );
 #endif
 
 
@@ -175,7 +175,7 @@ EXTERN_C int genaSubscribe(
 * Function : genaUnSubscribe
 *																	
 * Parameters:														
-*	IN UpnpClient_Handle client_handle: UPnP client handle
+*	IN dlnaClient_Handle client_handle: UPnP client handle
 *	IN SID in_sid: The subscription ID
 *
 * Description:														
@@ -184,20 +184,20 @@ EXTERN_C int genaSubscribe(
 *	to service processes request and finally removes the subscription
 *
 * Returns: int
-*	return UPNP_E_SUCCESS if service response is OK else 
+*	return DLNA_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaUnSubscribe(
-	UpnpClient_Handle client_handle,
-	const Upnp_SID in_sid);
+	dlnaClient_Handle client_handle,
+	const dlna_SID in_sid);
 #endif
 
 /************************************************************************
 * Function : genaUnregisterClient									
 *																	
 * Parameters:														
-*	IN UpnpClient_Handle client_handle: Handle containing all the control
+*	IN dlnaClient_Handle client_handle: Handle containing all the control
 *			point related information
 *
 * Description:														
@@ -206,10 +206,10 @@ EXTERN_C int genaUnSubscribe(
 *	unregisters.
 *
 * Returns: int
-*	return UPNP_E_SUCCESS if successful else returns appropriate error
+*	return DLNA_E_SUCCESS if successful else returns appropriate error
 ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
-EXTERN_C int genaUnregisterClient(UpnpClient_Handle client_handle);
+EXTERN_C int genaUnregisterClient(dlnaClient_Handle client_handle);
 #endif
 
 //server
@@ -217,16 +217,16 @@ EXTERN_C int genaUnregisterClient(UpnpClient_Handle client_handle);
 * Function : genaUnregisterDevice
 *																	
 * Parameters:														
-*	IN UpnpDevice_Handle device_handle: Handle of the root device
+*	IN dlnaDevice_Handle device_handle: Handle of the root device
 *
 * Description:														
 *	This function cleans the service table of the device. 
 *
 * Returns: int
-*	returns UPNP_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE
+*	returns DLNA_E_SUCCESS if successful else returns GENA_E_BAD_HANDLE
 ****************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
-EXTERN_C int genaUnregisterDevice(UpnpDevice_Handle device_handle);
+EXTERN_C int genaUnregisterDevice(dlnaDevice_Handle device_handle);
 #endif
 
 
@@ -234,8 +234,8 @@ EXTERN_C int genaUnregisterDevice(UpnpDevice_Handle device_handle);
 * Function : genaRenewSubscription
 *																	
 * Parameters:														
-*	IN UpnpClient_Handle client_handle: Client handle
-*	IN const Upnp_SID in_sid: subscription ID
+*	IN dlnaClient_Handle client_handle: Client handle
+*	IN const dlna_SID in_sid: subscription ID
 *	INOUT int * TimeOut: requested Duration, if -1, then "infinite".
 *						in the OUT case: actual Duration granted 
 *						by Service, -1 for infinite
@@ -247,20 +247,20 @@ EXTERN_C int genaUnregisterDevice(UpnpDevice_Handle device_handle);
 *	the response.
 *
 * Returns: int
-*	return UPNP_E_SUCCESS if service response is OK else 
+*	return DLNA_E_SUCCESS if service response is OK else 
 *	returns appropriate error
 ***************************************************************************/
 #ifdef INCLUDE_CLIENT_APIS
 EXTERN_C int genaRenewSubscription(
-	IN UpnpClient_Handle client_handle,
-	IN const Upnp_SID in_sid,
+	IN dlnaClient_Handle client_handle,
+	IN const dlna_SID in_sid,
 	OUT int * TimeOut);
 #endif
 /****************************************************************************
 *	Function :	genaNotifyAll
 *
 *	Parameters :
-*		IN UpnpDevice_Handle device_handle : Device handle
+*		IN dlnaDevice_Handle device_handle : Device handle
 *		IN char *UDN :	Device udn
 *		IN char *servId :	Service ID
 *	    IN char **VarNames : array of varible names
@@ -277,7 +277,7 @@ EXTERN_C int genaRenewSubscription(
 ****************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaNotifyAll(
-	UpnpDevice_Handle device_handle,
+	dlnaDevice_Handle device_handle,
 	char *UDN,
 	char *servId,
 	char **VarNames,
@@ -289,7 +289,7 @@ EXTERN_C int genaNotifyAll(
 * Function :	genaNotifyAllExt
 *
 * Parameters :
-*	IN UpnpDevice_Handle device_handle : Device handle
+*	IN dlnaDevice_Handle device_handle : Device handle
 *	IN char *UDN :			Device udn
 *	IN char *servId :		Service ID
 *	IN IXML_Document *PropSet :	XML document Event varible property set
@@ -304,7 +304,7 @@ EXTERN_C int genaNotifyAll(
 ****************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C int genaNotifyAllExt(
-	UpnpDevice_Handle device_handle, 
+	dlnaDevice_Handle device_handle, 
 	char *UDN,
 	char *servId,
 	IN IXML_Document *PropSet);
@@ -314,13 +314,13 @@ EXTERN_C int genaNotifyAllExt(
 *	Function :	genaInitNotify
 *
 *	Parameters :
-*		   IN UpnpDevice_Handle device_handle :	Device handle
+*		   IN dlnaDevice_Handle device_handle :	Device handle
 *		   IN char *UDN :	Device udn
 *		   IN char *servId :	Service ID
 *		   IN char **VarNames :	Array of variable names
 *		   IN char **VarValues :	Array of variable values
 *		   IN int var_count :	array size
-*		   IN Upnp_SID sid :	subscription ID
+*		   IN dlna_SID sid :	subscription ID
 *
 *	Description :	This function sends the intial state table dump to 
 *		newly subscribed control point. 
@@ -332,24 +332,24 @@ EXTERN_C int genaNotifyAllExt(
 *			intial state table dump.
 ****************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
-EXTERN_C int genaInitNotify(IN UpnpDevice_Handle device_handle,
+EXTERN_C int genaInitNotify(IN dlnaDevice_Handle device_handle,
 	IN char *UDN,
 	IN char *servId,
 	IN char **VarNames,
 	IN char **VarValues,
 	IN int var_count,
-	IN Upnp_SID sid);
+	IN dlna_SID sid);
 #endif
 
 /****************************************************************************
 *	Function :	genaInitNotifyExt
 *
 *	Parameters :
-*		   IN UpnpDevice_Handle device_handle :	Device handle
+*		   IN dlnaDevice_Handle device_handle :	Device handle
 *		   IN char *UDN :	Device udn
 *		   IN char *servId :	Service ID
 *		   IN IXML_Document *PropSet :	Document of the state table
-*		   IN Upnp_SID sid :	subscription ID
+*		   IN dlna_SID sid :	subscription ID
 *
 *	Description :	This function is similar to the genaInitNofity. The only 
 *	difference is that it takes the xml document for the state table and 
@@ -363,11 +363,11 @@ EXTERN_C int genaInitNotify(IN UpnpDevice_Handle device_handle,
 ****************************************************************************/
 #ifdef INCLUDE_DEVICE_APIS
 EXTERN_C  int genaInitNotifyExt(
-	IN UpnpDevice_Handle device_handle, 
+	IN dlnaDevice_Handle device_handle, 
 	IN char *UDN, 
 	IN char *servId,
 	IN IXML_Document *PropSet, 
-	IN Upnp_SID sid);
+	IN dlna_SID sid);
 #endif
 
 
@@ -384,7 +384,7 @@ EXTERN_C  int genaInitNotifyExt(
 *	incorrect GENA requests.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 void error_respond( IN SOCKINFO *info, IN int error_code,
 				    IN http_message_t* hmsg );

@@ -39,11 +39,11 @@ static int read_state( unsigned16 * clockseq,
 static void write_state( unsigned16 clockseq,
                          uuid_time_t timestamp,
                          uuid_node_t node );
-static void format_uuid_v1( uuid_upnp * uid,
+static void format_uuid_v1( uuid_dlna * uid,
                             unsigned16 clockseq,
                             uuid_time_t timestamp,
                             uuid_node_t node );
-static void format_uuid_v3( uuid_upnp * uid,
+static void format_uuid_v3( uuid_dlna * uid,
                             unsigned char hash[16] );
 static void get_current_time( uuid_time_t * timestamp );
 static unsigned16 true_random( void );
@@ -53,7 +53,7 @@ static unsigned16 true_random( void );
    uuid_create -- generator a UUID 
  */
 int
-uuid_create(uuid_upnp *uid)
+uuid_create(uuid_dlna *uid)
 {
     uuid_time_t timestamp;
     uuid_time_t last_time;
@@ -108,7 +108,7 @@ uuid_create(uuid_upnp *uid)
 
 /*-----------------------------------------------------------------------------*/
 void
-uuid_unpack(uuid_upnp *u, char *out)
+uuid_unpack(uuid_dlna *u, char *out)
 {
 	sprintf(out,
 		"%8.8x-%4.4x-%4.4x-%2.2x%2.2x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x",
@@ -131,7 +131,7 @@ uuid_unpack(uuid_upnp *u, char *out)
    and node ID 
  */
 void
-format_uuid_v1( uuid_upnp * uid,
+format_uuid_v1( uuid_dlna * uid,
                 unsigned16 clock_seq,
                 uuid_time_t timestamp,
                 uuid_node_t node )
@@ -290,9 +290,9 @@ true_random( void )
    uuid_create_from_name -- create a UUID using a "name" from a "name space" 
  */
 void
-uuid_create_from_name( uuid_upnp * uid, /* resulting UUID */
+uuid_create_from_name( uuid_dlna * uid, /* resulting UUID */
 
-                       uuid_upnp nsid,  /* UUID to serve as context, so identical
+                       uuid_dlna nsid,  /* UUID to serve as context, so identical
                                            names from different name spaces generate
                                            different UUIDs */
 
@@ -303,7 +303,7 @@ uuid_create_from_name( uuid_upnp * uid, /* resulting UUID */
 {
     MD5_CTX c;
     unsigned char hash[16];
-    uuid_upnp net_nsid;         /* context UUID in network byte order */
+    uuid_dlna net_nsid;         /* context UUID in network byte order */
 
     /*
        put name space ID in network byte order so it hashes the same
@@ -315,7 +315,7 @@ uuid_create_from_name( uuid_upnp * uid, /* resulting UUID */
     net_nsid.time_hi_and_version=htons( net_nsid.time_hi_and_version );
 
     MD5Init( &c );
-    MD5Update( &c, &net_nsid, sizeof( uuid_upnp ) );
+    MD5Update( &c, &net_nsid, sizeof( uuid_dlna ) );
     MD5Update( &c, name, namelen );
     MD5Final( hash, &c );
 
@@ -330,7 +330,7 @@ uuid_create_from_name( uuid_upnp * uid, /* resulting UUID */
    format_uuid_v3 -- make a UUID from a (pseudo)random 128 bit number
  */
 void
-format_uuid_v3( uuid_upnp * uid,
+format_uuid_v3( uuid_dlna * uid,
                 unsigned char hash[16] )
 {
     /*
@@ -338,7 +338,7 @@ format_uuid_v3( uuid_upnp * uid,
        * plus a few constants. 
      */
 
-    memcpy( uid, hash, sizeof( uuid_upnp ) );
+    memcpy( uid, hash, sizeof( uuid_dlna ) );
 
     /*
        convert UUID to local byte order 
@@ -366,8 +366,8 @@ format_uuid_v3( uuid_upnp * uid,
    Note:   lexical ordering is not temporal ordering!
  */
 int
-uuid_compare( uuid_upnp * u1,
-              uuid_upnp * u2 )
+uuid_compare( uuid_dlna * u1,
+              uuid_dlna * u2 )
 {
     int i;
 

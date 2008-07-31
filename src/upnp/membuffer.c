@@ -171,7 +171,7 @@ memptr_cmp_nocase( IN memptr * m,
 *
 *	Note :
 ************************************************************************/
-static UPNP_INLINE void
+static DLNA_INLINE void
 membuffer_initialize( INOUT membuffer * m )
 {
     m->buf = NULL;
@@ -191,8 +191,8 @@ membuffer_initialize( INOUT membuffer * m )
 *	   'new_length' bytes can be stored
 *
 *	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_OUTOF_MEMORY - On failure to allocate memory.
+*		DLNA_E_SUCCESS - On Success
+*		DLNA_E_OUTOF_MEMORY - On failure to allocate memory.
 *
 *	Note :
 ************************************************************************/
@@ -238,7 +238,7 @@ membuffer_set_size( INOUT membuffer * m,
         //temp_buf = Realloc( m->buf,m->length, alloc_len + 1 );//LEAK_FIX_MK
 
         if( temp_buf == NULL ) {
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         }
     }
     // save
@@ -306,8 +306,8 @@ membuffer_destroy( INOUT membuffer * m )
 *		of the in parameter IN const void* buf.
 *
 *	Return : int ;
-*	 UPNP_E_SUCCESS
-*	 UPNP_E_OUTOF_MEMORY
+*	 DLNA_E_SUCCESS
+*	 DLNA_E_OUTOF_MEMORY
 *
 *	Note :
 ************************************************************************/
@@ -351,8 +351,8 @@ membuffer_assign( INOUT membuffer * m,
 *	Description : Wrapper function for membuffer_assign()
 *
 *	Return : int ;
-*	 UPNP_E_SUCCESS
-*	 UPNP_E_OUTOF_MEMORY
+*	 DLNA_E_SUCCESS
+*	 DLNA_E_OUTOF_MEMORY
 *
 *	Note :
 ************************************************************************/
@@ -441,7 +441,7 @@ membuffer_insert( INOUT membuffer * m,
     assert( m != NULL );
 
     if( index < 0 || index > ( int )m->length )
-        return UPNP_E_OUTOF_BOUNDS;
+        return DLNA_E_OUTOF_BOUNDS;
 
     if( buf == NULL || buf_len == 0 ) {
         return 0;

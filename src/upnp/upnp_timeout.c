@@ -31,7 +31,7 @@
 
 /************************************************************************
 * Purpose: This file contains a function for freeing the memory associated
-*		wuth a upnp time out event.
+*		wuth a dlna time out event.
 ************************************************************************/
 
 #include "config.h"
@@ -40,10 +40,10 @@
 #include <stdlib.h>
 
 /************************************************************************
-*	Function :	free_upnp_timeout
+*	Function :	free_dlna_timeout
 *
 *	Parameters :
-*		upnp_timeout *event ;	Event which needs to be freed
+*		dlna_timeout *event ;	Event which needs to be freed
 *
 *	Description : Free memory associated with event and memory for any 
 *		sub-elements 
@@ -53,7 +53,7 @@
 *	Note :
 ************************************************************************/
 void
-free_upnp_timeout( upnp_timeout * event )
+free_dlna_timeout( dlna_timeout * event )
 {
 
     if( event ) {

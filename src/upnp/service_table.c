@@ -79,12 +79,12 @@ copy_subscription( subscription * in,
 *	Function :	RemoveSubscriptionSID
 *
 *	Parameters :
-*		Upnp_SID sid ;	subscription ID
+*		dlna_SID sid ;	subscription ID
 *		service_info * service ;	service object providing the list of
 *						subscriptions
 *
 *	Description :	Remove the subscription represented by the
-*		const Upnp_SID sid parameter from the service table and update 
+*		const dlna_SID sid parameter from the service table and update 
 *		the service table.
 *
 *	Return : void ;
@@ -92,7 +92,7 @@ copy_subscription( subscription * in,
 *	Note :
 ************************************************************************/
 void
-RemoveSubscriptionSID( Upnp_SID sid,
+RemoveSubscriptionSID( dlna_SID sid,
                        service_info * service )
 {
     subscription *finger = service->subscriptionList;
@@ -120,12 +120,12 @@ RemoveSubscriptionSID( Upnp_SID sid,
 *	Function :	GetSubscriptionSID
 *
 *	Parameters :
-*		Upnp_SID sid ;	subscription ID
+*		dlna_SID sid ;	subscription ID
 *		service_info * service ;	service object providing the list of
 *						subscriptions
 *
 *	Description :	Return the subscription from the service table 
-*		that matches const Upnp_SID sid value. 
+*		that matches const dlna_SID sid value. 
 *
 *	Return : subscription * - Pointer to the matching subscription 
 *		node;
@@ -133,7 +133,7 @@ RemoveSubscriptionSID( Upnp_SID sid,
 *	Note :
 ************************************************************************/
 subscription *
-GetSubscriptionSID( Upnp_SID sid,
+GetSubscriptionSID( dlna_SID sid,
                     service_info * service )
 {
     subscription *next = service->subscriptionList;
@@ -433,7 +433,7 @@ FindServiceControlURLPath( service_table * table,
 *
 *	Parameters :
 *		service_info *service ;Service whose information is to be printed
-*		Upnp_LogLevel level ; Debug level specified to the print function
+*		dlna_LogLevel level ; Debug level specified to the print function
 *		Dbg_Module module ;	Debug module specified to the print function
 *
 *	Description :	For debugging purposes prints information from the 
@@ -446,39 +446,39 @@ FindServiceControlURLPath( service_table * table,
 #ifdef DEBUG
 void printService(
     service_info *service,
-    Upnp_LogLevel level,
+    dlna_LogLevel level,
     Dbg_Module module )
 {
     if( service ) {
         if( service->serviceType ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "serviceType: %s\n", service->serviceType );
         }
         if( service->serviceId ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "serviceId: %s\n", service->serviceId );
         }
 	if( service->SCPDURL ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "SCPDURL: %s\n", service->SCPDURL );
         }
 	if( service->controlURL ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "controlURL: %s\n", service->controlURL );
         }
 	if( service->eventURL ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "eventURL: %s\n", service->eventURL );
         }
 	if( service->UDN ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "UDN: %s\n\n", service->UDN );
         }
 	if( service->active ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
             "Service is active\n" );
         } else {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
             "Service is inactive\n" );
         }
     }
@@ -490,7 +490,7 @@ void printService(
 *
 *	Parameters :
 *		service_info *service ;	Service whose information is to be printed
-*		Upnp_LogLevel level ;	Debug level specified to the print function
+*		dlna_LogLevel level ;	Debug level specified to the print function
 *		Dbg_Module module ;	Debug module specified to the print function
 *
 *	Description :	For debugging purposes prints information of each 
@@ -503,39 +503,39 @@ void printService(
 #ifdef DEBUG
 void printServiceList(
     service_info * service,
-    Upnp_LogLevel level,
+    dlna_LogLevel level,
     Dbg_Module module )
 {
     while( service ) {
         if( service->serviceType ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "serviceType: %s\n", service->serviceType );
         }
         if( service->serviceId ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "serviceId: %s\n", service->serviceId );
         }
         if( service->SCPDURL ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "SCPDURL: %s\n", service->SCPDURL );
         }
         if( service->controlURL ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "controlURL: %s\n", service->controlURL );
         }
         if( service->eventURL ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "eventURL: %s\n", service->eventURL );
         }
         if( service->UDN ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "UDN: %s\n\n", service->UDN );
         }
         if( service->active ) {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "Service is active\n" );
         } else {
-            UpnpPrintf( level, module, __FILE__, __LINE__,
+            dlnaPrintf( level, module, __FILE__, __LINE__,
                 "Service is inactive\n" );
         }
         service = service->next;
@@ -548,7 +548,7 @@ void printServiceList(
 *
 *	Parameters :
 *		service_table * table ;	Service table to be printed
-*		Upnp_LogLevel level ;	Debug level specified to the print function
+*		dlna_LogLevel level ;	Debug level specified to the print function
 *		Dbg_Module module ;	Debug module specified to the print function
 *
 *	Description :	For debugging purposes prints the URL base of the table
@@ -562,12 +562,12 @@ void printServiceList(
 #ifdef DEBUG
 void printServiceTable(
     service_table * table,
-    Upnp_LogLevel level,
+    dlna_LogLevel level,
     Dbg_Module module )
 {
-    UpnpPrintf( level, module, __FILE__, __LINE__,
+    dlnaPrintf( level, module, __FILE__, __LINE__,
         "URL_BASE: %s\n", table->URLBase );
-    UpnpPrintf( level, module, __FILE__, __LINE__,
+    dlnaPrintf( level, module, __FILE__, __LINE__,
         "Services: \n" );
     printServiceList( table->serviceList, level, module );}
 #endif
@@ -880,9 +880,9 @@ getServiceList( IXML_Node * node,
                     ( !
                       ( current->controlURL =
                         resolve_rel_url( URLBase, tempDOMString ) ) ) ) {
-                    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
                         "BAD OR MISSING CONTROL URL" );
-                    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
                         "CONTROL URL SET TO NULL IN SERVICE INFO" );
                     current->controlURL = NULL;
                     fail = 0;
@@ -899,9 +899,9 @@ getServiceList( IXML_Node * node,
                     ( !
                       ( current->eventURL =
                         resolve_rel_url( URLBase, tempDOMString ) ) ) ) {
-                    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
                         "BAD OR MISSING EVENT URL" );
-                    UpnpPrintf( UPNP_INFO, GENA, __FILE__, __LINE__,
+                    dlnaPrintf( DLNA_INFO, GENA, __FILE__, __LINE__,
                         "EVENT URL SET TO NULL IN SERVICE INFO" );
                     current->eventURL = NULL;
                     fail = 0;

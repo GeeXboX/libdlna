@@ -67,7 +67,7 @@ struct SendInstruction
 *																		
 * Returns:																
 *	0 - OK																
-*	UPNP_E_OUTOF_MEMORY: note: alias_content is not freed here			
+*	DLNA_E_OUTOF_MEMORY: note: alias_content is not freed here			
 ************************************************************************/
 int web_server_init( void );
 
@@ -103,7 +103,7 @@ void web_server_destroy( void );
 *																		
 * Returns:																
 *	0 - OK																
-*	UPNP_E_OUTOF_MEMORY: note: alias_content is not freed here			
+*	DLNA_E_OUTOF_MEMORY: note: alias_content is not freed here			
 ************************************************************************/
 int web_server_set_alias( IN const char* alias_name,
 		IN const char* alias_content, IN size_t alias_content_length,

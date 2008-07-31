@@ -179,7 +179,7 @@ upnp_http_get_info (void *cookie,
   return HTTP_OK;
 }
 
-static UpnpWebFileHandle
+static dlnaWebFileHandle
 http_get_file_from_memory (const char *fullpath,
                            const char *description,
                            const size_t length)
@@ -201,10 +201,10 @@ http_get_file_from_memory (const char *fullpath,
   dhdl->external             = 0;
   dhdl->priv                 = hdl;
   
-  return ((UpnpWebFileHandle) dhdl);
+  return ((dlnaWebFileHandle) dhdl);
 }
 
-static UpnpWebFileHandle
+static dlnaWebFileHandle
 http_get_file_local (vfs_item_t *item)
 {
   dlna_http_file_handler_t *dhdl;
@@ -233,13 +233,13 @@ http_get_file_local (vfs_item_t *item)
   dhdl->external             = 0;
   dhdl->priv                 = hdl;
 
-  return ((UpnpWebFileHandle) dhdl);
+  return ((dlnaWebFileHandle) dhdl);
 }
 
-static UpnpWebFileHandle
+static dlnaWebFileHandle
 upnp_http_open (void *cookie,
                 const char *filename,
-                enum UpnpOpenFileMode mode)
+                enum dlnaOpenFileMode mode)
 {
   dlna_t *dlna;
   uint32_t id;
@@ -253,7 +253,7 @@ upnp_http_open (void *cookie,
   dlna_log (dlna, DLNA_MSG_INFO,
             "%s, filename : %s\n", __FUNCTION__, filename);
 
-  if (mode != UPNP_READ)
+  if (mode != DLNA_READ)
     return NULL;
 
   /* trap application-level HTTP callback */
@@ -291,7 +291,7 @@ upnp_http_open (void *cookie,
 
 static int
 upnp_http_read (void *cookie,
-                UpnpWebFileHandle fh,
+                dlnaWebFileHandle fh,
                 char *buf,
                 size_t buflen)
 {
@@ -345,7 +345,7 @@ upnp_http_read (void *cookie,
 
 static int
 upnp_http_write (void *cookie,
-                 UpnpWebFileHandle fh,
+                 dlnaWebFileHandle fh,
                  char *buf,
                  size_t buflen)
 {
@@ -369,7 +369,7 @@ upnp_http_write (void *cookie,
 
 static int
 upnp_http_seek (void *cookie,
-                UpnpWebFileHandle fh,
+                dlnaWebFileHandle fh,
                 off_t offset,
                 int origin)
 {
@@ -469,7 +469,7 @@ upnp_http_seek (void *cookie,
 
 static int
 upnp_http_close (void *cookie,
-                 UpnpWebFileHandle fh)
+                 dlnaWebFileHandle fh)
 {
   dlna_t *dlna;
   dlna_http_file_handler_t *dhdl;
@@ -520,7 +520,7 @@ upnp_http_close (void *cookie,
   return HTTP_OK;
 }
 
-struct UpnpVirtualDirCallbacks virtual_dir_callbacks = {
+struct dlnaVirtualDirCallbacks virtual_dir_callbacks = {
   NULL,
   upnp_http_get_info,
   upnp_http_open,

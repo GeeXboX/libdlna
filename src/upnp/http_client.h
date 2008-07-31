@@ -36,7 +36,7 @@
 #else
 #define EXTERN_C
 #endif
-#include "genlib/closesocket/upnpclosesocket.h"
+#include "genlib/closesocket/dlnaclosesocket.h"
 #include <fcntl.h>
 #include <string.h>
 #include <sys/types.h>
@@ -52,7 +52,7 @@
 #include <sys/time.h>
 #include "tools/config.h"
 #include "upnp.h"
-//#include "upnp_debug.h"
+//#include "dlna_debug.h"
 
 
 #define HTTP_DATE_LENGTH 37 // length for HTTP DATE: 
@@ -61,15 +61,15 @@
 #define MARK "-_.!~*'()"
 #define RESERVED ";/?:@&=+$,"
 #define HTTP_SUCCESS 1
-#define HTTP_E_BAD_URL UPNP_E_INVALID_URL
-#define HTTP_E_READ_SOCKET  UPNP_E_SOCKET_READ
-#define HTTP_E_BIND_SOCKET  UPNP_E_SOCKET_BIND
-#define HTTP_E_WRITE_SOCKET  UPNP_E_SOCKET_WRITE
-#define HTTP_E_CONNECT_SOCKET  UPNP_E_SOCKET_CONNECT
-#define HTTP_E_SOCKET    UPNP_E_OUTOF_SOCKET
-#define HTTP_E_BAD_RESPONSE UPNP_E_BAD_RESPONSE
-#define HTTP_E_BAD_REQUEST UPNP_E_BAD_REQUEST
-#define HTTP_E_BAD_IP_ADDRESS UPNP_E_INVALID_URL
+#define HTTP_E_BAD_URL DLNA_E_INVALID_URL
+#define HTTP_E_READ_SOCKET  DLNA_E_SOCKET_READ
+#define HTTP_E_BIND_SOCKET  DLNA_E_SOCKET_BIND
+#define HTTP_E_WRITE_SOCKET  DLNA_E_SOCKET_WRITE
+#define HTTP_E_CONNECT_SOCKET  DLNA_E_SOCKET_CONNECT
+#define HTTP_E_SOCKET    DLNA_E_OUTOF_SOCKET
+#define HTTP_E_BAD_RESPONSE DLNA_E_BAD_RESPONSE
+#define HTTP_E_BAD_REQUEST DLNA_E_BAD_REQUEST
+#define HTTP_E_BAD_IP_ADDRESS DLNA_E_INVALID_URL
 #define FALSE 0
 #define TAB 9
 #define CR 13
@@ -217,14 +217,14 @@ EXTERN_C int remove_dots(char * in, int size);
 #ifdef DEBUG
 EXTERN_C void print_http_request(
 	http_message *message,
-	Upnp_LogLevel DLevel,
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	char *DbgFileName,
 	int DbgLineNo);
 #else
 static inline void print_http_request(
 	http_message *message,
-	Upnp_LogLevel DLevel,
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	char *DbgFileName,
 	int DbgLineNo) {}
@@ -233,14 +233,14 @@ static inline void print_http_request(
 #ifdef DEBUG
 EXTERN_C void print_http_response(
 	http_message *message,
-	Upnp_LogLevel DLevel,
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	char *DbgFileName,
 	int DbgLineNo);
 #else
 static inline void print_http_response(
 	http_message *message,
-	Upnp_LogLevel DLevel,
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	char *DbgFileName,
 	int DbgLineNo) {}
@@ -249,14 +249,14 @@ static inline void print_http_response(
 #ifdef DEBUG
 EXTERN_C void print_token(
 	token *in,
-	Upnp_LogLevel DLevel,
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	char *DbgFileName,
 	int DbgLineNo);
 #else
 static inline void print_token(
 	token *in,
-	Upnp_LogLevel DLevel,
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	char *DbgFileName,
 	int DbgLineNo) {}
@@ -265,14 +265,14 @@ static inline void print_token(
 #ifdef DEBUG
 EXTERN_C void print_status_line(
 	http_status *in,
-	Upnp_LogLevel DLevel,
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	char *DbgFileName,
 	int DbgLineNo);
 #else
 static inline void print_status_line(
 	http_status *in,
-	Upnp_LogLevel DLevel,
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	char *DbgFileName,
 	int DbgLineNo) {}
@@ -281,14 +281,14 @@ static inline void print_status_line(
 #ifdef DEBUG
 EXTERN_C void print_request_line(
 	http_request *in,
-	Upnp_LogLevel DLevel,
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	char *DbgFileName,
 	int DbgLineNo);
 #else
 static inline void print_request_line(
 	http_request *in,
-	Upnp_LogLevel DLevel,
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	char *DbgFileName,
 	int DbgLineNo) {}
@@ -297,14 +297,14 @@ static inline void print_request_line(
 #ifdef DEBUG
 EXTERN_C void print_uri(
 	uri_type *in,
-	Upnp_LogLevel DLevel,
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	char *DbgFileName,
 	int DbgLineNo);
 #else
 static inline void print_uri(
 	uri_type *in,
-	Upnp_LogLevel DLevel,
+	dlna_LogLevel DLevel,
 	Dbg_Module Module,
 	char *DbgFileName,
 	int DbgLineNo) {}

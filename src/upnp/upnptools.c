@@ -45,43 +45,43 @@ struct ErrorString {
 };
 
 // Initializing the array of error structures. 
-struct ErrorString ErrorMessages[] = { {UPNP_E_SUCCESS, "UPNP_E_SUCCESS"},
-{UPNP_E_INVALID_HANDLE, "UPNP_E_INVALID_HANDLE"},
-{UPNP_E_INVALID_PARAM, "UPNP_E_INVALID_PARAM"},
-{UPNP_E_OUTOF_HANDLE, "UPNP_E_OUTOF_HANDLE"},
-{UPNP_E_OUTOF_CONTEXT, "UPNP_E_OUTOF_CONTEXT"},
-{UPNP_E_OUTOF_MEMORY, "UPNP_E_OUTOF_MEMOR"},
-{UPNP_E_INIT, "UPNP_E_INIT"},
-{UPNP_E_BUFFER_TOO_SMALL, "UPNP_E_BUFFER_TOO_SMALL"},
-{UPNP_E_INVALID_DESC, "UPNP_E_INVALID_DESC"},
-{UPNP_E_INVALID_URL, "UPNP_E_INVALID_URL"},
-{UPNP_E_INVALID_SID, "UPNP_E_INVALID_SID"},
-{UPNP_E_INVALID_DEVICE, "UPNP_E_INVALID_DEVICE"},
-{UPNP_E_INVALID_SERVICE, "UPNP_E_INVALID_SERVICE"},
-{UPNP_E_BAD_RESPONSE, "UPNP_E_BAD_RESPONSE"},
-{UPNP_E_BAD_REQUEST, "UPNP_E_BAD_REQUEST"},
-{UPNP_E_INVALID_ACTION, "UPNP_E_INVALID_ACTION"},
-{UPNP_E_FINISH, "UPNP_E_FINISH"},
-{UPNP_E_INIT_FAILED, "UPNP_E_INIT_FAILED"},
-{UPNP_E_BAD_HTTPMSG, "UPNP_E_BAD_HTTPMSG"},
-{UPNP_E_NETWORK_ERROR, "UPNP_E_NETWORK_ERROR"},
-{UPNP_E_SOCKET_WRITE, "UPNP_E_SOCKET_WRITE"},
-{UPNP_E_SOCKET_READ, "UPNP_E_SOCKET_READ"},
-{UPNP_E_SOCKET_BIND, "UPNP_E_SOCKET_BIND"},
-{UPNP_E_SOCKET_CONNECT, "UPNP_E_SOCKET_CONNECT"},
-{UPNP_E_OUTOF_SOCKET, "UPNP_E_OUTOF_SOCKET"},
-{UPNP_E_LISTEN, "UPNP_E_LISTEN"},
-{UPNP_E_EVENT_PROTOCOL, "UPNP_E_EVENT_PROTOCOL"},
-{UPNP_E_SUBSCRIBE_UNACCEPTED, "UPNP_E_SUBSCRIBE_UNACCEPTED"},
-{UPNP_E_UNSUBSCRIBE_UNACCEPTED, "UPNP_E_UNSUBSCRIBE_UNACCEPTED"},
-{UPNP_E_NOTIFY_UNACCEPTED, "UPNP_E_NOTIFY_UNACCEPTED"},
-{UPNP_E_INTERNAL_ERROR, "UPNP_E_INTERNAL_ERROR"},
-{UPNP_E_INVALID_ARGUMENT, "UPNP_E_INVALID_ARGUMENT"},
-{UPNP_E_OUTOF_BOUNDS, "UPNP_E_OUTOF_BOUNDS"}
+struct ErrorString ErrorMessages[] = { {DLNA_E_SUCCESS, "DLNA_E_SUCCESS"},
+{DLNA_E_INVALID_HANDLE, "DLNA_E_INVALID_HANDLE"},
+{DLNA_E_INVALID_PARAM, "DLNA_E_INVALID_PARAM"},
+{DLNA_E_OUTOF_HANDLE, "DLNA_E_OUTOF_HANDLE"},
+{DLNA_E_OUTOF_CONTEXT, "DLNA_E_OUTOF_CONTEXT"},
+{DLNA_E_OUTOF_MEMORY, "DLNA_E_OUTOF_MEMOR"},
+{DLNA_E_INIT, "DLNA_E_INIT"},
+{DLNA_E_BUFFER_TOO_SMALL, "DLNA_E_BUFFER_TOO_SMALL"},
+{DLNA_E_INVALID_DESC, "DLNA_E_INVALID_DESC"},
+{DLNA_E_INVALID_URL, "DLNA_E_INVALID_URL"},
+{DLNA_E_INVALID_SID, "DLNA_E_INVALID_SID"},
+{DLNA_E_INVALID_DEVICE, "DLNA_E_INVALID_DEVICE"},
+{DLNA_E_INVALID_SERVICE, "DLNA_E_INVALID_SERVICE"},
+{DLNA_E_BAD_RESPONSE, "DLNA_E_BAD_RESPONSE"},
+{DLNA_E_BAD_REQUEST, "DLNA_E_BAD_REQUEST"},
+{DLNA_E_INVALID_ACTION, "DLNA_E_INVALID_ACTION"},
+{DLNA_E_FINISH, "DLNA_E_FINISH"},
+{DLNA_E_INIT_FAILED, "DLNA_E_INIT_FAILED"},
+{DLNA_E_BAD_HTTPMSG, "DLNA_E_BAD_HTTPMSG"},
+{DLNA_E_NETWORK_ERROR, "DLNA_E_NETWORK_ERROR"},
+{DLNA_E_SOCKET_WRITE, "DLNA_E_SOCKET_WRITE"},
+{DLNA_E_SOCKET_READ, "DLNA_E_SOCKET_READ"},
+{DLNA_E_SOCKET_BIND, "DLNA_E_SOCKET_BIND"},
+{DLNA_E_SOCKET_CONNECT, "DLNA_E_SOCKET_CONNECT"},
+{DLNA_E_OUTOF_SOCKET, "DLNA_E_OUTOF_SOCKET"},
+{DLNA_E_LISTEN, "DLNA_E_LISTEN"},
+{DLNA_E_EVENT_PROTOCOL, "DLNA_E_EVENT_PROTOCOL"},
+{DLNA_E_SUBSCRIBE_UNACCEPTED, "DLNA_E_SUBSCRIBE_UNACCEPTED"},
+{DLNA_E_UNSUBSCRIBE_UNACCEPTED, "DLNA_E_UNSUBSCRIBE_UNACCEPTED"},
+{DLNA_E_NOTIFY_UNACCEPTED, "DLNA_E_NOTIFY_UNACCEPTED"},
+{DLNA_E_INTERNAL_ERROR, "DLNA_E_INTERNAL_ERROR"},
+{DLNA_E_INVALID_ARGUMENT, "DLNA_E_INVALID_ARGUMENT"},
+{DLNA_E_OUTOF_BOUNDS, "DLNA_E_OUTOF_BOUNDS"}
 };
 
 /************************************************************************
-* Function : UpnpGetErrorMessage
+* Function : dlnaGetErrorMessage
 *
 * Parameters:
 *	IN int rc: error code
@@ -92,7 +92,7 @@ struct ErrorString ErrorMessages[] = { {UPNP_E_SUCCESS, "UPNP_E_SUCCESS"},
 *	return either the right string or "Unknown Error"
 ***************************************************************************/
 const char *
-UpnpGetErrorMessage( IN int rc )
+dlnaGetErrorMessage( IN int rc )
 {
     unsigned int i;
 
@@ -108,7 +108,7 @@ UpnpGetErrorMessage( IN int rc )
 }
 
 /************************************************************************
-* Function : UpnpResolveURL
+* Function : dlnaResolveURL
 *
 * Parameters:
 *	IN char * BaseURL: Base URL string
@@ -118,10 +118,10 @@ UpnpGetErrorMessage( IN int rc )
 *	This functions concatinates the base URL and relative URL to generate
 *	the absolute URL
 * Returns: int
-*	return either UPNP_E_SUCCESS or appropriate error
+*	return either DLNA_E_SUCCESS or appropriate error
 ***************************************************************************/
 int
-UpnpResolveURL( IN const char *BaseURL,
+dlnaResolveURL( IN const char *BaseURL,
                 IN const char *RelURL,
                 OUT char *AbsURL )
 {
@@ -133,7 +133,7 @@ UpnpResolveURL( IN const char *BaseURL,
     char *tempRel;
 
     if( RelURL == NULL )
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
 
     tempRel = NULL;
 
@@ -143,10 +143,10 @@ UpnpResolveURL( IN const char *BaseURL,
         strcpy( AbsURL, tempRel );
         free( tempRel );
     } else {
-        return UPNP_E_INVALID_URL;
+        return DLNA_E_INVALID_URL;
     }
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 
 }
 
@@ -168,7 +168,7 @@ UpnpResolveURL( IN const char *BaseURL,
 * argument else it will add the argument in the document
 *
 * Returns: int
-*	returns UPNP_E_SUCCESS if successful else returns appropriate error
+*	returns DLNA_E_SUCCESS if successful else returns appropriate error
 ***************************************************************************/
 static int
 addToAction( IN int response,
@@ -185,13 +185,13 @@ addToAction( IN int response,
     int rc = 0;
 
     if( ActionName == NULL || ServType == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     if( *ActionDoc == NULL ) {
         ActBuff = ( char * )malloc( HEADER_LENGTH );
         if( ActBuff == NULL ) {
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         }
 
         if( response ) {
@@ -208,9 +208,9 @@ addToAction( IN int response,
         free( ActBuff );
         if( rc != IXML_SUCCESS ) {
             if( rc == IXML_INSUFFICIENT_MEMORY ) {
-                return UPNP_E_OUTOF_MEMORY;
+                return DLNA_E_OUTOF_MEMORY;
             } else {
-                return UPNP_E_INVALID_DESC;
+                return DLNA_E_INVALID_DESC;
             }
         }
     }
@@ -226,7 +226,7 @@ addToAction( IN int response,
         ixmlNode_appendChild( node, ( IXML_Node * ) Ele );
     }
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -326,7 +326,7 @@ makeAction( IN int response,
 }
 
 /************************************************************************
-* Function : UpnpMakeAction
+* Function : dlnaMakeAction
 *
 * Parameters:
 *	IN char * ActionName: Name of the action request or response
@@ -346,7 +346,7 @@ makeAction( IN int response,
 *	else returns NULL
 ***************************************************************************/
 IXML_Document *
-UpnpMakeAction( const char *ActionName,
+dlnaMakeAction( const char *ActionName,
                 const char *ServType,
                 int NumArg,
                 const char *Arg,
@@ -363,7 +363,7 @@ UpnpMakeAction( const char *ActionName,
 }
 
 /************************************************************************
-* Function : UpnpMakeActionResponse
+* Function : dlnaMakeActionResponse
 *
 * Parameters:
 *	IN char * ActionName: Name of the action request or response
@@ -383,7 +383,7 @@ UpnpMakeAction( const char *ActionName,
 *	else returns NULL
 ***************************************************************************/
 IXML_Document *
-UpnpMakeActionResponse( const char *ActionName,
+dlnaMakeActionResponse( const char *ActionName,
                         const char *ServType,
                         int NumArg,
                         const char *Arg,
@@ -400,7 +400,7 @@ UpnpMakeActionResponse( const char *ActionName,
 }
 
 /************************************************************************
-* Function : UpnpAddToActionResponse
+* Function : dlnaAddToActionResponse
 *
 * Parameters:
 *	INOUT IXML_Document **ActionResponse: action response document
@@ -415,11 +415,11 @@ UpnpMakeActionResponse( const char *ActionName,
 * action response.
 *
 * Returns: int
-*	returns UPNP_E_SUCCESS if successful
+*	returns DLNA_E_SUCCESS if successful
 *	else returns appropriate error
 ***************************************************************************/
 int
-UpnpAddToActionResponse( INOUT IXML_Document ** ActionResponse,
+dlnaAddToActionResponse( INOUT IXML_Document ** ActionResponse,
                          IN const char *ActionName,
                          IN const char *ServType,
                          IN const char *ArgName,
@@ -430,7 +430,7 @@ UpnpAddToActionResponse( INOUT IXML_Document ** ActionResponse,
 }
 
 /************************************************************************
-* Function : UpnpAddToAction
+* Function : dlnaAddToAction
 *
 * Parameters:
 *	INOUT IXML_Document **ActionDoc: action request document
@@ -445,11 +445,11 @@ UpnpAddToActionResponse( INOUT IXML_Document ** ActionResponse,
 * action request.
 *
 * Returns: int
-*	returns UPNP_E_SUCCESS if successful
+*	returns DLNA_E_SUCCESS if successful
 *	else returns appropriate error
 ***************************************************************************/
 int
-UpnpAddToAction( IXML_Document ** ActionDoc,
+dlnaAddToAction( IXML_Document ** ActionDoc,
                  const char *ActionName,
                  const char *ServType,
                  const char *ArgName,
@@ -461,7 +461,7 @@ UpnpAddToAction( IXML_Document ** ActionDoc,
 }
 
 /************************************************************************
-* Function : UpnpAddToPropertySet
+* Function : dlnaAddToPropertySet
 *
 * Parameters:
 *	INOUT IXML_Document **PropSet: propertyset document
@@ -472,16 +472,16 @@ UpnpAddToAction( IXML_Document ** ActionDoc,
 *	This function adds the argument in the propertyset node
 *
 * Returns: int
-*	returns UPNP_E_SUCCESS if successful else returns appropriate error
+*	returns DLNA_E_SUCCESS if successful else returns appropriate error
 ***************************************************************************/
 int
-UpnpAddToPropertySet( INOUT IXML_Document ** PropSet,
+dlnaAddToPropertySet( INOUT IXML_Document ** PropSet,
                       IN const char *ArgName,
                       IN const char *ArgValue )
 {
 
     char BlankDoc[] = "<e:propertyset xmlns:e=\"urn:schemas"
-        "-upnp-org:event-1-0\"></e:propertyset>";
+        "-dlna-org:event-1-0\"></e:propertyset>";
     IXML_Node *node;
     IXML_Element *Ele;
     IXML_Element *Ele1;
@@ -489,13 +489,13 @@ UpnpAddToPropertySet( INOUT IXML_Document ** PropSet,
     int rc;
 
     if( ArgName == NULL ) {
-        return UPNP_E_INVALID_PARAM;
+        return DLNA_E_INVALID_PARAM;
     }
 
     if( *PropSet == NULL ) {
         rc = ixmlParseBufferEx( BlankDoc, PropSet );
         if( rc != IXML_SUCCESS ) {
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         }
     }
 
@@ -512,11 +512,11 @@ UpnpAddToPropertySet( INOUT IXML_Document ** PropSet,
     ixmlNode_appendChild( ( IXML_Node * ) Ele1, ( IXML_Node * ) Ele );
     ixmlNode_appendChild( node, ( IXML_Node * ) Ele1 );
 
-    return UPNP_E_SUCCESS;
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
-* Function : UpnpCreatePropertySet
+* Function : dlnaCreatePropertySet
 *
 * Parameters:
 *	IN int NumArg: Number of argument that will go in the propertyset node
@@ -530,14 +530,14 @@ UpnpAddToPropertySet( INOUT IXML_Document ** PropSet,
 *	returns the document containing propertyset node.
 ***************************************************************************/
 IXML_Document *
-UpnpCreatePropertySet( IN int NumArg,
+dlnaCreatePropertySet( IN int NumArg,
                        IN const char *Arg,
                        ... )
 {
     va_list ArgList;
     int Idx = 0;
     char BlankDoc[] = "<e:propertyset xmlns:e=\"urn:schemas-"
-        "upnp-org:event-1-0\"></e:propertyset>";
+        "dlna-org:event-1-0\"></e:propertyset>";
     const char *ArgName,
      *ArgValue;
     IXML_Node *node;

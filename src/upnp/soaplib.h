@@ -33,7 +33,7 @@
 #define SOAPLIB_H 
 
 
-// SOAP module API to be called in Upnp-Dk API
+// SOAP module API to be called in dlna-Dk API
 /****************************************************************************
 * Function :	soap_device_callback
 *
@@ -71,7 +71,7 @@ void soap_device_callback(
 *		pass the response to the API layer
 *
 *	Return :	int
-*		returns UPNP_E_SUCCESS if successful else returns appropriate error
+*		returns DLNA_E_SUCCESS if successful else returns appropriate error
 *	Note :
 ****************************************************************************/
 int SoapSendAction( 
@@ -97,7 +97,7 @@ int SoapSendAction(
 *		pass the SOAP header along the SOAP body ( soap action request)
 *
 *	Return :	int
-*		returns UPNP_E_SUCCESS if successful else returns appropriate error
+*		returns DLNA_E_SUCCESS if successful else returns appropriate error
 *	Note :
 ****************************************************************************/
 int SoapSendActionEx(

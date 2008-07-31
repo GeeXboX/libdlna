@@ -145,18 +145,18 @@ ssdp_handle_device_request( IN http_message_t * hmsg,
     maxAge = dev_info->MaxAge;
     HandleUnlock();
 
-    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_PACKET, API, __FILE__, __LINE__,
         "ssdp_handle_device_request with Cmd %d SEARCH\n",
         event.Cmd );
-    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_PACKET, API, __FILE__, __LINE__,
         "MAX-AGE     =  %d\n", maxAge );
-    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_PACKET, API, __FILE__, __LINE__,
         "MX     =  %d\n", event.Mx );
-    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_PACKET, API, __FILE__, __LINE__,
         "DeviceType   =  %s\n", event.DeviceType );
-    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_PACKET, API, __FILE__, __LINE__,
         "DeviceUuid   =  %s\n", event.UDN );
-    UpnpPrintf( UPNP_PACKET, API, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_PACKET, API, __FILE__, __LINE__,
         "ServiceType =  %s\n", event.ServiceType );
 
     threadArg =
@@ -218,15 +218,15 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
     int NumCopy,
       Index;
     unsigned long replyAddr = inet_addr( LOCAL_HOST );
-    int ttl = 4;                //a/c to UPNP Spec
+    int ttl = 4;                //a/c to DLNA Spec
 
     ReplySock = socket( AF_INET, SOCK_DGRAM, 0 );
-    if( ReplySock == UPNP_INVALID_SOCKET ) {
-        UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+    if( ReplySock == DLNA_INVALID_SOCKET ) {
+        dlnaPrintf( DLNA_INFO, SSDP, __FILE__, __LINE__,
             "SSDP_LIB: New Request Handler:"
             "Error in socket operation !!!\n" );
 
-        return UPNP_E_OUTOF_SOCKET;
+        return DLNA_E_OUTOF_SOCKET;
     }
 
     setsockopt( ReplySock, IPPROTO_IP, IP_MULTICAST_IF,
@@ -244,12 +244,12 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
         //  it receives. It MUST NOT repeat its response(s) per copy of the 
         //  request."
         //  
-        // http://www.upnp.org/download/draft-goland-http-udp-04.txt
+        // http://www.dlna.org/download/draft-goland-http-udp-04.txt
         //
         // So, NUM_COPY has been changed from 2 to 1.
         NumCopy = 0;
         while( NumCopy < NUM_COPY ) {
-            UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+            dlnaPrintf( DLNA_INFO, SSDP, __FILE__, __LINE__,
                 ">>> SSDP SEND >>>\n%s\n",
                 *( RqPacket + Index ) );
             rc = sendto( ReplySock, *( RqPacket + Index ),
@@ -261,8 +261,8 @@ NewRequestHandler( IN struct sockaddr_in *DestAddr,
     }
 
     shutdown( ReplySock, SD_BOTH );
-    UpnpCloseSocket( ReplySock );
-    return UPNP_E_SUCCESS;
+    dlnaCloseSocket( ReplySock );
+    return DLNA_E_SUCCESS;
 }
 
 /************************************************************************
@@ -373,7 +373,7 @@ CreateServicePacket( IN int msg_type,
 *	the input parameter, and send it to the multicast channel.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int
 DeviceAdvertisement( IN char *DevType,
@@ -389,7 +389,7 @@ DeviceAdvertisement( IN char *DevType,
     char *msgs[3];
     int ret_code;
 
-    UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, SSDP, __FILE__, __LINE__,
         "In function SendDeviceAdvertisemenrt\n" );
 
     DestAddr.sin_family = AF_INET;
@@ -403,8 +403,8 @@ DeviceAdvertisement( IN char *DevType,
     //If deviceis a root device , here we need to 
     //send 3 advertisement or reply
     if( RootDev ) {
-        sprintf( Mil_Usn, "%s::upnp:rootdevice", Udn );
-        CreateServicePacket( MSGTYPE_ADVERTISEMENT, "upnp:rootdevice",
+        sprintf( Mil_Usn, "%s::dlna:rootdevice", Udn );
+        CreateServicePacket( MSGTYPE_ADVERTISEMENT, "dlna:rootdevice",
                              Mil_Usn, Location, Duration, &msgs[0] );
     }
     // both root and sub-devices need to send these two messages
@@ -423,7 +423,7 @@ DeviceAdvertisement( IN char *DevType,
         free( msgs[0] );
         free( msgs[1] );
         free( msgs[2] );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     // send packets
     if( RootDev ) {
@@ -460,7 +460,7 @@ DeviceAdvertisement( IN char *DevType,
 *	and send it to the client addesss given in its input parameter DestAddr.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int
 SendReply( IN struct sockaddr_in *DestAddr,
@@ -484,8 +484,8 @@ SendReply( IN struct sockaddr_in *DestAddr,
         // one msg for root device
         num_msgs = 1;
 
-        sprintf( Mil_Usn, "%s::upnp:rootdevice", Udn );
-        CreateServicePacket( MSGTYPE_REPLY, "upnp:rootdevice",
+        sprintf( Mil_Usn, "%s::dlna:rootdevice", Udn );
+        CreateServicePacket( MSGTYPE_REPLY, "dlna:rootdevice",
                              Mil_Usn, Location, Duration, &msgs[0] );
     } else {
         // two msgs for embedded devices
@@ -506,7 +506,7 @@ SendReply( IN struct sockaddr_in *DestAddr,
     for( i = 0; i < num_msgs; i++ ) {
         if( msgs[i] == NULL ) {
             free( msgs[0] );
-            return UPNP_E_OUTOF_MEMORY;
+            return DLNA_E_OUTOF_MEMORY;
         }
     }
 
@@ -535,7 +535,7 @@ SendReply( IN struct sockaddr_in *DestAddr,
 *	and send it to the client address given in its input parameter DestAddr.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int
 DeviceReply( IN struct sockaddr_in *DestAddr,
@@ -558,8 +558,8 @@ DeviceReply( IN struct sockaddr_in *DestAddr,
 
     if( RootDev ) {
         // 3 replies for root device
-        strcpy( Mil_Nt, "upnp:rootdevice" );
-        sprintf( Mil_Usn, "%s::upnp:rootdevice", Udn );
+        strcpy( Mil_Nt, "dlna:rootdevice" );
+        sprintf( Mil_Usn, "%s::dlna:rootdevice", Udn );
         CreateServicePacket( MSGTYPE_REPLY, Mil_Nt, Mil_Usn,
                              Location, Duration, &szReq[0] );
     }
@@ -581,7 +581,7 @@ DeviceReply( IN struct sockaddr_in *DestAddr,
         free( szReq[0] );
         free( szReq[1] );
         free( szReq[2] );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     // send replies
     if( RootDev ) {
@@ -611,7 +611,7 @@ DeviceReply( IN struct sockaddr_in *DestAddr,
 *	on the input parameter, and send it to the multicast channel.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int
 ServiceAdvertisement( IN char *Udn,
@@ -635,7 +635,7 @@ ServiceAdvertisement( IN char *Udn,
     CreateServicePacket( MSGTYPE_ADVERTISEMENT, ServType, Mil_Usn,
                          Location, Duration, &szReq[0] );
     if( szReq[0] == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     RetVal = NewRequestHandler( &DestAddr, 1, szReq );
@@ -658,7 +658,7 @@ ServiceAdvertisement( IN char *Udn,
 *	on the input parameter, and send it to the multicast channel.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int
 ServiceReply( IN struct sockaddr_in *DestAddr,
@@ -678,7 +678,7 @@ ServiceReply( IN struct sockaddr_in *DestAddr,
     CreateServicePacket( MSGTYPE_REPLY, ServType, Mil_Usn,
                          Location, Duration, &szReq[0] );
     if( szReq[0] == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
 
     RetVal = NewRequestHandler( DestAddr, 1, szReq );
@@ -700,7 +700,7 @@ ServiceReply( IN struct sockaddr_in *DestAddr,
 *	and sent it to the multicast channel through RequestHandler.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int
 ServiceShutdown( IN char *Udn,
@@ -724,7 +724,7 @@ ServiceShutdown( IN char *Udn,
     CreateServicePacket( MSGTYPE_SHUTDOWN, ServType, Mil_Usn,
                          Location, Duration, &szReq[0] );
     if( szReq[0] == NULL ) {
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     RetVal = NewRequestHandler( &DestAddr, 1, szReq );
 
@@ -747,13 +747,13 @@ ServiceShutdown( IN char *Udn,
 *	and sent it to the multicast channel through RequestHandler.
 *
 * Returns: int
-*	UPNP_E_SUCCESS if successful else appropriate error
+*	DLNA_E_SUCCESS if successful else appropriate error
 ***************************************************************************/
 int
 DeviceShutdown( IN char *DevType,
                 IN int RootDev,
                 IN char *Udn,
-                IN char *_Server upnp_unused,
+                IN char *_Server dlna_unused,
                 IN char *Location,
                 IN int Duration )
 {
@@ -772,12 +772,12 @@ DeviceShutdown( IN char *DevType,
 
     // root device has one extra msg
     if( RootDev ) {
-        sprintf( Mil_Usn, "%s::upnp:rootdevice", Udn );
-        CreateServicePacket( MSGTYPE_SHUTDOWN, "upnp:rootdevice",
+        sprintf( Mil_Usn, "%s::dlna:rootdevice", Udn );
+        CreateServicePacket( MSGTYPE_SHUTDOWN, "dlna:rootdevice",
                              Mil_Usn, Location, Duration, &msgs[0] );
     }
 
-    UpnpPrintf( UPNP_INFO, SSDP, __FILE__, __LINE__,
+    dlnaPrintf( DLNA_INFO, SSDP, __FILE__, __LINE__,
         "In function DeviceShutdown\n" );
     // both root and sub-devices need to send these two messages
     CreateServicePacket( MSGTYPE_SHUTDOWN, Udn, Udn,
@@ -793,7 +793,7 @@ DeviceShutdown( IN char *DevType,
         free( msgs[0] );
         free( msgs[1] );
         free( msgs[2] );
-        return UPNP_E_OUTOF_MEMORY;
+        return DLNA_E_OUTOF_MEMORY;
     }
     // send packets
     if( RootDev ) {

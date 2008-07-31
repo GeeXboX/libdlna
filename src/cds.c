@@ -346,7 +346,7 @@ didl_add_item (dlna_t *dlna, buffer_t *out, vfs_item_t *item,
 
     buffer_append (out, ">");
     buffer_appendf (out, "http://%s:%d%s/%d",
-                    UpnpGetServerIpAddress (),
+                    dlnaGetServerIpAddress (),
                     dlna->port, VIRTUAL_DIR, item->id);
     buffer_appendf (out, "</%s>", DIDL_RES);
   }

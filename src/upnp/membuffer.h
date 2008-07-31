@@ -142,8 +142,8 @@ int memptr_cmp_nocase( IN memptr* m, IN const char* s );
 *	   'new_length' bytes can be stored
 *
 *	Return : int ;
-*		UPNP_E_SUCCESS - On Success
-*		UPNP_E_OUTOF_MEMORY - On failure to allocate memory.
+*		DLNA_E_SUCCESS - On Success
+*		DLNA_E_OUTOF_MEMORY - On failure to allocate memory.
 *
 *	Note :
 ************************************************************************/
@@ -193,8 +193,8 @@ void membuffer_destroy( INOUT membuffer* m );
 *		of the in parameter IN const void* buf.
 *
 *	Return : int ;
-*	 UPNP_E_SUCCESS
-*	 UPNP_E_OUTOF_MEMORY
+*	 DLNA_E_SUCCESS
+*	 DLNA_E_OUTOF_MEMORY
 *
 *	Note :
 ************************************************************************/
@@ -211,8 +211,8 @@ int membuffer_assign( INOUT membuffer* m, IN const void* buf, IN size_t buf_len 
 *	Description : Wrapper function for membuffer_assign()
 *
 *	Return : int ;
-*	 UPNP_E_SUCCESS
-*	 UPNP_E_OUTOF_MEMORY
+*	 DLNA_E_SUCCESS
+*	 DLNA_E_OUTOF_MEMORY
 *
 *	Note :
 ************************************************************************/

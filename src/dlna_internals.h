@@ -79,7 +79,7 @@ typedef struct upnp_action_event_s    upnp_action_event_t;
 typedef struct upnp_service_action_s  upnp_service_action_t;
 
 struct upnp_action_event_s {
-  struct Upnp_Action_Request *ar;
+  struct dlna_Action_Request *ar;
   int status;
   upnp_service_t *service;
 };
@@ -134,7 +134,7 @@ struct dlna_s {
   /* UPnP Properties */
   char *interface;
   unsigned short port; /* server port */
-  UpnpDevice_Handle dev;
+  dlnaDevice_Handle dev;
   char *friendly_name;
   char *manufacturer;
   char *manufacturer_url;
