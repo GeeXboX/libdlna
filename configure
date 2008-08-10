@@ -560,36 +560,6 @@ fi
 #################################################
 # check for SIMD availability
 
-# AltiVec flags: The FSF version of GCC differs from the Apple version
-if test $cpu = "powerpc"; then
-  if test $altivec = "yes"; then
-    if test -n "`$cc -v 2>&1 | grep version | grep Apple`"; then
-      add_cflags "-faltivec"
-    else
-      add_cflags "-maltivec -mabi=altivec"
-    fi
-  fi
-fi
-
-check_header altivec.h && _altivec_h=yes || _altivec_h=no
-
-# check if our compiler supports Motorola AltiVec C API
-if enabled altivec; then
-  if enabled _altivec_h; then
-    inc_altivec_h="#include <altivec.h>"
-  else
-    inc_altivec_h=
-  fi
-  check_cc <<EOF || altivec=no
-$inc_altivec_h
-int main(void) {
-    vector signed int v1, v2, v3;
-    v1 = vec_add(v2,v3);
-    return 0;
-}
-EOF
-fi
-
 # mmi only available on mips
 if [ "$mmi" = "default" ]; then
   if [ "$cpu" = "mips" ]; then
