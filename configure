@@ -50,6 +50,7 @@ show_help(){
 
   echo ""
   echo "Advanced options (experts only):"
+  echo "  --arch=ARCH                 force architecture"
   echo "  --enable-debug              enable debugging symbols"
   echo "  --disable-debug             disable debugging symbols"
   echo "  --disable-strip             disable stripping of executables at installation"
@@ -404,6 +405,8 @@ for opt do
   --enable-shared) shared="yes"
   ;;
   --disable-shared) shared="no"
+  ;;
+  --arch=*) arch="$optval"
   ;;
   --enable-debug) debug="yes"
   ;;
