@@ -29,8 +29,6 @@
 #include <errno.h>
 #include <string.h>
 
-#include <ffmpeg/common.h>
-
 #include "upnp_internals.h"
 
 #define PROTOCOL_TYPE_PRE_SZ  11   /* for the str length of "http-get:*:" */
@@ -327,7 +325,7 @@ upnp_http_read (void *cookie,
     break;
   case HTTP_FILE_MEMORY:
     dlna_log (dlna, DLNA_MSG_INFO, "Read file from memory.\n");
-    len = (ssize_t) FFMIN (buflen, hdl->detail.memory.len - hdl->pos);
+    len = (ssize_t) MIN (buflen, hdl->detail.memory.len - hdl->pos);
     memcpy (buf, hdl->detail.memory.content + hdl->pos, (ssize_t) len);
     break;
   default:
