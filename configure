@@ -382,65 +382,6 @@ INSTALL="/usr/bin/install -c"
 VERSION=""
 
 #################################################
-#   set cpu variable and specific cpu flags
-#################################################
-case "$cpu" in
-  i386|i486|i586|i686|i86pc|BePC)
-    cpu="x86"
-  ;;
-  x86_64|amd64)
-    cpu="x86"
-    canon_arch="`$cc -dumpmachine | sed -e 's,\([^-]*\)-.*,\1,'`"
-    if [ x"$canon_arch" = x"x86_64" -o x"$canon_arch" = x"amd64" ]; then
-      if [ -z "`echo $CFLAGS | grep -- -m32`"  ]; then
-        cpu="x86_64"
-      fi
-    fi
-  ;;
-# armv4l is a subset of armv5tel
-  arm|armv4l|armv5tel)
-    cpu="armv4l"
-  ;;
-  alpha)
-    cpu="alpha"
-  ;;
-  "Power Macintosh"|ppc|ppc64|powerpc|powerpc64)
-    cpu="powerpc"
-  ;;
-  mips|mipsel|IP*)
-    cpu="mips"
-  ;;
-  sun4u|sparc64)
-    cpu="sparc64"
-  ;;
-  sparc)
-    cpu="sparc"
-  ;;
-  sh4)
-    cpu="sh4"
-  ;;
-  parisc|parisc64)
-    cpu="parisc"
-  ;;
-  s390|s390x)
-    cpu="s390"
-  ;;
-  m68k)
-    cpu="m68k"
-  ;;
-  ia64)
-    cpu="ia64"
-  ;;
-  bfin)
-    cpu="bfin"
-  ;;
-  *)
-    cpu="unknown"
-  ;;
-esac
-
-
-#################################################
 #   check options
 #################################################
 for opt do
@@ -523,6 +464,66 @@ fi
 [ -n "$HOST_CC" ] && HOST_CC="$HOST_CC"
 [ -n "$HOST_CFLAGS" ] && HOST_CFLAGS="$HOST_CFLAGS"
 [ -n "$HOST_LDFLAGS" ] && HOST_LDFLAGS="$HOST_LDFLAGS"
+
+#################################################
+#   set cpu variable and specific cpu flags
+#################################################
+case "$cpu" in
+  i386|i486|i586|i686|i86pc|BePC)
+    cpu="x86"
+  ;;
+  x86_64|amd64)
+    cpu="x86"
+    canon_arch="`$cc -dumpmachine | sed -e 's,\([^-]*\)-.*,\1,'`"
+    if [ x"$canon_arch" = x"x86_64" -o x"$canon_arch" = x"amd64" ]; then
+      if [ -z "`echo $CFLAGS | grep -- -m32`"  ]; then
+        cpu="x86_64"
+      fi
+    fi
+  ;;
+# armv4l is a subset of armv5tel
+  arm|armv4l|armv5tel)
+    cpu="armv4l"
+  ;;
+  alpha)
+    cpu="alpha"
+  ;;
+  "Power Macintosh"|ppc|ppc64|powerpc|powerpc64)
+    cpu="powerpc"
+  ;;
+  mips|mipsel|IP*)
+    cpu="mips"
+  ;;
+  sun4u|sparc64)
+    cpu="sparc64"
+  ;;
+  sparc)
+    cpu="sparc"
+  ;;
+  sh4)
+    cpu="sh4"
+  ;;
+  parisc|parisc64)
+    cpu="parisc"
+  ;;
+  s390|s390x)
+    cpu="s390"
+  ;;
+  m68k)
+    cpu="m68k"
+  ;;
+  ia64)
+    cpu="ia64"
+  ;;
+  bfin)
+    cpu="bfin"
+  ;;
+  *)
+    cpu="unknown"
+  ;;
+esac
+
+echo "CC = $cc, CPU = $cpu"
 
 #################################################
 #   create logging file
