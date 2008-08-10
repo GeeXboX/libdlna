@@ -37,7 +37,17 @@ show_help(){
   echo "  --disable-shared            do not build shared libraries [default=no]"
   echo ""
   echo "Search paths:"
-  echo "  --with-ffmpeg-dir=DIR       check for ffmpeg installed in DIR"
+  echo "  --with-lavf=PATH            specify prefix directory for libavformat package.
+                              Equivalent to --with-lavf-inc=PATH/include
+                              plus --with-lavf-lib=PATH/lib"
+  echo "  --with-lavf-inc=PATH        specify directory for libavformat include files"
+  echo "  --with-lavf-lib=PATH        specify directory for libavformat library"
+  echo "  --with-lavc=PATH            specify prefix directory for libavcodec package.
+                              Equivalent to --with-lavc-inc=PATH/include
+                              plus --with-lavc-lib=PATH/lib"
+  echo "  --with-lavc-inc=PATH        specify directory for libavcodec include files"
+  echo "  --with-lavc-lib=PATH        specify directory for libavcodec library"
+
   echo ""
   echo "Advanced options (experts only):"
   echo "  --enable-debug              enable debugging symbols"
@@ -433,7 +443,17 @@ for opt do
   ;;
   --cross-compile) cross_compile="yes"
   ;;
-  --with-ffmpeg-dir=*) ffmpegdir="$optval";
+  --with-lavf=*) lavfdir="$optval";
+  ;;
+  --with-lavf-inc=*) lavfincdir="$optval";
+  ;;
+  --with-lavf-lib=*) lavflibdir="$optval";
+  ;;
+  --with-lavc=*) lavcdir="$optval";
+  ;;
+  --with-lavc-inc=*) lavcincdir="$optval";
+  ;;
+  --with-lavc-lib=*) lavclibdir="$optval";
   ;;
   --help) show_help
   ;;
@@ -620,19 +640,44 @@ echolog "Checking for ifaddrs ..."
 check_lib ifaddrs.h getifaddrs "" && add_cflags -DHAVE_IFADDRS_H
 
 #################################################
-#   check for ffmpeg libavformat/libavcodec
+#   check for ffmpeg libavformat
 #################################################
-if [ -n "$ffmpegdir" ]; then
-  check_cflags -I$ffmpegdir
-  check_ldflags -L$ffmpegdir
+if [ -n "$lavfdir" ]; then
+  check_cflags -I${lavfdir}/include
+  check_ldflags -L${lavfdir}/lib
+fi
+if [ -n "$lavfincdir" ]; then
+  check_cflags -I${lavfincdir}
+fi
+if [ -n "$lavflibdir" ]; then
+  check_cflags -L${lavflibdir}
+fi
+if [ -z  "$lavfdir" -a -z "$lavfincdir" -a -z "$lavflibdir" ]; then
+  add_pkgconfig_deps libavformat
 fi
 
 echolog "Checking for libavformat ..."
-add_pkgconfig_deps libavformat
 check_lib avformat.h av_register_all -lavformat || die "Error, can't find libavformat !"
 
+#################################################
+#   check for ffmpeg libavcodec
+#################################################
+if [ -n "$lavcdir" ]; then
+  check_cflags -I${lavcdir}/include
+  check_ldflags -L${lavcdir}/lib
+fi
+if [ -n "$lavcincdir" ]; then
+  check_cflags -I${lavcincdir}
+fi
+if [ -n "$lavclibdir" ]; then
+  check_cflags -L${lavclibdir}
+fi
+
+if [ -z  "$lavcdir" -a -z "$lavcincdir" -a -z "$lavclibdir" ]; then
+  add_pkgconfig_deps libavcodec
+fi
+
 echolog "Checking for libavcodec ..."
-add_pkgconfig_deps libavcodec
 check_lib avcodec.h avcodec_register_all -lavcodec || die "Error, can't find libavcodec !"
 
 #################################################
