@@ -89,6 +89,18 @@ die(){
     exit 1
 }
 
+set_all(){
+    value=$1
+    shift
+    for var in $*; do
+        eval $var=$value
+    done
+}
+
+enable(){
+    set_all yes $*
+}
+
 enabled(){
     eval test "x\$$1" = "xyes"
 }
@@ -619,20 +631,10 @@ EOF
 
 # ---
 # big/little-endian test
-if test "$cross_compile" = "no"; then
-  check_ld <<EOF || die "endian test failed" && $TMPE && bigendian="yes"
-#include <inttypes.h>
-int main(int argc, char ** argv){
-        volatile uint32_t i=0x01234567;
-        return (*((uint8_t*)(&i))) == 0x67;
-}
+check_cc <<EOF || die "endian test failed"
+unsigned int endian = 'B' << 24 | 'I' << 16 | 'G' << 8 | 'E';
 EOF
-else
-# programs cannot be launched if cross compiling, so make a static guess
-  if test "$cpu" = "powerpc" -o "$cpu" = "mips" ; then
-    bigendian="yes"
-  fi
-fi
+od -A n -t x1 $TMPO | grep -q '42 *49 *47 *45' && enable bigendian
 
 # add some useful compiler flags if supported
 check_cflags -W
@@ -736,6 +738,7 @@ echolog "  RANLIB             $ranlib"
 echolog "  STRIP              $strip"
 echolog "  make               $make"
 echolog "  CPU                $cpu ($tune)"
+echolog "  big-endian         ${bigendian-no}"
 echolog "  debug symbols      $debug"
 echolog "  strip symbols      $dostrip"
 echolog "  optimize           $optimize"
@@ -782,6 +785,10 @@ append_config "EXTRALIBS=$extralibs"
 append_config "OPTFLAGS=$CFLAGS"
 append_config "LDFLAGS=$LDFLAGS"
 append_config "INSTALL=$INSTALL"
+
+if enabled bigendian; then
+    append_config "WORDS_BIGENDIAN=yes"
+fi
 
 append_config "DEBUG=$debug"
 
