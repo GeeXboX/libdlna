@@ -468,6 +468,10 @@ fi
 #################################################
 #   set cpu variable and specific cpu flags
 #################################################
+if enabled cross_compile; then
+  cpu="`$cc -dumpmachine | sed -e 's,\([^-]*\)-.*,\1,'`"
+fi
+
 case "$cpu" in
   i386|i486|i586|i686|i86pc|BePC)
     cpu="x86"
