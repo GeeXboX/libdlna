@@ -100,21 +100,28 @@ flags_saved(){
 save_flags(){
     flags_saved && return
     SAVE_CFLAGS="$CFLAGS"
+    SAVE_HOST_CFLAGS="$HOST_CFLAGS"
     SAVE_LDFLAGS="$LDFLAGS"
     SAVE_extralibs="$extralibs"
 }
 
 restore_flags(){
     CFLAGS="$SAVE_CFLAGS"
+    HOST_CFLAGS="$SAVE_HOST_CFLAGS"
     LDFLAGS="$SAVE_LDFLAGS"
     extralibs="$SAVE_extralibs"
     unset SAVE_CFLAGS
+    unset SAVE_HOST_CFLAGS
     unset SAVE_LDFLAGS
     unset SAVE_extralibs
 }
 
 temp_cflags(){
     temp_append CFLAGS "$@"
+}
+
+temp_host_cflags(){
+    temp_append HOST_CFLAGS "$@"
 }
 
 temp_ldflags(){
@@ -176,6 +183,13 @@ check_cc(){
     check_cmd $cc $CFLAGS "$@" -c -o $TMPO $TMPC
 }
 
+check_host_cc(){
+    log check_host_cc "$@"
+    cat >$TMPC
+    log_file $TMPC
+    check_cmd $host_cc $HOST_CFLAGS "$@" -c -o $TMPO $TMPC
+}
+
 check_cpp(){
     log check_cpp "$@"
     cat >$TMPC
@@ -187,6 +201,12 @@ check_ld(){
     log check_ld "$@"
     check_cc || return
     check_cmd $cc $LDFLAGS "$@" -o $TMPE $TMPO $extralibs
+}
+
+check_host_ld(){
+    log check_host_ld "$@"
+    check_host_cc || return
+    check_cmd $host_cc $HOST_LDFLAGS "$@" -o $TMPE $TMPO
 }
 
 check_exec(){
@@ -334,6 +354,7 @@ includedir='${PREFIX}/include'
 static="no"
 shared="yes"
 cc="gcc"
+host_cc="gcc"
 ar="ar"
 ranlib="ranlib"
 make="make"
@@ -486,6 +507,10 @@ else
   [ -n "$STRIP" ] && strip="$STRIP"
 fi
 [ -n "$MAKE" ] && make="$MAKE"
+
+[ -n "$HOST_CC" ] && HOST_CC="$HOST_CC"
+[ -n "$HOST_CFLAGS" ] && HOST_CFLAGS="$HOST_CFLAGS"
+[ -n "$HOST_LDFLAGS" ] && HOST_LDFLAGS="$HOST_LDFLAGS"
 
 #################################################
 #   create logging file
@@ -683,8 +708,8 @@ check_lib avcodec.h avcodec_register_all -lavcodec || die "Error, can't find lib
 #################################################
 #   version
 #################################################
-temp_cflags "-Isrc"
-check_ld <<EOF
+temp_host_cflags "-Isrc"
+check_host_ld <<EOF
 #include <stdio.h>
 #include <dlna.h>
 int main(){
