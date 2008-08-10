@@ -371,7 +371,7 @@ ar="ar"
 ranlib="ranlib"
 make="make"
 strip="strip"
-cpu=`uname -m`
+arch=`uname -m`
 optimize="yes"
 debug="no"
 dostrip="yes"
@@ -466,64 +466,64 @@ fi
 [ -n "$HOST_LDFLAGS" ] && HOST_LDFLAGS="$HOST_LDFLAGS"
 
 #################################################
-#   set cpu variable and specific cpu flags
+#   set arch variable and specific cpu flags
 #################################################
 if enabled cross_compile; then
-  cpu="`$cc -dumpmachine | sed -e 's,\([^-]*\)-.*,\1,'`"
+  arch="`$cc -dumpmachine | sed -e 's,\([^-]*\)-.*,\1,'`"
 fi
 
-case "$cpu" in
+case "$arch" in
   i386|i486|i586|i686|i86pc|BePC)
-    cpu="x86"
+    arch="x86"
   ;;
   x86_64|amd64)
-    cpu="x86"
+    arch="x86"
     canon_arch="`$cc -dumpmachine | sed -e 's,\([^-]*\)-.*,\1,'`"
     if [ x"$canon_arch" = x"x86_64" -o x"$canon_arch" = x"amd64" ]; then
       if [ -z "`echo $CFLAGS | grep -- -m32`"  ]; then
-        cpu="x86_64"
+        arch="x86_64"
       fi
     fi
   ;;
 # armv4l is a subset of armv5tel
   arm|armv4l|armv5tel)
-    cpu="armv4l"
+    arch="armv4l"
   ;;
   alpha)
-    cpu="alpha"
+    arch="alpha"
   ;;
   "Power Macintosh"|ppc|ppc64|powerpc|powerpc64)
-    cpu="powerpc"
+    arch="powerpc"
   ;;
   mips|mipsel|IP*)
-    cpu="mips"
+    arch="mips"
   ;;
   sun4u|sparc64)
-    cpu="sparc64"
+    arch="sparc64"
   ;;
   sparc)
-    cpu="sparc"
+    arch="sparc"
   ;;
   sh4)
-    cpu="sh4"
+    arch="sh4"
   ;;
   parisc|parisc64)
-    cpu="parisc"
+    arch="parisc"
   ;;
   s390|s390x)
-    cpu="s390"
+    arch="s390"
   ;;
   m68k)
-    cpu="m68k"
+    arch="m68k"
   ;;
   ia64)
-    cpu="ia64"
+    arch="ia64"
   ;;
   bfin)
-    cpu="bfin"
+    arch="bfin"
   ;;
   *)
-    cpu="unknown"
+    arch="unknown"
   ;;
 esac
 
@@ -562,7 +562,7 @@ fi
 
 # mmi only available on mips
 if [ "$mmi" = "default" ]; then
-  if [ "$cpu" = "mips" ]; then
+  if [ "$arch" = "mips" ]; then
     mmi="yes"
   else
     mmi="no"
@@ -591,7 +591,7 @@ return 0;
 EOF
 
 # test for mm3dnow.h
-test "$cpu" = "x86_64" && march=k8 || march=athlon
+test "$arch" = "x86_64" && march=k8 || march=athlon
 check_cc -march=$march <<EOF && mm3dnow=yes || mm3dnow=no
 #include <mm3dnow.h>
 int main(void) {
@@ -710,7 +710,7 @@ echolog "  AR                 $ar"
 echolog "  RANLIB             $ranlib"
 echolog "  STRIP              $strip"
 echolog "  make               $make"
-echolog "  CPU                $cpu ($tune)"
+echolog "  Architecture       $arch ($tune)"
 echolog "  big-endian         ${bigendian-no}"
 echolog "  debug symbols      $debug"
 echolog "  strip symbols      $dostrip"
