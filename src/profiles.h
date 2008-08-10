@@ -22,8 +22,8 @@
 #ifndef PROFILES_H
 #define PROFILES_H
 
-#include <ffmpeg/avcodec.h>
-#include <ffmpeg/avformat.h>
+#include <avcodec.h>
+#include <avformat.h>
 
 #include "dlna_internals.h"
 #include "containers.h"

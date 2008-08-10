@@ -26,7 +26,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <ffmpeg/avcodec.h>
+#include <avcodec.h>
 
 #include "dlna_internals.h"
 #include "profiles.h"
