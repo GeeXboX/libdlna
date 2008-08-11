@@ -35,6 +35,8 @@ show_help(){
 "
   echo "  --enable-shared             build shared libraries [default=yes]"
   echo "  --disable-shared            do not build shared libraries [default=no]"
+  echo "  --enable-sqlite             enable SQLite database [default=auto]"
+  echo "  --disable-sqlite            disable SQLite database"
   echo ""
   echo "Search paths:"
   echo "  --with-lavf=PATH            specify prefix directory for libavformat package.
@@ -367,6 +369,7 @@ libdir='${PREFIX}/lib'
 includedir='${PREFIX}/include'
 static="no"
 shared="yes"
+sqlite="auto"
 cc="gcc"
 host_cc="gcc"
 ar="ar"
@@ -407,6 +410,10 @@ for opt do
   --enable-shared) shared="yes"
   ;;
   --disable-shared) shared="no"
+  ;;
+  --enable-sqlite) sqlite="yes"
+  ;;
+  --disable-sqlite) sqlite="no"
   ;;
   --arch=*) arch="$optval"
   ;;
@@ -736,6 +743,17 @@ echolog "Checking for libavcodec ..."
 check_lib avcodec.h avcodec_register_all -lavcodec || die "Error, can't find libavcodec !"
 
 #################################################
+#   check for SQLite
+#################################################
+if [ "$sqlite" = auto -o "$sqlite" = yes ]; then
+  echolog "Checking for SQLite3 ..."
+  add_pkgconfig_deps sqlite3
+  check_lib sqlite3.h sqlite3_finalize -lsqlite3 || die "Error, can't find libsqlite3 !"
+  sqlite=yes
+  add_cflags -DHAVE_SQLITE
+fi
+
+#################################################
 #   version
 #################################################
 temp_host_cflags "-Isrc"
@@ -772,6 +790,7 @@ echolog "  strip symbols      $dostrip"
 echolog "  optimize           $optimize"
 echolog "  static             ${static}"
 echolog "  shared             ${shared}"
+echolog "  SQLite3            ${sqlite}"
 echolog ""
 echolog "  CFLAGS             $CFLAGS"
 echolog "  LDFLAGS            $LDFLAGS"
