@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <string.h>
+#include <getopt.h>
 
 #include "dlna.h"
 
@@ -80,26 +81,106 @@ add_dir (dlna_t *dlna, char *dir, uint32_t id)
   free (namelist);
 }
 
+static void
+display_usage (char *name)
+{
+  printf ("Usage: %s [-u|d|x] [-c directory] [[-c directory]...]\n", name);
+  printf ("Options:\n");
+  printf (" -c\tContent directory to be shared\n");
+  printf (" -d\tStart in strict DLNA compliant mode\n");
+  printf (" -h\tDisplay help\n");
+  printf (" -u\tStart in pervasive UPnP A/V compliant mode\n");
+  printf (" -x\tStart in hackish XboX 360 UPnP A/V compliant mode\n");
+}
+
 int
 main (int argc, char **argv)
 {
   dlna_t *dlna;
   dlna_org_flags_t flags;
-  int c;
-  
+  dlna_capability_mode_t cap;
+  int c, index;
+  char *content_dir = NULL;
+  struct stat st;
+  char short_options[] = "c:dhux";
+  struct option long_options [] = {
+    {"content", required_argument, 0, 'c' },
+    {"dlna", no_argument, 0, 'd' },
+    {"help", no_argument, 0, 'h' },
+    {"upnp", no_argument, 0, 'u' },
+    {"xbox", no_argument, 0, 'x' },
+    {0, 0, 0, 0 }
+  };
+
   printf ("libdlna Digital Media Server (DMS) API example\n");
   printf ("Using %s\n", LIBDLNA_IDENT);
 
+  if (argc == 1)
+  {
+    display_usage (argv[0]);
+    return -1;
+  }
+ 
   flags = DLNA_ORG_FLAG_STREAMING_TRANSFER_MODE |
     DLNA_ORG_FLAG_BACKGROUND_TRANSFERT_MODE |
     DLNA_ORG_FLAG_CONNECTION_STALL |
     DLNA_ORG_FLAG_DLNA_V15;
+
+  cap = DLNA_CAPABILITY_DLNA;
+
+  /* command line argument processing */
+  while (1)
+  {
+    c = getopt_long (argc, argv, short_options, long_options, &index);
+
+    if (c == EOF)
+      break;
+
+    switch (c)
+    {
+    case 0:
+      /* opt = long_options[index].name; */
+      break;
+
+    case 'h':
+      display_usage (argv[0]);
+      return -1;
+
+    case 'c':
+      content_dir = strdup (optarg);
+      break;
+
+    case 'd':
+      cap = DLNA_CAPABILITY_DLNA;
+      printf ("Running in strict DLNA compliant mode ...\n");
+      break;
+
+    case 'u':
+      cap = DLNA_CAPABILITY_UPNP_AV;
+      printf ("Running in pervasive UPnP A/V compliant mode ...\n");
+      break;
+
+    case 'x':
+      cap = DLNA_CAPABILITY_UPNP_AV_XBOX;
+      printf ("Running in hackish XboX 360 UPnP A/V compliant mode ...\n");
+      break;
+
+    default:
+      break;
+    }
+  }
+  
+  if (!content_dir)
+  {
+    printf ("No content directory to be shared, bail out.\n");
+    return -1;
+  }
   
   /* init DLNA stack */
   dlna = dlna_init ();
   dlna_set_org_flags (dlna, flags);
   dlna_set_verbosity (dlna, DLNA_MSG_INFO);
-  dlna_set_capability_mode (dlna, DLNA_CAPABILITY_UPNP_AV);
+  dlna_set_capability_mode (dlna, cap);
   dlna_set_extension_check (dlna, 1);
   dlna_register_all_media_profiles (dlna);
 
@@ -118,25 +199,18 @@ main (int argc, char **argv)
     return -1;
   }
 
-  if (argc > 1)
+  if (stat (content_dir, &st) < 0)
   {
-    int i;
-
-    for (i = 1; i < argc; i++)
-    {
-      struct stat st;
-
-      if (stat (argv[i], &st) < 0)
-        continue;
-      
-      printf ("Trying to share '%s'\n", argv[i]);
-      if (S_ISDIR (st.st_mode))
-        add_dir (dlna, argv[i], 0);
-      else
-        dlna_vfs_add_resource (dlna, basename (argv[i]),
-                               argv[i], st.st_size, 0);
-    }
+    printf ("Invalid content directory\n");
+    return -1;
   }
+      
+  printf ("Trying to share '%s'\n", content_dir);
+  if (S_ISDIR (st.st_mode))
+    add_dir (dlna, content_dir, 0);
+  else
+    dlna_vfs_add_resource (dlna, basename (content_dir),
+                           content_dir, st.st_size, 0);
   
   printf ("Hit 'q' or 'Q' + Enter to shutdown\n");
   while (1)
