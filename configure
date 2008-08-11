@@ -604,6 +604,12 @@ if test "$?" != 0; then
   die "C compiler test failed."
 fi
 
+if test -n "`$cc -v 2>&1 | grep version | grep Apple`"; then
+  dylib="yes"
+else
+  dylib="no"
+fi
+
 #################################################
 #   check for target specific flags
 #################################################
@@ -793,6 +799,7 @@ append_config "RANLIB=$ranlib"
 
 append_config "BUILD_STATIC=$static"
 append_config "BUILD_SHARED=$shared"
+append_config "BUILD_DYLIB=$dylib"
 
 append_config "LN=ln"
 if enabled dostrip; then

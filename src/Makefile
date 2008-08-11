@@ -7,20 +7,28 @@ include ixml/ixml.mak
 include threadutil/threadutil.mak
 include upnp/upnp.mak
 
+LIBNAME = libdlna
+LIBNAME_STATIC = ${LIBNAME}.a
+
 ifeq ($(BUILD_STATIC),yes)
   BUILD_RULES   += lib_static
   INSTALL_RULES += install_static
 endif
 ifeq ($(BUILD_SHARED),yes)
+  ifeq ($(BUILD_DYLIB),yes)
+    LIBNAME_SHARED  = ${LIBNAME}.dylib
+    LIBNAME_VERSION = $(LIBNAME).$(VERSION).dylib
+    LIBNAME_MAJOR   = $(LIBNAME).$(shell echo $(VERSION) | cut -f1 -d.).dylib
+    LIBNAME_FLAGS   = -dynamiclib -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup,-install_name,$(LIBNAME_VERSION)
+  else
+    LIBNAME_SHARED  = ${LIBNAME}.so
+    LIBNAME_VERSION = $(LIBNAME_SHARED).$(VERSION)
+    LIBNAME_MAJOR   = $(LIBNAME_SHARED).$(shell echo $(VERSION) | cut -f1 -d.)
+    LIBNAME_FLAGS   = -shared -Wl,-soname,$(LIBNAME_MAJOR)
+  endif
   BUILD_RULES   += lib_shared
   INSTALL_RULES += install_shared
 endif
-
-LIBNAME = libdlna
-LIBNAME_SHARED = ${LIBNAME}.so
-LIBNAME_STATIC = ${LIBNAME}.a
-LIBNAME_VERSION = $(LIBNAME_SHARED).$(VERSION)
-LIBNAME_MAJOR = $(LIBNAME_SHARED).$(shell echo $(VERSION) | cut -f1 -d.)
 
 SRCS =  \
 	profiles.c \
@@ -120,7 +128,7 @@ lib_shared_info_post:
 	@echo "#############################################"
 
 lib_shared: lib_shared_info_pre $(LOBJS) $(IXML_LOBJS) $(THREADUTIL_LOBJS) $(UPNP_LOBJS) lib_shared_info_post
-	$(CC) -shared -Wl,-soname,$(LIBNAME_MAJOR) $(LOBJS) \
+	$(CC) $(LIBNAME_FLAGS) $(LOBJS) \
 	  $(IXML_LOBJS) $(THREADUTIL_LOBJS) $(UPNP_LOBJS) \
 	  $(LDFLAGS) $(EXTRALIBS) -o $(LIBNAME_VERSION)
 	$(LN) -sf $(LIBNAME_VERSION) $(LIBNAME_MAJOR)
