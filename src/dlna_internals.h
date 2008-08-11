@@ -35,6 +35,10 @@
 
 #include "uthash.h"
 
+#ifdef HAVE_SQLITE
+#include <sqlite3.h>
+#endif /* HAVE_SQLITE */
+
 typedef enum {
   DLNA_DEVICE_UNKNOWN,
   DLNA_DEVICE_DMS,      /* Digital Media Server */
@@ -128,8 +132,12 @@ struct dlna_s {
   upnp_service_t *services;
   
   /* VFS for Content Directory */
+  dlna_dms_storage_type_t storage_type;
   vfs_item_t *vfs_root;
   uint32_t vfs_items;
+#ifdef HAVE_SQLITE
+  sqlite3 *db;
+#endif /* HAVE_SQLITE */
   
   /* UPnP Properties */
   char *interface;
