@@ -719,7 +719,7 @@ if [ -z  "$lavfdir" -a -z "$lavfincdir" -a -z "$lavflibdir" ]; then
 fi
 
 echolog "Checking for libavformat ..."
-check_lib avformat.h av_register_all -lavformat || die "Error, can't find libavformat !"
+check_lib libavformat/avformat.h av_register_all -lavformat || die "Error, can't find libavformat !"
 
 #################################################
 #   check for ffmpeg libavcodec
@@ -740,7 +740,7 @@ if [ -z  "$lavcdir" -a -z "$lavcincdir" -a -z "$lavclibdir" ]; then
 fi
 
 echolog "Checking for libavcodec ..."
-check_lib avcodec.h avcodec_register_all -lavcodec || die "Error, can't find libavcodec !"
+check_lib libavcodec/avcodec.h avcodec_register_all -lavcodec || die "Error, can't find libavcodec !"
 
 #################################################
 #   check for SQLite
