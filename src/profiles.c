@@ -593,7 +593,7 @@ dlna_item_get_properties (AVFormatContext *ctx)
 
   prop->bitrate = (uint32_t) (ctx->bit_rate / 8);
   prop->sample_frequency = codecs->ac ? codecs->ac->sample_rate : 0;
-  prop->bps = codecs->ac ? codecs->ac->bits_per_sample : 0;
+  prop->bps = codecs->ac ? codecs->ac->bits_per_raw_sample : 0;
   prop->channels = codecs->ac ? codecs->ac->channels : 0;
 
   memset (prop->resolution, '\0', 64);
