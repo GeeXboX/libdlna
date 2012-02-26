@@ -1,3 +1,9 @@
+2012-02-26  Benjamin Zores  <ben@geexbox.org>
+
+	* Release 0.2.4.
+	* Various fixes due to FFmpeg/libav API changes.
+	* Compiler warning flags fixed.
+
 2007-11-26  Benjamin Zores  <ben@geexbox.org>
 
 	* Release 0.2.3.
