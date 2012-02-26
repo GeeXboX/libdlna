@@ -36,10 +36,11 @@ mpeg_find_container_type (const char *filename)
 {
   unsigned char buffer[2*MPEG_TS_PACKET_LENGTH_DLNA+1];
   int fd, i;
+  ssize_t count;
 
   /* read file header */
   fd = open (filename, O_RDONLY);
-  read (fd, buffer, 2 * MPEG_TS_PACKET_LENGTH_DLNA); 
+  count = read (fd, buffer, 2 * MPEG_TS_PACKET_LENGTH_DLNA); // Ignoring count
   close (fd);
 
   /* check for MPEG-TS container */
