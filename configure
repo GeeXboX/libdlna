@@ -38,6 +38,8 @@ show_help(){
   echo "  --with-ffmpeg-dir=DIR       check for ffmpeg installed in DIR"
   echo ""
   echo "Advanced options (experts only):"
+  echo "  --enable-developer          enable developer options"
+  echo "  --disable-developer         disable developer options"
   echo "  --enable-debug              enable debugging symbols"
   echo "  --disable-debug             disable debugging symbols"
   echo "  --disable-strip             disable stripping of executables at installation"
@@ -150,6 +152,11 @@ add_ldflags(){
 
 add_extralibs(){
     append extralibs "$@"
+}
+
+check_cmd_exists(){
+	log check_cmd_exists "$@"
+	which "$@" >>$logfile 2>&1
 }
 
 check_cmd(){
@@ -317,6 +324,7 @@ make="make"
 strip="strip"
 cpu=`uname -m`
 optimize="yes"
+developer="no"
 debug="no"
 dostrip="yes"
 extralibs=""
@@ -407,6 +415,10 @@ for opt do
   --enable-shared) shared="yes"
   ;;
   --disable-shared) shared="no"
+  ;;
+  --enable-developer) developer="yes"
+  ;;
+  --disable-developer) developer="no"
   ;;
   --enable-debug) debug="yes"
   ;;
@@ -584,6 +596,25 @@ check_cflags -D_FILE_OFFSET_BITS=64
 check_cflags -D_REENTRANT
 
 #################################################
+#   check for developer options
+#################################################
+if enabled developer; then
+  add_cflags -Werror
+  add_cflags -DHAVE_DEVELOPER
+
+  have_ctags='no'
+  if check_cmd_exists 'ctags'; then
+    have_ctags='yes'
+  fi
+
+  have_etags='no'
+  if check_cmd_exists 'etags'; then
+  	have_etags='yes'
+  fi
+
+fi
+
+#################################################
 #   check for debug symbols
 #################################################
 if enabled debug; then
@@ -645,6 +676,7 @@ echolog "  RANLIB             $ranlib"
 echolog "  STRIP              $strip"
 echolog "  make               $make"
 echolog "  CPU                $cpu ($tune)"
+echolog "  developer options  $developer"
 echolog "  debug symbols      $debug"
 echolog "  strip symbols      $dostrip"
 echolog "  optimize           $optimize"
@@ -692,6 +724,9 @@ append_config "OPTFLAGS=$CFLAGS"
 append_config "LDFLAGS=$LDFLAGS"
 append_config "INSTALL=$INSTALL"
 
+append_config "DEVELOPER=$developer"
+append_config "HAVE_CTAGS=$have_ctags"
+append_config "HAVE_ETAGS=$have_etags"
 append_config "DEBUG=$debug"
 
 #################################################

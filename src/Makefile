@@ -11,6 +11,14 @@ ifeq ($(BUILD_SHARED),yes)
   BUILD_RULES   += lib_shared
   INSTALL_RULES += install_shared
 endif
+ifeq ($(DEVELOPER),yes)
+  ifeq ($(HAVE_ETAGS),yes)
+    BUILD_RULES   += TAGS
+  endif
+  ifeq ($(HAVE_CTAGS),yes)
+    BUILD_RULES   += tags
+  endif
+endif
 
 LIBNAME = libdlna
 LIBNAME_SHARED = ${LIBNAME}.so
@@ -93,6 +101,14 @@ lib_shared: lib_shared_info_pre $(LOBJS) lib_shared_info_post
 	  $(LDFLAGS) $(EXTRALIBS) -o $(LIBNAME_VERSION)
 	$(LN) -sf $(LIBNAME_VERSION) $(LIBNAME_MAJOR)
 	$(LN) -sf $(LIBNAME_MAJOR) $(LIBNAME_SHARED)
+
+TAGS:
+	@rm -f $@; \
+	 ( find -name '*.[chS]' -print ) | xargs etags -a
+
+tags:
+	@rm -f $@; \
+	 ( find -name '*.[chS]' -print ) | xargs ctags -a;
 
 clean:
 	-$(RM) -f *.o *.lo *.a *.so*
