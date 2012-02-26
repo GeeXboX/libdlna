@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <ffmpeg/avformat.h>
+#include <libavformat/avformat.h>
 
 #include "containers.h"
 #include "profiles.h"
